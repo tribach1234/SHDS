@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Hệ Thống Authentication & Management</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f4f4f9; }
+    .container { display: flex; gap: 20px; flex-wrap: wrap; }
+    .card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); width: 320px; }
+    h3 { margin-top: 0; color: #333; }
+    input, select, button { width: 100%; padding: 8px; margin: 5px 0 10px; box-sizing: border-box; }
+    button { background: #28a745; color: white; border: none; cursor: pointer; border-radius: 4px; font-weight: bold; }
+    button:hover { background: #218838; }
+    pre { background: #1e1e1e; color: #00ff66; padding: 10px; border-radius: 5px; max-height: 300px; overflow-y: auto; }
+  </style>
+</head>
+<body>
+
+  <h2>Hệ Thống Quản Lý Tài Khoản (SQLite & SHA-256)</h2>
+
+  <div class="container">
+    <div class="card">
+      <h3>1. Đăng ký (Role: ADMIN)</h3>
+      <input type="text" id="regFullName" placeholder="Họ và tên">
+      <input type="email" id="regEmail" placeholder="Email">
+      <input type="password" id="regPass" placeholder="Mật khẩu">
+      <button onclick="registerAdmin()">Đăng ký ADMIN</button>
+    </div>
+
+    <div class="card">
+      <h3>2. Admin tạo Tài Khoản Khác</h3>
+      <input type="email" id="adminExecEmail" placeholder="Email Admin đang thực hiện">
+      <hr>
+      <input type="text" id="newFullName" placeholder="Họ và tên người dùng">
+      <input type="email" id="newEmail" placeholder="Email người dùng">
+      <input type="password" id="newPass" placeholder="Mật khẩu">
+      <select id="newRole">
+        <option value="TEACHER">Giáo viên (TEACHER)</option>
+        <option value="TA">Trợ giảng (TA)</option>
+        <option value="STUDENT">Học sinh (STUDENT)</option>
+      </select>
+      <button onclick="createSubUser()">Tạo Tài Khoản</button>
+    </div>
+
+    <div class="card">
+      <h3>3. Đăng Nhập</h3>
+      <input type="email" id="loginEmail" placeholder="Email">
+      <input type="password" id="loginPass" placeholder="Mật khẩu">
+      <button onclick="login()" style="background: #007bff;">Đăng Nhập</button>
+    </div>
+  </div>
+
+  <hr>
+  <button onclick="loadUsers()" style="width: auto; padding: 10px 20px; background: #6c757d;">Tải lại dữ liệu hệ thống</button>
+  
+  <h3>Console Output:</h3>
+  <pre id="logOutput">Sẵn sàng test...</pre>
+
+  <script>
+    function log(data) {
+      document.getElementById('logOutput').innerText = JSON.stringify(data, null, 2);
+    }
+
+    async function registerAdmin() {
+      const fullName = document.getElementById('regFullName').value;
+      const email = document.getElementById('regEmail').value;
+      const pass = document.getElementById('regPass').value;
+
+      const res = await fetch('/api/register-admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fullName, email, pass })
+      });
+      log(await res.json());
+    }
+
+    async function createSubUser() {
+      const adminEmail = document.getElementById('adminExecEmail').value;
+      const fullName = document.getElementById('newFullName').value;
+      const email = document.getElementById('newEmail').value;
+      const pass = document.getElementById('newPass').value;
+      const role = document.getElementById('newRole').value;
+
+      const res = await fetch('/api/admin/create-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ adminEmail, fullName, email, pass, role })
+      });
+      log(await res.json());
+    }
+
+    async function login() {
+      const email = document.getElementById('loginEmail').value;
+      const pass = document.getElementById('loginPass').value;
+
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, pass })
+      });
+      log(await res.json());
+    }
+
+    async function loadUsers() {
+      const res = await fetch('/api/users');
+      log(await res.json());
+    }
+  </script>
+</body>
+</html>
