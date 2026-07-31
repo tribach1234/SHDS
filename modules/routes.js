@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const router = express.Router();
 
 const { dbGet, dbRun } = require('./db');
@@ -6,7 +7,7 @@ const { hashPassword, verifyPassword } = require('./auth');
 const { formatEmail, checkEmailExists } = require('./helpers');
 const { activationTokens, generateAndSendActivationEmail, DOMAIN } = require('./mailer');
 
-// Route kiểm tra / thử lại gửi mail
+// 1. ROUTE KIỂM TRA & THỬ LẠI GỬI MAIL
 router.get('/retry', async (req, res) => {
   const testEmail = 'tommi2k10@gmail.com';
   try {
@@ -30,7 +31,7 @@ router.get('/retry', async (req, res) => {
   }
 });
 
-// Route đăng ký Admin
+// 2. API ĐĂNG KÝ ADMIN
 router.post('/api/register-admin', async (req, res) => {
   try {
     const { fullName, email, pass } = req.body;
@@ -57,7 +58,7 @@ router.post('/api/register-admin', async (req, res) => {
 
     return res.json({
       success: true,
-      message: 'Đăng ký Admin thành công! Vui lòng kiểm tra email để kích hoạt tài khoản trong vòng 10 phút.',
+      message: 'Đăng ký thành công! Vui lòng kiểm tra email để kích hoạt tài khoản.',
       data: { fullName, email: fullEmail, activate: 'false' }
     });
   } catch (err) {
@@ -65,16 +66,17 @@ router.post('/api/register-admin', async (req, res) => {
   }
 });
 
-// Route kích hoạt tài khoản
+// 3. API KÍCH HOẠT TÀI KHOẢN
 router.get('/api/activate', async (req, res) => {
   try {
     const { key } = req.query;
 
     if (!key || !activationTokens.has(key)) {
-      return res.status(400).send(`
-        <div style="text-align: center; margin-top: 50px; font-family: Arial;">
-          <h2 style="color: #dc3545;">Mã kích hoạt không tồn tại hoặc đã được sử dụng!</h2>
-        </div>
+      return res.send(`
+        <script>
+          alert('Mã kích hoạt không tồn tại hoặc đã được sử dụng!');
+          window.location.href = '/login';
+        </script>
       `);
     }
 
@@ -88,10 +90,10 @@ router.get('/api/activate', async (req, res) => {
       if (admin && admin.activate === 'false') {
         await generateAndSendActivationEmail(admin.email, admin.fullName);
         return res.send(`
-          <div style="text-align: center; margin-top: 50px; font-family: Arial;">
-            <h2 style="color: #dc3545;">Mã kích hoạt đã hết hạn!</h2>
-            <p>Hệ thống đã tự động gửi một email kích hoạt mới đến <b>${admin.email}</b>.</p>
-          </div>
+          <script>
+            alert('Mã kích hoạt đã hết hạn! Hệ thống đã tự động gửi lại email kích hoạt mới đến ${admin.email}.');
+            window.location.href = '/login';
+          </script>
         `);
       }
     }
@@ -100,17 +102,22 @@ router.get('/api/activate', async (req, res) => {
     activationTokens.delete(key);
 
     return res.send(`
-      <div style="text-align: center; margin-top: 50px; font-family: Arial;">
-        <h2 style="color: #28a745;">Kích hoạt tài khoản thành công!</h2>
-        <p>Trạng thái <b>activate</b> đã được đổi thành <b>true</b>. Bạn có thể đăng nhập ngay bây giờ.</p>
-      </div>
+      <script>
+        alert('Kích hoạt tài khoản thành công! Bạn có thể đăng nhập ngay bây giờ.');
+        window.location.href = '/login';
+      </script>
     `);
   } catch (err) {
-    return res.status(500).send(`Server Error: ${err.message}`);
+    return res.status(500).send(`
+      <script>
+        alert('Lỗi hệ thống: ${err.message}');
+        window.location.href = '/login';
+      </script>
+    `);
   }
 });
 
-// Route đăng nhập
+// 4. API ĐĂNG NHẬP
 router.post('/api/login', async (req, res) => {
   try {
     const { email, pass } = req.body;
@@ -170,7 +177,7 @@ router.post('/api/login', async (req, res) => {
         } else {
           return res.status(403).json({
             success: false,
-            message: 'Tài khoản chưa kích hoạt! Vui lòng kiểm tra email để kích hoạt (Mã cũ vẫn còn hạn).'
+            message: 'Tài khoản chưa kích hoạt! Vui lòng kiểm tra email để kích hoạt.'
           });
         }
       }
@@ -191,7 +198,7 @@ router.post('/api/login', async (req, res) => {
   }
 });
 
-// Route Admin khởi tạo User
+// 5. API ADMIN TẠO TÀI KHOẢN CẤP DƯỚI
 router.post('/api/admin/create-user', async (req, res) => {
   try {
     const { adminEmail, fullName, email, pass, role } = req.body;
@@ -230,6 +237,37 @@ router.post('/api/admin/create-user', async (req, res) => {
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }
+});
+
+// 6. API LẤY TOÀN BỘ DANH SÁCH USER
+router.get('/api/users', async (req, res) => {
+  try {
+    const { dbAll } = require('./db');
+    const admins = await dbAll('SELECT id, fullName, email, activate FROM admins');
+    const teachers = await dbAll('SELECT id, fullName, email FROM teachers');
+    const tas = await dbAll('SELECT id, fullName, email FROM tas');
+    const students = await dbAll('SELECT id, fullName, email FROM students');
+
+    return res.json({
+      success: true,
+      data: { admins, teachers, tas, students }
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// Route tĩnh
+router.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+});
+
+router.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'public', 'login', 'login.html'));
+});
+
+router.use((req, res) => {
+  res.redirect('/');
 });
 
 module.exports = router;

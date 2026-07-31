@@ -72,7 +72,7 @@ form {
 
 .input-box {
   position: relative;
-  margin: 30px 0;
+  margin: 20px 0;
 }
 
 .input-box input {
@@ -80,11 +80,12 @@ form {
   padding: 13px 50px 13px 20px;
   background: #eee;
   border-radius: 8px;
-  border: none;
+  border: 1px solid transparent;
   outline: none;
   font-size: 16px;
   color: #333;
   font-weight: 500;
+  transition: all 0.3s ease;
 }
 
 .input-box input::placeholder {
@@ -98,15 +99,31 @@ form {
   top: 50%;
   transform: translateY(-50%);
   font-size: 20px;
+  color: #555;
+  transition: color 0.3s ease;
+}
+
+/* Kiểu dáng icon mật khẩu */
+.input-box i.password-icon {
+  cursor: default;
+}
+
+.input-box i.password-icon.active {
+  cursor: pointer;
 }
 
 .forgot-link {
-  margin: -15px 0 15px;
+  margin: -10px 0 15px;
+  text-align: right;
 }
 
 .forgot-link a {
   font-size: 14.5px;
   color: #333;
+}
+
+.forgot-link a:hover {
+  text-decoration: underline;
 }
 
 .btn {
@@ -120,7 +137,7 @@ form {
   font-size: 16px;
   color: #fff;
   font-weight: 600;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .btn:hover {
@@ -212,13 +229,91 @@ form {
   margin-bottom: 20px;
 }
 
+/* Kiểu dáng nút trong Toggle Panel */
 .toggle-panel .btn {
   width: 160px;
   height: 46px;
   background: transparent;
   border: 2px solid #fff;
   box-shadow: none;
+  transition: all 0.3s ease;
 }
+
+/* Hiệu ứng hover đổi màu cho nút trong Toggle Panel */
+.toggle-panel .btn:hover {
+  background: #fff;
+  color: #418612;
+}
+
+/* --- TOAST NOTIFICATION --- */
+
+.toast-notification {
+  position: fixed;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+  z-index: 9999;
+  transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+  opacity: 0;
+  pointer-events: none;
+  text-align: center;
+  max-width: 90%;
+}
+
+.toast-notification.show {
+  top: 25px;
+  opacity: 1;
+}
+
+/* Trạng thái lỗi: Đỏ nhạt */
+.toast-notification.error {
+  background-color: #fde8e8;
+  color: #e53e3e;
+  border: 1px solid #f8b4b4;
+}
+
+/* Trạng thái thành công: Xanh nhạt */
+.toast-notification.success {
+  background-color: #def7ec;
+  color: #0e9f6e;
+  border: 1px solid #84e1bc;
+}
+
+/* --- TRẠNG THÁI Ô NHẬP LỖI --- */
+
+.input-box.input-error-box {
+  animation: shake 0.35s ease-in-out;
+}
+
+.input-box.input-error-box input {
+  background-color: #fde8e8 !important;
+  border: 1px solid #f8b4b4 !important;
+  color: #c81e1e !important;
+}
+
+.input-box.input-error-box i {
+  color: #e53e3e !important;
+}
+
+/* Hiệu ứng rung nhẹ cho toàn bộ ô chứa */
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  20%, 60% {
+    transform: translateX(-7px);
+  }
+  40%, 80% {
+    transform: translateX(7px);
+  }
+}
+
+/* --- RESPONSIVE DESIGN --- */
 
 @media screen and (max-width: 650px) {
   .container {
@@ -281,8 +376,4 @@ form {
   .toggle-panel h1 {
     font-size: 30px;
   }
-}
-
-.btn:hover {
-  background: #418612;
 }
