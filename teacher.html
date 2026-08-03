@@ -1,0 +1,2068 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#b9dda0" />
+  <title>EduGreen - Quản lý bài tập giáo viên</title>
+  <style>
+    :root {
+      --green-50: #f4faef;
+      --green-100: #e8f5dc;
+      --green-200: #d4ebc1;
+      --green-300: #b9dda0;
+      --green-400: #9dce7a;
+      --green-500: #7fba5a;
+      --green-600: #619843;
+      --green-700: #4d7837;
+      --ink: #23262d;
+      --ink-soft: #626872;
+      --muted: #f1f2f2;
+      --line: #e5e7e5;
+      --white: #ffffff;
+      --danger: #c65050;
+      --danger-bg: #fff1f1;
+      --warning: #ad7424;
+      --warning-bg: #fff8e8;
+      --success: #43815a;
+      --success-bg: #edf8f0;
+      --shadow: 0 20px 55px rgba(35, 38, 45, 0.14);
+      --shadow-soft: 0 10px 25px rgba(35, 38, 45, 0.08);
+      --radius-xl: 30px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background:
+        radial-gradient(circle at 8% 18%, rgba(121, 176, 76, 0.34), transparent 19rem),
+        radial-gradient(circle at 96% 12%, rgba(195, 225, 173, 0.58), transparent 20rem),
+        linear-gradient(135deg, #f4f0eb 0%, #ebe5df 48%, #f5f2ed 100%);
+      overflow-x: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      z-index: -1;
+      width: 320px;
+      height: 520px;
+      opacity: 0.22;
+      filter: blur(1px);
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at 50% 10%, #669944 0 14%, transparent 15%),
+        radial-gradient(ellipse at 35% 27%, #7da75e 0 12%, transparent 13%),
+        radial-gradient(ellipse at 63% 42%, #679a4a 0 13%, transparent 14%),
+        radial-gradient(ellipse at 38% 60%, #8eb56f 0 12%, transparent 13%),
+        radial-gradient(ellipse at 64% 78%, #75a557 0 13%, transparent 14%),
+        linear-gradient(90deg, transparent 48%, #789657 49% 51%, transparent 52%);
+      transform: rotate(-17deg);
+    }
+
+    body::before {
+      left: -90px;
+      top: -30px;
+    }
+
+    body::after {
+      right: -110px;
+      bottom: -110px;
+      transform: rotate(166deg);
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+    }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: 265px minmax(0, 1fr);
+      width: min(1440px, calc(100% - 48px));
+      min-height: calc(100vh - 48px);
+      margin: 24px auto;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    .sidebar {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+      padding: 28px 22px;
+      color: #fff;
+      background: var(--green-300);
+      border-radius: 0 110px 110px 0;
+      isolation: isolate;
+    }
+
+    .sidebar::after {
+      content: "";
+      position: absolute;
+      inset: auto -22px 42px auto;
+      z-index: -1;
+      width: 145px;
+      height: 145px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.13);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 4px 8px 26px;
+      font-size: 21px;
+      font-weight: 850;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 15px;
+      color: var(--green-700);
+      background: #fff;
+      box-shadow: 0 8px 20px rgba(71, 111, 52, 0.16);
+    }
+
+    .brand-mark svg {
+      width: 25px;
+      height: 25px;
+    }
+
+    .nav-label {
+      margin: 8px 12px 9px;
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
+    }
+
+    .nav {
+      display: grid;
+      gap: 7px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 48px;
+      padding: 0 14px;
+      color: rgba(255, 255, 255, 0.9);
+      text-decoration: none;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 700;
+      transition: 0.2s ease;
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      color: var(--green-700);
+      background: #fff;
+      box-shadow: 0 8px 18px rgba(72, 109, 52, 0.12);
+      transform: translateX(2px);
+    }
+
+    .nav-item svg {
+      width: 20px;
+      height: 20px;
+      flex: 0 0 auto;
+    }
+
+    .sidebar-spacer {
+      flex: 1;
+      min-height: 28px;
+    }
+
+    .sidebar-tip {
+      padding: 18px;
+      color: var(--green-700);
+      background: rgba(255, 255, 255, 0.82);
+      border-radius: 18px;
+      box-shadow: 0 12px 30px rgba(72, 109, 52, 0.12);
+    }
+
+    .sidebar-tip strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    .sidebar-tip span {
+      display: block;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .main {
+      min-width: 0;
+      padding: 28px 34px 36px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 25px;
+    }
+
+    .mobile-menu {
+      display: none;
+    }
+
+    .page-heading h1 {
+      margin: 0 0 6px;
+      font-size: clamp(25px, 3vw, 35px);
+      line-height: 1.1;
+      letter-spacing: -1.2px;
+    }
+
+    .page-heading p {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 14px;
+    }
+
+    .teacher-chip {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 8px 12px 8px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      box-shadow: 0 7px 18px rgba(35, 38, 45, 0.06);
+    }
+
+    .avatar {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      color: var(--green-700);
+      background: var(--green-100);
+      font-weight: 850;
+    }
+
+    .teacher-chip strong,
+    .teacher-chip span {
+      display: block;
+    }
+
+    .teacher-chip strong {
+      font-size: 13px;
+    }
+
+    .teacher-chip span {
+      margin-top: 2px;
+      color: var(--ink-soft);
+      font-size: 11px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .stat-card {
+      position: relative;
+      min-height: 122px;
+      overflow: hidden;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: #fff;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .stat-card.primary {
+      color: #fff;
+      border-color: transparent;
+      background: var(--green-300);
+    }
+
+    .stat-card::after {
+      content: "";
+      position: absolute;
+      right: -28px;
+      bottom: -34px;
+      width: 95px;
+      height: 95px;
+      border-radius: 50%;
+      background: var(--green-50);
+      opacity: 0.7;
+    }
+
+    .stat-card.primary::after {
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+    .stat-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .stat-icon {
+      display: grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      color: var(--green-700);
+      background: var(--green-100);
+    }
+
+    .stat-card.primary .stat-icon {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+    .stat-icon svg {
+      width: 19px;
+      height: 19px;
+    }
+
+    .stat-value {
+      margin-top: 13px;
+      font-size: 28px;
+      font-weight: 850;
+      letter-spacing: -1px;
+    }
+
+    .stat-title {
+      margin-top: 2px;
+      color: var(--ink-soft);
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .stat-card.primary .stat-title {
+      color: rgba(255, 255, 255, 0.86);
+    }
+
+    .workspace {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      width: 18px;
+      height: 18px;
+      color: #7b8189;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    .control {
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      color: var(--ink);
+      background: #f7f8f7;
+      outline: none;
+      transition: 0.2s ease;
+    }
+
+    .control:hover {
+      border-color: #cad5c4;
+    }
+
+    .control:focus {
+      border-color: var(--green-500);
+      box-shadow: 0 0 0 4px rgba(127, 186, 90, 0.14);
+      background: #fff;
+    }
+
+    input.control {
+      width: 100%;
+      padding: 0 14px 0 42px;
+    }
+
+    select.control {
+      min-width: 145px;
+      padding: 0 34px 0 12px;
+      cursor: pointer;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 44px;
+      padding: 0 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 800;
+      transition: 0.2s ease;
+    }
+
+    .btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary {
+      color: #fff;
+      background: var(--green-500);
+      box-shadow: 0 8px 18px rgba(97, 152, 67, 0.22);
+    }
+
+    .btn-primary:hover {
+      background: var(--green-600);
+    }
+
+    .btn-secondary {
+      color: var(--ink);
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .btn-danger {
+      color: #fff;
+      background: var(--danger);
+    }
+
+    .btn-ghost {
+      color: var(--ink-soft);
+      background: transparent;
+    }
+
+    .list-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 18px 20px 8px;
+    }
+
+    .list-header h2 {
+      margin: 0;
+      font-size: 17px;
+    }
+
+    .result-count {
+      color: var(--ink-soft);
+      font-size: 12px;
+    }
+
+    .assignment-list {
+      display: grid;
+      gap: 12px;
+      padding: 10px 16px 18px;
+    }
+
+    .assignment-card {
+      display: grid;
+      grid-template-columns: 54px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 15px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      background: #fff;
+      transition: 0.2s ease;
+    }
+
+    .assignment-card:hover {
+      border-color: #cbdcc0;
+      box-shadow: 0 10px 24px rgba(35, 38, 45, 0.07);
+      transform: translateY(-1px);
+    }
+
+    .assignment-card.overdue {
+      border-left: 4px solid var(--danger);
+    }
+
+    .assignment-icon {
+      display: grid;
+      place-items: center;
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      color: var(--green-700);
+      background: var(--green-100);
+    }
+
+    .assignment-icon svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .assignment-main {
+      min-width: 0;
+    }
+
+    .assignment-title-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 7px;
+    }
+
+    .assignment-title {
+      overflow: hidden;
+      margin: 0;
+      font-size: 15px;
+      font-weight: 850;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 0 9px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .badge-published {
+      color: var(--success);
+      background: var(--success-bg);
+    }
+
+    .badge-draft {
+      color: var(--warning);
+      background: var(--warning-bg);
+    }
+
+    .badge-completed {
+      color: #656b72;
+      background: #eef0f1;
+    }
+
+    .badge-overdue {
+      color: var(--danger);
+      background: var(--danger-bg);
+    }
+
+    .assignment-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      color: var(--ink-soft);
+      font-size: 12px;
+    }
+
+    .meta-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .meta-item svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .assignment-desc {
+      display: -webkit-box;
+      overflow: hidden;
+      margin: 9px 0 0;
+      color: #747981;
+      font-size: 12px;
+      line-height: 1.5;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 1;
+    }
+
+    .card-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 11px;
+      color: var(--ink-soft);
+      background: #f5f6f5;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .icon-btn:hover {
+      color: var(--green-700);
+      background: var(--green-100);
+      transform: translateY(-1px);
+    }
+
+    .icon-btn.danger:hover {
+      color: var(--danger);
+      background: var(--danger-bg);
+    }
+
+    .icon-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .empty-state {
+      display: grid;
+      place-items: center;
+      min-height: 330px;
+      padding: 44px 20px;
+      text-align: center;
+    }
+
+    .empty-illustration {
+      display: grid;
+      place-items: center;
+      width: 92px;
+      height: 92px;
+      margin-bottom: 18px;
+      border-radius: 30px 30px 55px 30px;
+      color: var(--green-700);
+      background: var(--green-100);
+    }
+
+    .empty-illustration svg {
+      width: 43px;
+      height: 43px;
+    }
+
+    .empty-state h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    .empty-state p {
+      max-width: 390px;
+      margin: 0 0 20px;
+      color: var(--ink-soft);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+      background: rgba(27, 31, 35, 0.42);
+      backdrop-filter: blur(7px);
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal {
+      width: min(720px, 100%);
+      max-height: min(90vh, 850px);
+      overflow: auto;
+      border-radius: 26px;
+      background: #fff;
+      box-shadow: 0 28px 85px rgba(25, 28, 31, 0.26);
+      animation: modal-in 0.22s ease;
+    }
+
+    .confirm-modal {
+      width: min(430px, 100%);
+    }
+
+    @keyframes modal-in {
+      from { opacity: 0; transform: translateY(14px) scale(0.985); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 22px 24px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .modal-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .modal-title-icon {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      color: var(--green-700);
+      background: var(--green-100);
+    }
+
+    .modal-title-icon svg {
+      width: 21px;
+      height: 21px;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .modal-header p {
+      margin: 3px 0 0;
+      color: var(--ink-soft);
+      font-size: 12px;
+    }
+
+    .close-btn {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      color: var(--ink-soft);
+      background: #f4f5f4;
+      cursor: pointer;
+    }
+
+    .close-btn:hover {
+      color: var(--ink);
+      background: #eceeec;
+    }
+
+    .close-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .modal-body {
+      padding: 22px 24px 8px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 17px;
+    }
+
+    .field {
+      min-width: 0;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    .field label {
+      display: inline-block;
+      margin-bottom: 7px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .required {
+      color: var(--danger);
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      color: var(--ink);
+      background: #f7f8f7;
+      outline: none;
+      transition: 0.2s ease;
+    }
+
+    .field input,
+    .field select {
+      height: 46px;
+      padding: 0 13px;
+    }
+
+    .field textarea {
+      min-height: 105px;
+      padding: 12px 13px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: var(--green-500);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(127, 186, 90, 0.14);
+    }
+
+    .field-error {
+      display: none;
+      margin-top: 6px;
+      color: var(--danger);
+      font-size: 11px;
+    }
+
+    .field.invalid .field-error {
+      display: block;
+    }
+
+    .field.invalid input,
+    .field.invalid select,
+    .field.invalid textarea {
+      border-color: var(--danger);
+      background: var(--danger-bg);
+    }
+
+    .helper {
+      margin-top: 6px;
+      color: #8a8f96;
+      font-size: 10px;
+      line-height: 1.45;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 18px 24px 24px;
+    }
+
+    .confirm-content {
+      padding: 26px 25px 10px;
+      text-align: center;
+    }
+
+    .confirm-icon {
+      display: grid;
+      place-items: center;
+      width: 65px;
+      height: 65px;
+      margin: 0 auto 16px;
+      border-radius: 21px;
+      color: var(--danger);
+      background: var(--danger-bg);
+    }
+
+    .confirm-icon svg {
+      width: 30px;
+      height: 30px;
+    }
+
+    .confirm-content h2 {
+      margin: 0 0 8px;
+      font-size: 20px;
+    }
+
+    .confirm-content p {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .toast-region {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 1200;
+      display: grid;
+      gap: 10px;
+      width: min(370px, calc(100% - 44px));
+      pointer-events: none;
+    }
+
+    .toast {
+      display: flex;
+      align-items: flex-start;
+      gap: 11px;
+      padding: 14px 15px;
+      border: 1px solid #d9ead5;
+      border-radius: 15px;
+      color: var(--ink);
+      background: #fff;
+      box-shadow: 0 14px 35px rgba(35, 38, 45, 0.16);
+      animation: toast-in 0.25s ease;
+      pointer-events: auto;
+    }
+
+    .toast.error {
+      border-color: #f0cece;
+    }
+
+    .toast-icon {
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      width: 30px;
+      height: 30px;
+      border-radius: 10px;
+      color: var(--success);
+      background: var(--success-bg);
+    }
+
+    .toast.error .toast-icon {
+      color: var(--danger);
+      background: var(--danger-bg);
+    }
+
+    .toast-icon svg {
+      width: 17px;
+      height: 17px;
+    }
+
+    .toast strong {
+      display: block;
+      margin-bottom: 2px;
+      font-size: 12px;
+    }
+
+    .toast span {
+      display: block;
+      color: var(--ink-soft);
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    @keyframes toast-in {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .sidebar-overlay {
+      display: none;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 1120px) {
+      .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .toolbar {
+        flex-wrap: wrap;
+      }
+
+      .search-wrap {
+        flex: 1 1 100%;
+      }
+
+      .toolbar select.control {
+        flex: 1;
+      }
+    }
+
+    @media (max-width: 820px) {
+      body {
+        background: #f5f2ed;
+      }
+
+      .app-shell {
+        display: block;
+        width: 100%;
+        min-height: 100vh;
+        margin: 0;
+        border: 0;
+        border-radius: 0;
+      }
+
+      .sidebar {
+        position: fixed;
+        inset: 0 auto 0 0;
+        z-index: 1100;
+        width: 275px;
+        border-radius: 0 80px 80px 0;
+        transform: translateX(-105%);
+        transition: transform 0.25s ease;
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .sidebar-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 1090;
+        display: none;
+        background: rgba(25, 28, 31, 0.35);
+        backdrop-filter: blur(4px);
+      }
+
+      .sidebar-overlay.open {
+        display: block;
+      }
+
+      .main {
+        padding: 21px 18px 28px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+      }
+
+      .mobile-menu {
+        display: grid;
+        place-items: center;
+        flex: 0 0 auto;
+        width: 42px;
+        height: 42px;
+        border-radius: 13px;
+        color: var(--green-700);
+        background: var(--green-100);
+        cursor: pointer;
+      }
+
+      .mobile-menu svg {
+        width: 21px;
+        height: 21px;
+      }
+
+      .heading-group {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .teacher-chip .teacher-text {
+        display: none;
+      }
+
+      .teacher-chip {
+        padding: 5px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .stat-card {
+        min-height: 112px;
+        padding: 14px;
+      }
+
+      .toolbar select.control {
+        min-width: calc(50% - 5px);
+      }
+
+      .toolbar .btn-primary {
+        width: 100%;
+      }
+
+      .assignment-card {
+        grid-template-columns: 44px minmax(0, 1fr);
+        gap: 12px;
+        padding: 14px;
+      }
+
+      .assignment-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+      }
+
+      .card-actions {
+        grid-column: 1 / -1;
+        justify-content: flex-end;
+        padding-top: 3px;
+        border-top: 1px dashed var(--line);
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .field.full {
+        grid-column: auto;
+      }
+
+      .modal-backdrop {
+        align-items: flex-end;
+        padding: 0;
+      }
+
+      .modal {
+        width: 100%;
+        max-height: 94vh;
+        border-radius: 26px 26px 0 0;
+      }
+
+      .modal-header,
+      .modal-body,
+      .modal-footer {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .page-heading p {
+        display: none;
+      }
+
+      .stats {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .stat-value {
+        font-size: 24px;
+      }
+
+      .toolbar select.control {
+        width: 100%;
+        min-width: 100%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Bộ biểu tượng SVG dùng lại trong toàn trang -->
+  <svg aria-hidden="true" width="0" height="0" style="position:absolute">
+    <symbol id="i-book" viewBox="0 0 24 24">
+      <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.8A2.8 2.8 0 0 0 4 20.8V5.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20v3H6.5A2.5 2.5 0 0 1 4 18.5M8 7h8M8 11h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-home" viewBox="0 0 24 24">
+      <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V10Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-task" viewBox="0 0 24 24">
+      <rect x="4" y="3" width="16" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/>
+      <path d="m8 9 1.5 1.5L12 8M14 9h3M8 15h9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-users" viewBox="0 0 24 24">
+      <circle cx="9" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/>
+      <path d="M3.5 20a5.5 5.5 0 0 1 11 0M16 5.3a3 3 0 0 1 0 5.4M16.5 14.7A5.5 5.5 0 0 1 20.5 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24">
+      <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/>
+      <path d="M19.4 15a1.8 1.8 0 0 0 .36 2l.06.06-2.12 2.12-.06-.06a1.8 1.8 0 0 0-2-.36 1.8 1.8 0 0 0-1.1 1.65V20.5h-3v-.09A1.8 1.8 0 0 0 10.4 18.8a1.8 1.8 0 0 0-2 .36l-.06.06-2.12-2.12.06-.06a1.8 1.8 0 0 0 .36-2A1.8 1.8 0 0 0 5 13.9H4.9v-3H5A1.8 1.8 0 0 0 6.6 9.8a1.8 1.8 0 0 0-.36-2l-.06-.06 2.12-2.12.06.06a1.8 1.8 0 0 0 2 .36A1.8 1.8 0 0 0 11.5 4.4V4.3h3v.1a1.8 1.8 0 0 0 1.1 1.64 1.8 1.8 0 0 0 2-.36l.06-.06 2.12 2.12-.06.06a1.8 1.8 0 0 0-.36 2A1.8 1.8 0 0 0 21 10.9h.1v3H21a1.8 1.8 0 0 0-1.6 1.1Z" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-search" viewBox="0 0 24 24">
+      <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/>
+      <path d="m20 20-4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24">
+      <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24">
+      <path d="m14 5 5 5M4 20l1.3-5.3L16.6 3.4a2 2 0 0 1 2.8 0l1.2 1.2a2 2 0 0 1 0 2.8L9.3 18.7 4 20Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24">
+      <path d="M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14M10 11v6M14 11v6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24">
+      <rect x="8" y="8" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/>
+      <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" fill="none" stroke="currentColor" stroke-width="1.8"/>
+    </symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24">
+      <rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/>
+      <path d="M8 3v4M16 3v4M3 10h18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-class" viewBox="0 0 24 24">
+      <path d="M3 5h18v14H3zM7 9h5M7 13h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-star" viewBox="0 0 24 24">
+      <path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/>
+      <path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-check" viewBox="0 0 24 24">
+      <path d="m5 12 4 4L19 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-close" viewBox="0 0 24 24">
+      <path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24">
+      <path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24">
+      <path d="M12 3 2.7 20h18.6L12 3Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M12 9v5M12 17.3v.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-link" viewBox="0 0 24 24">
+      <path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.2 1.2M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.2-1.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </symbol>
+  </svg>
+
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Điều hướng chính">
+      <div class="brand">
+        <div class="brand-mark"><svg><use href="#i-book"></use></svg></div>
+        <span>EduGreen</span>
+      </div>
+
+      <div class="nav-label">Không gian giáo viên</div>
+      <nav class="nav">
+        <a class="nav-item" href="#" onclick="return false;">
+          <svg><use href="#i-home"></use></svg>
+          <span>Tổng quan</span>
+        </a>
+        <a class="nav-item active" href="#" onclick="return false;" aria-current="page">
+          <svg><use href="#i-task"></use></svg>
+          <span>Quản lý bài tập</span>
+        </a>
+        <a class="nav-item" href="#" onclick="return false;">
+          <svg><use href="#i-users"></use></svg>
+          <span>Lớp học</span>
+        </a>
+        <a class="nav-item" href="#" onclick="return false;">
+          <svg><use href="#i-chart"></use></svg>
+          <span>Kết quả học tập</span>
+        </a>
+        <a class="nav-item" href="#" onclick="return false;">
+          <svg><use href="#i-settings"></use></svg>
+          <span>Cài đặt</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-spacer"></div>
+      <div class="sidebar-tip">
+        <strong>💡 Mẹo nhỏ</strong>
+        <span>Dữ liệu đang được lưu ngay trên trình duyệt bằng Local Storage, phù hợp để thử nghiệm giao diện.</span>
+      </div>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="heading-group">
+          <button class="mobile-menu" id="mobileMenuBtn" aria-label="Mở menu">
+            <svg><use href="#i-menu"></use></svg>
+          </button>
+          <div class="page-heading">
+            <h1>Quản lý bài tập</h1>
+            <p>Tạo, chỉnh sửa và theo dõi bài tập cho các lớp của bạn.</p>
+          </div>
+        </div>
+
+        <div class="teacher-chip" aria-label="Tài khoản giáo viên">
+          <div class="avatar">GV</div>
+          <div class="teacher-text">
+            <strong>Giáo viên</strong>
+            <span>Teacher Workspace</span>
+          </div>
+        </div>
+      </header>
+
+      <section class="stats" aria-label="Thống kê bài tập">
+        <article class="stat-card primary">
+          <div class="stat-top">
+            <span class="stat-icon"><svg><use href="#i-task"></use></svg></span>
+          </div>
+          <div class="stat-value" id="statTotal">0</div>
+          <div class="stat-title">Tổng số bài tập</div>
+        </article>
+        <article class="stat-card">
+          <div class="stat-top">
+            <span class="stat-icon"><svg><use href="#i-clock"></use></svg></span>
+          </div>
+          <div class="stat-value" id="statUpcoming">0</div>
+          <div class="stat-title">Sắp đến hạn</div>
+        </article>
+        <article class="stat-card">
+          <div class="stat-top">
+            <span class="stat-icon"><svg><use href="#i-alert"></use></svg></span>
+          </div>
+          <div class="stat-value" id="statOverdue">0</div>
+          <div class="stat-title">Đã quá hạn</div>
+        </article>
+        <article class="stat-card">
+          <div class="stat-top">
+            <span class="stat-icon"><svg><use href="#i-check"></use></svg></span>
+          </div>
+          <div class="stat-value" id="statCompleted">0</div>
+          <div class="stat-title">Đã hoàn thành</div>
+        </article>
+      </section>
+
+      <section class="workspace">
+        <div class="toolbar">
+          <div class="search-wrap">
+            <svg><use href="#i-search"></use></svg>
+            <input
+              class="control"
+              id="searchInput"
+              type="search"
+              placeholder="Tìm theo tên bài tập, lớp hoặc mô tả..."
+              autocomplete="off"
+              aria-label="Tìm kiếm bài tập"
+            />
+          </div>
+
+          <select class="control" id="classFilter" aria-label="Lọc theo lớp">
+            <option value="all">Tất cả lớp</option>
+          </select>
+
+          <select class="control" id="statusFilter" aria-label="Lọc theo trạng thái">
+            <option value="all">Tất cả trạng thái</option>
+            <option value="published">Đã giao</option>
+            <option value="draft">Bản nháp</option>
+            <option value="completed">Hoàn thành</option>
+            <option value="overdue">Quá hạn</option>
+          </select>
+
+          <button class="btn btn-primary" id="addAssignmentBtn">
+            <svg><use href="#i-plus"></use></svg>
+            <span>Giao bài mới</span>
+          </button>
+        </div>
+
+        <div class="list-header">
+          <h2>Danh sách bài tập</h2>
+          <span class="result-count" id="resultCount">0 bài tập</span>
+        </div>
+
+        <div class="assignment-list" id="assignmentList"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal tạo / chỉnh sửa bài tập -->
+  <div class="modal-backdrop" id="assignmentModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-title-icon"><svg><use href="#i-task"></use></svg></div>
+          <div>
+            <h2 id="modalTitle">Giao bài tập mới</h2>
+            <p id="modalSubtitle">Điền đầy đủ thông tin trước khi lưu.</p>
+          </div>
+        </div>
+        <button class="close-btn" type="button" data-close-modal aria-label="Đóng">
+          <svg><use href="#i-close"></use></svg>
+        </button>
+      </div>
+
+      <form id="assignmentForm" novalidate>
+        <div class="modal-body">
+          <input type="hidden" id="assignmentId" />
+
+          <div class="form-grid">
+            <div class="field full" id="fieldTitle">
+              <label for="title">Tên bài tập <span class="required">*</span></label>
+              <input id="title" type="text" maxlength="120" placeholder="Ví dụ: Bài tập chương 2 - Hàm số" />
+              <span class="field-error">Vui lòng nhập tên bài tập.</span>
+            </div>
+
+            <div class="field" id="fieldClassName">
+              <label for="className">Lớp học <span class="required">*</span></label>
+              <input id="className" type="text" maxlength="60" placeholder="Ví dụ: 10A1" list="classSuggestions" />
+              <datalist id="classSuggestions">
+                <option value="10A1"></option>
+                <option value="10A2"></option>
+                <option value="11A1"></option>
+                <option value="12A1"></option>
+              </datalist>
+              <span class="field-error">Vui lòng nhập lớp học.</span>
+            </div>
+
+            <div class="field" id="fieldPoints">
+              <label for="points">Điểm tối đa <span class="required">*</span></label>
+              <input id="points" type="number" min="1" max="1000" step="1" value="10" />
+              <span class="field-error">Điểm phải từ 1 đến 1000.</span>
+            </div>
+
+            <div class="field" id="fieldDueDate">
+              <label for="dueDate">Ngày đến hạn <span class="required">*</span></label>
+              <input id="dueDate" type="date" />
+              <span class="field-error">Vui lòng chọn ngày đến hạn.</span>
+            </div>
+
+            <div class="field" id="fieldDueTime">
+              <label for="dueTime">Giờ đến hạn <span class="required">*</span></label>
+              <input id="dueTime" type="time" value="23:59" />
+              <span class="field-error">Vui lòng chọn giờ đến hạn.</span>
+            </div>
+
+            <div class="field">
+              <label for="status">Trạng thái</label>
+              <select id="status">
+                <option value="published">Giao ngay</option>
+                <option value="draft">Lưu bản nháp</option>
+                <option value="completed">Đánh dấu hoàn thành</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="materialUrl">Liên kết tài liệu</label>
+              <input id="materialUrl" type="url" placeholder="https://..." />
+              <div class="helper">Có thể để trống. Liên kết sẽ được mở trong tab mới.</div>
+            </div>
+
+            <div class="field full">
+              <label for="description">Mô tả / yêu cầu bài tập</label>
+              <textarea id="description" maxlength="1000" placeholder="Nhập hướng dẫn, nội dung cần hoàn thành, cách nộp bài..."></textarea>
+              <div class="helper"><span id="descriptionCount">0</span>/1000 ký tự</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-close-modal>Hủy</button>
+          <button class="btn btn-primary" type="submit">
+            <svg><use href="#i-check"></use></svg>
+            <span id="saveButtonText">Lưu bài tập</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal xác nhận xóa -->
+  <div class="modal-backdrop" id="deleteModal" role="dialog" aria-modal="true" aria-labelledby="deleteTitle">
+    <div class="modal confirm-modal">
+      <div class="confirm-content">
+        <div class="confirm-icon"><svg><use href="#i-trash"></use></svg></div>
+        <h2 id="deleteTitle">Xóa bài tập?</h2>
+        <p>Bài tập <strong id="deleteAssignmentName"></strong> sẽ bị xóa khỏi trình duyệt này. Thao tác không thể hoàn tác.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" id="cancelDeleteBtn">Giữ lại</button>
+        <button class="btn btn-danger" type="button" id="confirmDeleteBtn">
+          <svg><use href="#i-trash"></use></svg>
+          Xóa bài tập
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const STORAGE_KEY = "edugreen.teacher.assignments.v1";
+
+      const $ = (selector, root = document) => root.querySelector(selector);
+      const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+
+      const elements = {
+        list: $("#assignmentList"),
+        resultCount: $("#resultCount"),
+        search: $("#searchInput"),
+        classFilter: $("#classFilter"),
+        statusFilter: $("#statusFilter"),
+        addButton: $("#addAssignmentBtn"),
+        assignmentModal: $("#assignmentModal"),
+        deleteModal: $("#deleteModal"),
+        form: $("#assignmentForm"),
+        modalTitle: $("#modalTitle"),
+        modalSubtitle: $("#modalSubtitle"),
+        saveButtonText: $("#saveButtonText"),
+        descriptionCount: $("#descriptionCount"),
+        toastRegion: $("#toastRegion"),
+        deleteAssignmentName: $("#deleteAssignmentName"),
+        cancelDeleteBtn: $("#cancelDeleteBtn"),
+        confirmDeleteBtn: $("#confirmDeleteBtn"),
+        sidebar: $("#sidebar"),
+        sidebarOverlay: $("#sidebarOverlay"),
+        mobileMenuBtn: $("#mobileMenuBtn"),
+        stats: {
+          total: $("#statTotal"),
+          upcoming: $("#statUpcoming"),
+          overdue: $("#statOverdue"),
+          completed: $("#statCompleted")
+        },
+        fields: {
+          id: $("#assignmentId"),
+          title: $("#title"),
+          className: $("#className"),
+          points: $("#points"),
+          dueDate: $("#dueDate"),
+          dueTime: $("#dueTime"),
+          status: $("#status"),
+          materialUrl: $("#materialUrl"),
+          description: $("#description")
+        }
+      };
+
+      let assignments = loadAssignments();
+      let pendingDeleteId = null;
+      let lastFocusedElement = null;
+
+      function toLocalDateInput(date) {
+        const offset = date.getTimezoneOffset();
+        return new Date(date.getTime() - offset * 60000).toISOString().slice(0, 10);
+      }
+
+      function addDays(baseDate, days) {
+        const date = new Date(baseDate);
+        date.setDate(date.getDate() + days);
+        return date;
+      }
+
+      function seedAssignments() {
+        const now = new Date();
+        return [
+          {
+            id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + 1),
+            title: "Ôn tập chương 1 - Đại số",
+            className: "10A1",
+            points: 10,
+            dueDate: toLocalDateInput(addDays(now, 2)),
+            dueTime: "21:00",
+            status: "published",
+            materialUrl: "",
+            description: "Hoàn thành các câu 1 đến 12 trong phiếu bài tập và trình bày rõ các bước giải.",
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          {
+            id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + 2),
+            title: "Thuyết trình: Bảo vệ môi trường",
+            className: "11A1",
+            points: 20,
+            dueDate: toLocalDateInput(addDays(now, 6)),
+            dueTime: "17:30",
+            status: "published",
+            materialUrl: "https://example.com/tai-lieu",
+            description: "Làm việc theo nhóm 4-5 học sinh, chuẩn bị tối đa 10 slide và thuyết trình trong 7 phút.",
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          {
+            id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + 3),
+            title: "Phiếu luyện tập cuối tuần",
+            className: "10A2",
+            points: 10,
+            dueDate: toLocalDateInput(addDays(now, 9)),
+            dueTime: "23:59",
+            status: "draft",
+            materialUrl: "",
+            description: "Bản nháp, chưa gửi tới học sinh.",
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          }
+        ];
+      }
+
+      function loadAssignments() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) {
+            const initial = seedAssignments();
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
+            return initial;
+          }
+          const parsed = JSON.parse(raw);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (error) {
+          console.error("Không thể đọc Local Storage:", error);
+          return [];
+        }
+      }
+
+      function saveAssignments() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(assignments));
+        } catch (error) {
+          showToast("Không thể lưu dữ liệu", "Trình duyệt có thể đang chặn Local Storage.", "error");
+        }
+      }
+
+      function assignmentDateTime(item) {
+        return new Date(`${item.dueDate}T${item.dueTime || "23:59"}:00`);
+      }
+
+      function isOverdue(item) {
+        return item.status !== "completed" &&
+          item.status !== "draft" &&
+          assignmentDateTime(item).getTime() < Date.now();
+      }
+
+      function isUpcoming(item) {
+        if (item.status !== "published" || isOverdue(item)) return false;
+        const diff = assignmentDateTime(item).getTime() - Date.now();
+        return diff >= 0 && diff <= 7 * 24 * 60 * 60 * 1000;
+      }
+
+      function formatDate(dateString, timeString) {
+        const date = new Date(`${dateString}T${timeString || "23:59"}:00`);
+        return new Intl.DateTimeFormat("vi-VN", {
+          weekday: "short",
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit"
+        }).format(date);
+      }
+
+      function escapeHtml(value = "") {
+        return String(value)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function getStatusInfo(item) {
+        if (isOverdue(item)) return { text: "Quá hạn", className: "badge-overdue" };
+        if (item.status === "draft") return { text: "Bản nháp", className: "badge-draft" };
+        if (item.status === "completed") return { text: "Hoàn thành", className: "badge-completed" };
+        return { text: "Đã giao", className: "badge-published" };
+      }
+
+      function render() {
+        updateClassFilter();
+        updateStats();
+
+        const keyword = elements.search.value.trim().toLocaleLowerCase("vi");
+        const classValue = elements.classFilter.value;
+        const statusValue = elements.statusFilter.value;
+
+        const filtered = assignments
+          .filter(item => {
+            const haystack = `${item.title} ${item.className} ${item.description || ""}`.toLocaleLowerCase("vi");
+            const matchKeyword = !keyword || haystack.includes(keyword);
+            const matchClass = classValue === "all" || item.className === classValue;
+            const effectiveStatus = isOverdue(item) ? "overdue" : item.status;
+            const matchStatus = statusValue === "all" || effectiveStatus === statusValue;
+            return matchKeyword && matchClass && matchStatus;
+          })
+          .sort((a, b) => assignmentDateTime(a) - assignmentDateTime(b));
+
+        elements.resultCount.textContent = `${filtered.length} bài tập`;
+
+        if (!filtered.length) {
+          elements.list.innerHTML = `
+            <div class="empty-state">
+              <div>
+                <div class="empty-illustration"><svg><use href="#i-task"></use></svg></div>
+                <h3>Chưa có bài tập phù hợp</h3>
+                <p>Thử thay đổi từ khóa hoặc bộ lọc. Bạn cũng có thể tạo một bài tập mới ngay bây giờ.</p>
+                <button class="btn btn-primary" type="button" data-empty-add>
+                  <svg><use href="#i-plus"></use></svg>
+                  Giao bài mới
+                </button>
+              </div>
+            </div>
+          `;
+          $("[data-empty-add]", elements.list)?.addEventListener("click", openCreateModal);
+          return;
+        }
+
+        elements.list.innerHTML = filtered.map(item => {
+          const status = getStatusInfo(item);
+          const overdueClass = isOverdue(item) ? "overdue" : "";
+          const safeUrl = item.materialUrl && /^https?:\/\//i.test(item.materialUrl) ? item.materialUrl : "";
+
+          return `
+            <article class="assignment-card ${overdueClass}" data-id="${escapeHtml(item.id)}">
+              <div class="assignment-icon"><svg><use href="#i-task"></use></svg></div>
+              <div class="assignment-main">
+                <div class="assignment-title-row">
+                  <h3 class="assignment-title" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</h3>
+                  <span class="badge ${status.className}">${status.text}</span>
+                </div>
+                <div class="assignment-meta">
+                  <span class="meta-item">
+                    <svg><use href="#i-class"></use></svg>
+                    ${escapeHtml(item.className)}
+                  </span>
+                  <span class="meta-item">
+                    <svg><use href="#i-calendar"></use></svg>
+                    ${escapeHtml(formatDate(item.dueDate, item.dueTime))}
+                  </span>
+                  <span class="meta-item">
+                    <svg><use href="#i-star"></use></svg>
+                    ${Number(item.points)} điểm
+                  </span>
+                  ${safeUrl ? `
+                    <a class="meta-item" href="${escapeHtml(safeUrl)}" target="_blank" rel="noopener noreferrer" style="color:var(--green-700);font-weight:700;text-decoration:none">
+                      <svg><use href="#i-link"></use></svg>
+                      Tài liệu
+                    </a>` : ""}
+                </div>
+                ${item.description ? `<p class="assignment-desc">${escapeHtml(item.description)}</p>` : ""}
+              </div>
+              <div class="card-actions" aria-label="Thao tác với ${escapeHtml(item.title)}">
+                <button class="icon-btn" type="button" data-action="duplicate" title="Nhân bản" aria-label="Nhân bản bài tập">
+                  <svg><use href="#i-copy"></use></svg>
+                </button>
+                <button class="icon-btn" type="button" data-action="edit" title="Chỉnh sửa" aria-label="Chỉnh sửa bài tập">
+                  <svg><use href="#i-edit"></use></svg>
+                </button>
+                <button class="icon-btn danger" type="button" data-action="delete" title="Xóa" aria-label="Xóa bài tập">
+                  <svg><use href="#i-trash"></use></svg>
+                </button>
+              </div>
+            </article>
+          `;
+        }).join("");
+      }
+
+      function updateStats() {
+        elements.stats.total.textContent = assignments.length;
+        elements.stats.upcoming.textContent = assignments.filter(isUpcoming).length;
+        elements.stats.overdue.textContent = assignments.filter(isOverdue).length;
+        elements.stats.completed.textContent = assignments.filter(item => item.status === "completed").length;
+      }
+
+      function updateClassFilter() {
+        const currentValue = elements.classFilter.value || "all";
+        const classes = [...new Set(assignments.map(item => item.className).filter(Boolean))]
+          .sort((a, b) => a.localeCompare(b, "vi"));
+
+        elements.classFilter.innerHTML = `
+          <option value="all">Tất cả lớp</option>
+          ${classes.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join("")}
+        `;
+
+        elements.classFilter.value = classes.includes(currentValue) ? currentValue : "all";
+      }
+
+      function openModal(modal) {
+        lastFocusedElement = document.activeElement;
+        modal.classList.add("open");
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeModal(modal) {
+        modal.classList.remove("open");
+        if (!$$(".modal-backdrop.open").length) {
+          document.body.style.overflow = "";
+        }
+        lastFocusedElement?.focus?.();
+      }
+
+      function openCreateModal() {
+        clearValidation();
+        elements.form.reset();
+        elements.fields.id.value = "";
+        elements.fields.points.value = "10";
+        elements.fields.dueTime.value = "23:59";
+        elements.fields.status.value = "published";
+        elements.fields.dueDate.value = toLocalDateInput(addDays(new Date(), 7));
+        elements.modalTitle.textContent = "Giao bài tập mới";
+        elements.modalSubtitle.textContent = "Điền đầy đủ thông tin trước khi lưu.";
+        elements.saveButtonText.textContent = "Lưu bài tập";
+        elements.descriptionCount.textContent = "0";
+        openModal(elements.assignmentModal);
+        setTimeout(() => elements.fields.title.focus(), 50);
+      }
+
+      function openEditModal(id) {
+        const item = assignments.find(assignment => assignment.id === id);
+        if (!item) return;
+
+        clearValidation();
+        elements.fields.id.value = item.id;
+        elements.fields.title.value = item.title;
+        elements.fields.className.value = item.className;
+        elements.fields.points.value = item.points;
+        elements.fields.dueDate.value = item.dueDate;
+        elements.fields.dueTime.value = item.dueTime;
+        elements.fields.status.value = item.status;
+        elements.fields.materialUrl.value = item.materialUrl || "";
+        elements.fields.description.value = item.description || "";
+        elements.descriptionCount.textContent = String((item.description || "").length);
+        elements.modalTitle.textContent = "Chỉnh sửa bài tập";
+        elements.modalSubtitle.textContent = "Cập nhật nội dung rồi nhấn lưu thay đổi.";
+        elements.saveButtonText.textContent = "Lưu thay đổi";
+        openModal(elements.assignmentModal);
+        setTimeout(() => elements.fields.title.focus(), 50);
+      }
+
+      function validateForm() {
+        clearValidation();
+        let valid = true;
+
+        const rules = [
+          { field: "fieldTitle", invalid: !elements.fields.title.value.trim() },
+          { field: "fieldClassName", invalid: !elements.fields.className.value.trim() },
+          {
+            field: "fieldPoints",
+            invalid: !Number.isFinite(Number(elements.fields.points.value)) ||
+              Number(elements.fields.points.value) < 1 ||
+              Number(elements.fields.points.value) > 1000
+          },
+          { field: "fieldDueDate", invalid: !elements.fields.dueDate.value },
+          { field: "fieldDueTime", invalid: !elements.fields.dueTime.value }
+        ];
+
+        rules.forEach(rule => {
+          if (rule.invalid) {
+            document.getElementById(rule.field).classList.add("invalid");
+            valid = false;
+          }
+        });
+
+        if (!valid) {
+          $(".field.invalid input, .field.invalid select, .field.invalid textarea")?.focus();
+        }
+
+        return valid;
+      }
+
+      function clearValidation() {
+        $$(".field.invalid").forEach(field => field.classList.remove("invalid"));
+      }
+
+      function handleSubmit(event) {
+        event.preventDefault();
+        if (!validateForm()) return;
+
+        const id = elements.fields.id.value;
+        const now = new Date().toISOString();
+
+        const data = {
+          id: id || (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`),
+          title: elements.fields.title.value.trim(),
+          className: elements.fields.className.value.trim(),
+          points: Number(elements.fields.points.value),
+          dueDate: elements.fields.dueDate.value,
+          dueTime: elements.fields.dueTime.value,
+          status: elements.fields.status.value,
+          materialUrl: elements.fields.materialUrl.value.trim(),
+          description: elements.fields.description.value.trim(),
+          createdAt: now,
+          updatedAt: now
+        };
+
+        if (id) {
+          const index = assignments.findIndex(item => item.id === id);
+          if (index !== -1) {
+            data.createdAt = assignments[index].createdAt || now;
+            assignments[index] = data;
+          }
+          showToast("Đã cập nhật bài tập", `"${data.title}" đã được lưu thay đổi.`);
+        } else {
+          assignments.push(data);
+          showToast("Đã tạo bài tập", `"${data.title}" đã được lưu trên trình duyệt.`);
+        }
+
+        saveAssignments();
+        closeModal(elements.assignmentModal);
+        render();
+      }
+
+      function duplicateAssignment(id) {
+        const source = assignments.find(item => item.id === id);
+        if (!source) return;
+
+        const copy = {
+          ...source,
+          id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`,
+          title: `${source.title} (Bản sao)`,
+          status: "draft",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+
+        assignments.push(copy);
+        saveAssignments();
+        render();
+        showToast("Đã nhân bản bài tập", "Bản sao được lưu ở trạng thái nháp.");
+      }
+
+      function requestDelete(id) {
+        const item = assignments.find(assignment => assignment.id === id);
+        if (!item) return;
+        pendingDeleteId = id;
+        elements.deleteAssignmentName.textContent = `"${item.title}"`;
+        openModal(elements.deleteModal);
+        setTimeout(() => elements.cancelDeleteBtn.focus(), 50);
+      }
+
+      function confirmDelete() {
+        if (!pendingDeleteId) return;
+        const item = assignments.find(assignment => assignment.id === pendingDeleteId);
+        assignments = assignments.filter(assignment => assignment.id !== pendingDeleteId);
+        saveAssignments();
+        closeModal(elements.deleteModal);
+        render();
+        showToast("Đã xóa bài tập", item ? `"${item.title}" đã được xóa.` : "Bài tập đã được xóa.");
+        pendingDeleteId = null;
+      }
+
+      function showToast(title, message, type = "success") {
+        const toast = document.createElement("div");
+        toast.className = `toast ${type === "error" ? "error" : ""}`;
+        toast.innerHTML = `
+          <div class="toast-icon">
+            <svg><use href="#${type === "error" ? "i-alert" : "i-check"}"></use></svg>
+          </div>
+          <div>
+            <strong>${escapeHtml(title)}</strong>
+            <span>${escapeHtml(message)}</span>
+          </div>
+        `;
+        elements.toastRegion.appendChild(toast);
+        setTimeout(() => toast.remove(), 3500);
+      }
+
+      function closeSidebar() {
+        elements.sidebar.classList.remove("open");
+        elements.sidebarOverlay.classList.remove("open");
+      }
+
+      elements.addButton.addEventListener("click", openCreateModal);
+      elements.form.addEventListener("submit", handleSubmit);
+      elements.search.addEventListener("input", render);
+      elements.classFilter.addEventListener("change", render);
+      elements.statusFilter.addEventListener("change", render);
+
+      elements.fields.description.addEventListener("input", event => {
+        elements.descriptionCount.textContent = String(event.target.value.length);
+      });
+
+      elements.list.addEventListener("click", event => {
+        const button = event.target.closest("[data-action]");
+        if (!button) return;
+
+        const card = button.closest("[data-id]");
+        const id = card?.dataset.id;
+        if (!id) return;
+
+        const action = button.dataset.action;
+        if (action === "edit") openEditModal(id);
+        if (action === "delete") requestDelete(id);
+        if (action === "duplicate") duplicateAssignment(id);
+      });
+
+      $$("[data-close-modal]").forEach(button => {
+        button.addEventListener("click", () => closeModal(elements.assignmentModal));
+      });
+
+      elements.cancelDeleteBtn.addEventListener("click", () => {
+        pendingDeleteId = null;
+        closeModal(elements.deleteModal);
+      });
+      elements.confirmDeleteBtn.addEventListener("click", confirmDelete);
+
+      [elements.assignmentModal, elements.deleteModal].forEach(modal => {
+        modal.addEventListener("mousedown", event => {
+          if (event.target === modal) {
+            if (modal === elements.deleteModal) pendingDeleteId = null;
+            closeModal(modal);
+          }
+        });
+      });
+
+      elements.mobileMenuBtn.addEventListener("click", () => {
+        elements.sidebar.classList.add("open");
+        elements.sidebarOverlay.classList.add("open");
+      });
+      elements.sidebarOverlay.addEventListener("click", closeSidebar);
+
+      document.addEventListener("keydown", event => {
+        if (event.key === "Escape") {
+          if (elements.deleteModal.classList.contains("open")) {
+            pendingDeleteId = null;
+            closeModal(elements.deleteModal);
+          } else if (elements.assignmentModal.classList.contains("open")) {
+            closeModal(elements.assignmentModal);
+          } else {
+            closeSidebar();
+          }
+        }
+      });
+
+      render();
+    })();
+  </script>
+</body>
+</html>
