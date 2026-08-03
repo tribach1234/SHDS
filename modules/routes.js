@@ -1,11 +1,28 @@
 const express = require('express');
 const router = express.Router();
+const StudentService = require("../backend/hocsinh/StudentService")
 
 const { dbGet, dbRun } = require('./db');
 const { hashPassword, verifyPassword } = require('./auth');
 const { formatEmail, checkEmailExists } = require('./helpers');
 const { activationTokens, generateAndSendActivationEmail, DOMAIN } = require('./mailer');
+// Check student data
+function helper(fn) {
+  return async (req, res) => {
+    try {
+      const data = await fn(req, res);
+      res.json({ success: true, data });
+    } catch (err) {
+      console.error("[studentRoutes]", err);
+      res.status(err.statusCode || 500).json({
+        success: false,
+        error: err.message || "Đã có lỗi xảy ra, vui lòng thử lại.",
+      });
+    }
+  };
+}
 
+/// LOGIN/REGISTER AND AUTH
 // Route kiểm tra / thử lại gửi mail
 router.get('/retry', async (req, res) => {
   const testEmail = 'tommi2k10@gmail.com';
@@ -231,5 +248,45 @@ router.post('/api/admin/create-user', async (req, res) => {
     return res.status(500).json({ success: false, message: err.message });
   }
 });
+
+/// STUDENT PAGE
+//     getMyClasses,
+router.get("/api/students/:studentId/classes", helper((req) => (
+    StudentService.getMyClasses(req.params.studentId)
+)));
+
+//     getHomeworkByClass,
+router.get("/api/classes/:classId/homeworks", helper((req) => (
+    StudentService.getHomeworkByClass(req.params.classId)
+)));
+
+//     getAllHomeworks,
+router.get("/api/students/:studentId/dashboard", helper((req) => (
+    StudentService.getAllHomeworks(req.params.studentId)
+)));
+
+//     getHomeworkDetail,
+router.get("/api/homeworks/:homeworkId", helper((req) => (
+    StudentService.getHomeworkDetail(req.params.homeworkId)
+)));
+
+//     getOneSubmission,
+router.get("/api/homeworks/:homeworkId/submission", helper((req) => (
+    StudentService.getOneSubmission(req.params.homeworkId, req.query.studentId)
+)));
+
+//     getSubmissions
+router.get("/api/students/:studentId/submissions", helper((req) => (
+    StudentService.getSubmissions(req.params.studentId)
+)));
+
+//     submitHomework,
+router.post("/api/homeworks/:homeworkId/submit", helper((req) => (
+    StudentService.submitHomework({
+        homeworkId: req.params.homeworkId,
+        studentId: req.body.studentId,
+        fileLink: req.body.fileLink,
+    })
+)));
 
 module.exports = router;
