@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard</title>
+    <link rel="stylesheet" href="teacher-dashboard.css">
+    <script src="https://kit.fontawesome.com/YOUR_KIT_CODE.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+    <!-- 1. SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <h1>SHDS</h1>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fa-solid fa-users"></i>
+                <span>Classes</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fa-solid fa-book-open"></i>
+                <span>Create Assignments</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fa-solid fa-check-to-slot"></i>
+                <span>Grade Assignments</span>
+                <span class="badge">12 (still HTML)</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="#" class="nav-item">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- 2. RIGHT CONTENT AREA -->
+    <div class="main-wrapper">
+        <!-- HEADER -->
+        <header class="header">
+            <div class="search-bar">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" placeholder="Search students, assignments...">
+            </div>
+            <div class="header-actions">
+                <button class="notification-btn">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="notification-dot"></span>
+                </button>
+                <div class="user-profile">
+                    <img src="https://ui-avatars.com/api/?name=Teacher&background=0D8ABC&color=fff" alt="Avatar">
+                    <span style="font-size: 0.875rem; font-weight: 500;">Teacher ${username}</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- 3. MAIN CONTENT -->
+        <main class="main-content">
+            <h2 class="page-title">Hello, Teacher! 👋</h2>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div>
+                        <p>Needs grading urgently</p>
+                        <h3>12 (still HTML)</h3>
+                    </div>
+                    <div class="stat-icon icon-red">
+                        <i class="fa-solid fa-stopwatch"></i>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div>
+                        <p>Graded this week</p>
+                        <h3>45 (still HTML)</h3>
+                    </div>
+                    <div class="stat-icon icon-green">
+                        <i class="fa-solid fa-check-double"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-section">
+                <h3>Recent submissions</h3>
+                <p style="color: #6b7280; font-size: 0.875rem; font-style: italic;">
+                    (This area can host a table showing student names, assignments, and a "Grade now" button.)
+                </p>
+            </div>
+        </main>
+    </div>
+
+</body>
+
+</html>
