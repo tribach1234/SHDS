@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#b9dda0" />
+  <title>EduGreen - Quản lý bài tập giáo viên</title>
+  <link rel="stylesheet" href="teacher.css" />
+</head>
+
+<body>
+  <!-- Bộ biểu tượng SVG dùng lại trong toàn trang -->
+  <svg aria-hidden="true" width="0" height="0" style="position:absolute">
+    <symbol id="i-book" viewBox="0 0 24 24">
+      <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.8A2.8 2.8 0 0 0 4 20.8V5.5Z" fill="none" stroke="currentColor"
+        stroke-width="1.8" stroke-linejoin="round" />
+      <path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20v3H6.5A2.5 2.5 0 0 1 4 18.5M8 7h8M8 11h6" fill="none"
+        stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+    </symbol>
+    <symbol id="i-home" viewBox="0 0 24 24">
+      <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V10Z" fill="none" stroke="currentColor"
+        stroke-width="1.8" stroke-linejoin="round" />
+    </symbol>
+    <symbol id="i-task" viewBox="0 0 24 24">
+      <rect x="4" y="3" width="16" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.8" />
+      <path d="m8 9 1.5 1.5L12 8M14 9h3M8 15h9" fill="none" stroke="currentColor" stroke-width="1.8"
+        stroke-linecap="round" stroke-linejoin="round" />
+    </symbol>
+    <symbol id="i-users" viewBox="0 0 24 24">
+      <circle cx="9" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="1.8" />
+      <path d="M3.5 20a5.5 5.5 0 0 1 11 0M16 5.3a3 3 0 0 1 0 5.4M16.5 14.7A5.5 5.5 0 0 1 20.5 20" fill="none"
+        stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+    </symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24">
+      <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" fill="none" stroke="currentColor" stroke-width="1.8"
+        stroke-linecap="round" />
+    </symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8" />
+      <path
+        d="M19.4 15a1.8 1.8 0 0 0 .36 2l.06.06-2.12 2.12-.06-.06a1.8 1.8 0 0 0-2-.36 1.8 1.8 0 0 0-1.1 1.65V20.5h-3v-.09A1.8 1.8 0 0 0 10.4 18.8a1.8 1.8 0 0 0-2 .36l-.06.06-2.12-2.12.06-.06a1.8 1.8 0 0 0 .36-2A1.8 1.8 0 0 0 5 13.9H4.9v-3H5A1.8 1.8 0 0 0 6.6 9.8a1.8 1.8 0 0 0-.36-2l-.06-.06 2.12-2.12.06.06a1.8 1.8 0 0 0 2 .36A1.8 1.8 0 0 0 11.5 4.4V4.3h3v.1a1.8 1.8 0 0 0 1.1 1.64 1.8 1.8 0 0 0 2-.36l.06-.06 2.12 2.12-.06.06a1.8 1.8 0 0 0-.36 2A1.8 1.8 0 0 0 21 10.9h.1v3H21a1.8 1.8 0 0 0-1.6 1.1Z"
+        fill="none" stroke="currentColor" stroke-width="1.45" stroke-linejoin="round" />
+    </symbol>
+    <symbol id="i-search" viewBox="0 0 24 24">
+      <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2" />
+      <path d="m20 20-4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+    </symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24">
+      <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+    </symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24">
+      <path d="m14 5 5 5M4 20l1.3-5.3L16.6 3.4a2 2 0 0 1 2.8 0l1.2 1.2a2 2 0 0 1 0 2.8L9.3 18.7 4 20Z" fill="none"
+        stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+    </symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24">
+      <path d="M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14M10 11v6M14 11v6" fill="none" stroke="currentColor" stroke-width="1.8"
+        stroke-linecap="round" stroke-linejoin="round" />
+    </symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24">
+      <rect x="8" y="8" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.8" />
+      <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" fill="none" stroke="currentColor"
+        stroke-width="1.8" />
+    </symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24">
+      <rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.8" />
+      <path d="M8 3v4M16 3v4M3 10h18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+    </symbol>
+    <symbol id="i-class" viewBox="0 0 24 24">
+      <path d="M3 5h18v14H3zM7 9h5M7 13h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+        stroke-linejoin="round" />
+    </symbol>
+    <symbol id="i-star" viewBox="0 0 24 24">
+      <path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z" fill="none"
+        stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+    </symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8" />
+      <path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+    </symbol>
+    <symbol id="i-check" viewBox="0 0 24 24">
+      <path d="m5 12 4 4L19 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+        stroke-linejoin="round" />
+    </symbol>
+    <symbol id="i-close" viewBox="0 0 24 24">
+      <path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+    </symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24">
+      <path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+    </symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24">
+      <path d="M12 3 2.7 20h18.6L12 3Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+      <path d="M12 9v5M12 17.3v.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+    </symbol>
+    <symbol id="i-link" viewBox="0 0 24 24">
+      <path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.2 1.2M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.2-1.2"
+        fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+    </symbol>
+  </svg>
+
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Điều hướng chính">
+      <div class="brand">
+        <div class="brand-mark"><svg>
+            <use href="#i-book"></use>
+          </svg></div>
+        <span>EduGreen</span>
+      </div>
+
+      <div class="nav-label">Không gian giáo viên</div>
+      <nav class="nav">
+        <a class="nav-item" href="#" onclick="return false;">
+          <svg>
+            <use href="#i-home"></use>
+          </svg>
+          <span>Tổng quan</span>
+        </a>
+        <a class="nav-item active" href="#" onclick="return false;" aria-current="page">
+          <svg>
+            <use href="#i-task"></use>
+          </svg>
+          <span>Quản lý bài tập</span>
+        </a>
+        <a class="nav-item" href="#" onclick="return false;">
+          <svg>
+            <use href="#i-users"></use>
+          </svg>
+          <span>Lớp học</span>
+        </a>
+        <a class="nav-item" href="#" onclick="return false;">
+          <svg>
+            <use href="#i-chart"></use>
+          </svg>
+          <span>Kết quả học tập</span>
+        </a>
+        <a class="nav-item" href="#" onclick="return false;">
+          <svg>
+            <use href="#i-settings"></use>
+          </svg>
+          <span>Cài đặt</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-spacer"></div>
+      <div class="sidebar-tip">
+        <strong>💡 Mẹo nhỏ</strong>
+        <span>Dữ liệu đang được lưu ngay trên trình duyệt bằng Local Storage, phù hợp để thử nghiệm giao diện.</span>
+      </div>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="heading-group">
+          <button class="mobile-menu" id="mobileMenuBtn" aria-label="Mở menu">
+            <svg>
+              <use href="#i-menu"></use>
+            </svg>
+          </button>
+          <div class="page-heading">
+            <h1>Quản lý bài tập</h1>
+            <p>Tạo, chỉnh sửa và theo dõi bài tập cho các lớp của bạn.</p>
+          </div>
+        </div>
+
+        <div class="teacher-chip" aria-label="Tài khoản giáo viên">
+          <div class="avatar">GV</div>
+          <div class="teacher-text">
+            <strong>Giáo viên</strong>
+            <span>Teacher Workspace</span>
+          </div>
+        </div>
+      </header>
+
+      <section class="stats" aria-label="Thống kê bài tập">
+        <article class="stat-card primary">
+          <div class="stat-top">
+            <span class="stat-icon"><svg>
+                <use href="#i-task"></use>
+              </svg></span>
+          </div>
+          <div class="stat-value" id="statTotal">0</div>
+          <div class="stat-title">Tổng số bài tập</div>
+        </article>
+        <article class="stat-card">
+          <div class="stat-top">
+            <span class="stat-icon"><svg>
+                <use href="#i-clock"></use>
+              </svg></span>
+          </div>
+          <div class="stat-value" id="statUpcoming">0</div>
+          <div class="stat-title">Sắp đến hạn</div>
+        </article>
+        <article class="stat-card">
+          <div class="stat-top">
+            <span class="stat-icon"><svg>
+                <use href="#i-alert"></use>
+              </svg></span>
+          </div>
+          <div class="stat-value" id="statOverdue">0</div>
+          <div class="stat-title">Đã quá hạn</div>
+        </article>
+        <article class="stat-card">
+          <div class="stat-top">
+            <span class="stat-icon"><svg>
+                <use href="#i-check"></use>
+              </svg></span>
+          </div>
+          <div class="stat-value" id="statCompleted">0</div>
+          <div class="stat-title">Đã hoàn thành</div>
+        </article>
+      </section>
+
+      <section class="workspace">
+        <div class="toolbar">
+          <div class="search-wrap">
+            <svg>
+              <use href="#i-search"></use>
+            </svg>
+            <input class="control" id="searchInput" type="search" placeholder="Tìm theo tên bài tập, lớp hoặc mô tả..."
+              autocomplete="off" aria-label="Tìm kiếm bài tập" />
+          </div>
+
+          <select class="control" id="classFilter" aria-label="Lọc theo lớp">
+            <option value="all">Tất cả lớp</option>
+          </select>
+
+          <select class="control" id="statusFilter" aria-label="Lọc theo trạng thái">
+            <option value="all">Tất cả trạng thái</option>
+            <option value="published">Đã giao</option>
+            <option value="draft">Bản nháp</option>
+            <option value="completed">Hoàn thành</option>
+            <option value="overdue">Quá hạn</option>
+          </select>
+
+          <button class="btn btn-primary" id="addAssignmentBtn">
+            <svg>
+              <use href="#i-plus"></use>
+            </svg>
+            <span>Giao bài mới</span>
+          </button>
+        </div>
+
+        <div class="list-header">
+          <h2>Danh sách bài tập</h2>
+          <span class="result-count" id="resultCount">0 bài tập</span>
+        </div>
+
+        <div class="assignment-list" id="assignmentList"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal tạo / chỉnh sửa bài tập -->
+  <div class="modal-backdrop" id="assignmentModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-title-icon"><svg>
+              <use href="#i-task"></use>
+            </svg></div>
+          <div>
+            <h2 id="modalTitle">Giao bài tập mới</h2>
+            <p id="modalSubtitle">Điền đầy đủ thông tin trước khi lưu.</p>
+          </div>
+        </div>
+        <button class="close-btn" type="button" data-close-modal aria-label="Đóng">
+          <svg>
+            <use href="#i-close"></use>
+          </svg>
+        </button>
+      </div>
+
+      <form id="assignmentForm" novalidate>
+        <div class="modal-body">
+          <input type="hidden" id="assignmentId" />
+
+          <div class="form-grid">
+            <div class="field full" id="fieldTitle">
+              <label for="title">Tên bài tập <span class="required">*</span></label>
+              <input id="title" type="text" maxlength="120" placeholder="Ví dụ: Bài tập chương 2 - Hàm số" />
+              <span class="field-error">Vui lòng nhập tên bài tập.</span>
+            </div>
+
+            <div class="field" id="fieldClassName">
+              <label for="className">Lớp học <span class="required">*</span></label>
+              <input id="className" type="text" maxlength="60" placeholder="Ví dụ: 10A1" list="classSuggestions" />
+              <datalist id="classSuggestions">
+                <option value="10A1"></option>
+                <option value="10A2"></option>
+                <option value="11A1"></option>
+                <option value="12A1"></option>
+              </datalist>
+              <span class="field-error">Vui lòng nhập lớp học.</span>
+            </div>
+
+            <div class="field" id="fieldPoints">
+              <label for="points">Điểm tối đa <span class="required">*</span></label>
+              <input id="points" type="number" min="1" max="1000" step="1" value="10" />
+              <span class="field-error">Điểm phải từ 1 đến 1000.</span>
+            </div>
+
+            <div class="field" id="fieldDueDate">
+              <label for="dueDate">Ngày đến hạn <span class="required">*</span></label>
+              <input id="dueDate" type="date" />
+              <span class="field-error">Vui lòng chọn ngày đến hạn.</span>
+            </div>
+
+            <div class="field" id="fieldDueTime">
+              <label for="dueTime">Giờ đến hạn <span class="required">*</span></label>
+              <input id="dueTime" type="time" value="23:59" />
+              <span class="field-error">Vui lòng chọn giờ đến hạn.</span>
+            </div>
+
+            <div class="field">
+              <label for="status">Trạng thái</label>
+              <select id="status">
+                <option value="published">Giao ngay</option>
+                <option value="draft">Lưu bản nháp</option>
+                <option value="completed">Đánh dấu hoàn thành</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="materialUrl">Liên kết tài liệu</label>
+              <input id="materialUrl" type="url" placeholder="https://..." />
+              <div class="helper">Có thể để trống. Liên kết sẽ được mở trong tab mới.</div>
+            </div>
+
+            <div class="field full">
+              <label for="description">Mô tả / yêu cầu bài tập</label>
+              <textarea id="description" maxlength="1000"
+                placeholder="Nhập hướng dẫn, nội dung cần hoàn thành, cách nộp bài..."></textarea>
+              <div class="helper"><span id="descriptionCount">0</span>/1000 ký tự</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-close-modal>Hủy</button>
+          <button class="btn btn-primary" type="submit">
+            <svg>
+              <use href="#i-check"></use>
+            </svg>
+            <span id="saveButtonText">Lưu bài tập</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal xác nhận xóa -->
+  <div class="modal-backdrop" id="deleteModal" role="dialog" aria-modal="true" aria-labelledby="deleteTitle">
+    <div class="modal confirm-modal">
+      <div class="confirm-content">
+        <div class="confirm-icon"><svg>
+            <use href="#i-trash"></use>
+          </svg></div>
+        <h2 id="deleteTitle">Xóa bài tập?</h2>
+        <p>Bài tập <strong id="deleteAssignmentName"></strong> sẽ bị xóa khỏi trình duyệt này. Thao tác không thể hoàn
+          tác.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" id="cancelDeleteBtn">Giữ lại</button>
+        <button class="btn btn-danger" type="button" id="confirmDeleteBtn">
+          <svg>
+            <use href="#i-trash"></use>
+          </svg>
+          Xóa bài tập
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
+  <script src="teacher.js"></script>
+</body>
+
+</html>

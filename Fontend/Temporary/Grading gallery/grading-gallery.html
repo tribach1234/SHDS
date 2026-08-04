@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Giao diện chấm bài</title>
+  <link rel="stylesheet" href="grading-gallery.css" />
+</head>
+<body>
+  <div class="page">
+    <div class="panel">
+      <div class="topbar">
+        <div>
+          <h1>Chấm bài học viên</h1>
+          <div class="meta">Bài tập: Bài kiểm tra cuối kỳ · Môn: Toán</div>
+        </div>
+        <div class="status-pill">Đang chấm</div>
+      </div>
+
+      <div class="layout">
+        <section class="left-col">
+          <div class="student-card">
+            <div>
+              <div class="name">Nguyễn Văn A</div>
+              <div class="sub">Lớp 10A1 · Mã bài: #1024</div>
+            </div>
+            <div class="status-pill">Đã nộp</div>
+          </div>
+
+          <div class="work-area">
+            <h3>Bài làm của học viên</h3>
+            <div class="work-box">
+              <p><strong>Câu 1:</strong> Tính giá trị của biểu thức...</p>
+              <p><strong>Câu 2:</strong> Giải phương trình bậc hai...</p>
+              <p><strong>Câu 3:</strong> Vẽ đồ thị hàm số y = 2x + 1...</p>
+              <p>Học sinh trình bày rõ các bước và có kết luận cuối cùng.</p>
+            </div>
+          </div>
+        </section>
+
+        <aside class="right-col">
+          <div class="score-box">
+            <div class="score-card">
+              <h3>Cho điểm</h3>
+              <div class="score-row">
+                <label for="score">Điểm số</label>
+                <input id="score" type="number" min="0" max="10" value="8.5" />
+              </div>
+              <div class="score-row">
+                <label for="bonus">Điểm cộng</label>
+                <input id="bonus" type="number" min="0" max="2" value="0.5" />
+              </div>
+              <textarea class="comment-box" placeholder="Nhập nhận xét cho học viên..."></textarea>
+              <div class="actions">
+                <button class="btn btn-primary" type="button">Lưu điểm</button>
+                <button class="btn btn-secondary" type="button">Bỏ qua</button>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
