@@ -1,4 +1,4 @@
-const db = require("./Database");
+const db = require("./Database.js");
 
 function submissionId(homeworkId, studentId) {
     return `submission_${homeworkId}_${studentId}`;
