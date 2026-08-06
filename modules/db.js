@@ -1,42 +1,87 @@
-const path = require('path');
-const fs = require('fs');
-const sqlite3 = require('sqlite3').verbose();
+// db.js
+// Unified database layer — uses better-sqlite3 via Database.js
+// All tables are auto-created on first require().
 
-const DB_DIR = path.join(__dirname, '..', 'data');
-const DB_PATH = path.join(DB_DIR, 'users.db');
+const db = require('../backend/hocsinh/Database');
 
-if (!fs.existsSync(DB_DIR)) {
-  fs.mkdirSync(DB_DIR, { recursive: true });
-}
+// ── User tables (in attached "users" schema) ──────────────────────
+db.exec(`CREATE TABLE IF NOT EXISTS users.admins (
+  id TEXT PRIMARY KEY,
+  fullName TEXT,
+  email TEXT,
+  pass TEXT,
+  activate TEXT DEFAULT 'false'
+)`);
 
-const db = new sqlite3.Database(DB_PATH);
+db.exec(`CREATE TABLE IF NOT EXISTS users.teachers (
+  id TEXT PRIMARY KEY,
+  fullName TEXT,
+  email TEXT,
+  pass TEXT
+)`);
 
-db.serialize(() => {
-  db.run(`CREATE TABLE IF NOT EXISTS admins (
-    id TEXT PRIMARY KEY, 
-    fullName TEXT, 
-    email TEXT, 
-    pass TEXT, 
-    activate TEXT DEFAULT 'false'
-  )`);
-  db.run(`CREATE TABLE IF NOT EXISTS teachers (id TEXT PRIMARY KEY, fullName TEXT, email TEXT, pass TEXT)`);
-  db.run(`CREATE TABLE IF NOT EXISTS tas (id TEXT PRIMARY KEY, fullName TEXT, email TEXT, pass TEXT)`);
-  db.run(`CREATE TABLE IF NOT EXISTS students (id TEXT PRIMARY KEY, fullName TEXT, email TEXT, pass TEXT)`);
-});
+db.exec(`CREATE TABLE IF NOT EXISTS users.tas (
+  id TEXT PRIMARY KEY,
+  fullName TEXT,
+  email TEXT,
+  pass TEXT
+)`);
+
+db.exec(`CREATE TABLE IF NOT EXISTS users.students (
+  id TEXT PRIMARY KEY,
+  fullName TEXT,
+  email TEXT,
+  pass TEXT
+)`);
+
+// ── Class tables (in main "classes.db" schema) ────────────────────
+db.exec(`CREATE TABLE IF NOT EXISTS classes (
+  classId TEXT PRIMARY KEY,
+  className TEXT,
+  description TEXT,
+  status TEXT,
+  note TEXT
+)`);
+
+db.exec(`CREATE TABLE IF NOT EXISTS class_members (
+  classId TEXT,
+  userId TEXT,
+  fullName TEXT,
+  role TEXT,
+  PRIMARY KEY (classId, userId)
+)`);
+
+// ── Homework tables (in attached "hw" schema) ─────────────────────
+db.exec(`CREATE TABLE IF NOT EXISTS hw.homeworks (
+  homeworkId TEXT PRIMARY KEY,
+  classId TEXT,
+  title TEXT,
+  note TEXT,
+  deadline TEXT,
+  createdAt TEXT,
+  joinLink TEXT
+)`);
+
+db.exec(`CREATE TABLE IF NOT EXISTS hw.submissions (
+  id TEXT PRIMARY KEY,
+  homeworkId TEXT,
+  studentId TEXT,
+  fileLink TEXT,
+  submittedAt TEXT,
+  score REAL,
+  comment TEXT
+)`);
+
+// ── Helper wrappers ───────────────────────────────────────────────
+// Wrapped in Promises so existing `await dbGet(...)` / `await dbRun(...)`
+// calls in routes.js continue to work without modification.
 
 function dbGet(query, params = []) {
-  return new Promise((resolve, reject) => {
-    db.get(query, params, (err, row) => (err ? reject(err) : resolve(row)));
-  });
+  return Promise.resolve(db.prepare(query).get(...params));
 }
 
 function dbRun(query, params = []) {
-  return new Promise((resolve, reject) => {
-    db.run(query, params, function (err) {
-      if (err) reject(err);
-      else resolve(this);
-    });
-  });
+  return Promise.resolve(db.prepare(query).run(...params));
 }
 
 module.exports = { db, dbGet, dbRun };

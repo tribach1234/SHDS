@@ -150,7 +150,7 @@
       <div class="sidebar-spacer"></div>
       <div class="sidebar-tip">
         <strong>💡 Mẹo nhỏ</strong>
-        <span>Dữ liệu đang được lưu ngay trên trình duyệt bằng Local Storage, phù hợp để thử nghiệm giao diện.</span>
+        <span>Dữ liệu bài tập được lấy từ server. Đăng nhập tại trang Login để sử dụng tài khoản của bạn.</span>
       </div>
     </aside>
 
@@ -169,12 +169,15 @@
           </div>
         </div>
 
-        <div class="teacher-chip" aria-label="Tài khoản giáo viên">
-          <div class="avatar">HS</div>
+        <div class="teacher-chip" aria-label="Tài khoản học sinh">
+          <div class="avatar" id="userAvatar">HS</div>
           <div class="teacher-text">
-            <strong>Học sinh</strong>
+            <strong id="userName">Học sinh</strong>
             <span>Student Workspace</span>
           </div>
+          <button type="button" onclick="handleLogout()" style="margin-left: 12px; background: transparent; border: 1px solid #ccc; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 12px;">
+            Đăng xuất
+          </button>
         </div>
       </header>
 

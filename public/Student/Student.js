@@ -7,7 +7,7 @@
 //   GET  /api/homeworks/:homeworkId/submission
 //   GET  /api/students/:studentId/submissions
 //
-// (Không dùng Local Storage nữa — gọi thẳng server thật.)
+// Gọi API server thật (không dùng Local Storage cho dữ liệu bài tập).
 
 /* ======================= CẤU HÌNH ======================= */
 
@@ -19,8 +19,37 @@ const BASE_URL = "";
 // ví dụ: http://localhost:3000/Student/Student.html?studentId=test-student-01
 // Nếu không có trên URL, thử lấy từ localStorage (trang login lưu sau này),
 // cuối cùng mới fallback về "student-1".
+// Student.js
+
 const urlParams = new URLSearchParams(window.location.search);
-const STUDENT_ID = urlParams.get("studentId") || localStorage.getItem("studentId") || "student-1";
+const STUDENT_ID = urlParams.get("studentId") || localStorage.getItem("studentId"); //[cite: 2]
+const ROLE = localStorage.getItem("role"); //
+
+// Auth Guard: Redirect back to login if unauthenticated or wrong role
+if (!STUDENT_ID || ROLE !== "STUDENT") {
+  window.location.href = "/Login.html";
+}
+
+// Populate user profile info from localStorage
+function setupUserProfile() {
+  const fullName = localStorage.getItem("fullName") || "Học sinh"; //[cite: 4]
+  const avatarEl = document.getElementById("userAvatar");
+  const nameEl = document.getElementById("userName");
+
+  if (avatarEl) avatarEl.textContent = fullName.slice(0, 2).toUpperCase();
+  if (nameEl) nameEl.textContent = fullName;
+}
+
+// Clear session and return to login[cite: 4]
+window.handleLogout = function () {
+  localStorage.removeItem("studentId"); //[cite: 4]
+  localStorage.removeItem("fullName"); //[cite: 4]
+  localStorage.removeItem("role"); //[cite: 4]
+  window.location.href = "/Login.html";
+};
+
+// Execute profile setup on script init
+setupUserProfile();
 
 console.log("[Student.js] Đang test với studentId =", STUDENT_ID);
 

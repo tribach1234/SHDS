@@ -1,4 +1,6 @@
 const { dbGet } = require('./db');
+// Note: dbGet is now a sync better-sqlite3 call wrapped in Promise.resolve()
+// so existing `await dbGet(...)` usage continues to work unchanged.
 
 function formatEmail(inputEmail) {
   if (!inputEmail) return '';
