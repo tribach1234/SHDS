@@ -13,6 +13,13 @@ loginBtn.addEventListener('click', () => {
     container.classList.remove('active');
 });
 
+// Where each role should land after a successful login.
+// NOTE: adjust these paths if your public/ folder layout differs.
+const ROLE_REDIRECTS = {
+    STUDENT: (email) => `/Student/Student.html?studentId=${encodeURIComponent(email)}`,
+    TEACHER: (email) => `/Teacher/teacher-overview.html?teacherId=${encodeURIComponent(email)}`,
+};
+
 // ── Login Form ────────────────────────────────────────────────────
 const loginForm = document.getElementById('loginForm');
 loginForm.addEventListener('submit', async (e) => {
@@ -37,15 +44,17 @@ loginForm.addEventListener('submit', async (e) => {
             return alert(data.message || 'Đăng nhập thất bại!');
         }
 
-        // Save user info for the Student page to pick up
-        localStorage.setItem('studentId', data.user.email);
+        // Save user info for the destination page to pick up.
         localStorage.setItem('fullName', data.user.fullName);
         localStorage.setItem('role', data.user.role);
+        localStorage.setItem('studentId', data.user.id);
+        localStorage.setItem('teacherId', data.user.id);
 
-        // Redirect based on role
-        if (data.user.role === 'STUDENT') {
-            window.location.href = `/Student/Student.html?studentId=${encodeURIComponent(data.user.email)}`;
+        const redirect = ROLE_REDIRECTS[data.user.role];
+        if (redirect) {
+            window.location.href = redirect(data.user.id);
         } else {
+            // ADMIN / TA: no dedicated dashboard built yet
             alert(`Đăng nhập thành công! Vai trò: ${data.user.role}`);
         }
     } catch (err) {

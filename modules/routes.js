@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const StudentService = require("../backend/hocsinh/StudentService");
+const StudentService = require("./hocsinh/StudentService");
 
-const { dbGet, dbRun } = require('./db');
+const { dbGet, dbRun, dbAll } = require("./db");
 const { hashPassword, verifyPassword } = require('./auth');
 const { formatEmail, checkEmailExists } = require('./helpers');
 const { activationTokens, generateAndSendActivationEmail, DOMAIN } = require('./mailer');
@@ -192,6 +192,7 @@ router.post('/api/login', async (req, res) => {
       success: true,
       message: 'Đăng nhập thành công!',
       user: {
+        id: matchedUser.id,
         fullName: matchedUser.fullName,
         email: matchedUser.email,
         role: matchedRole,
@@ -256,5 +257,264 @@ router.post("/api/homeworks/:homeworkId/submit", helper((req) => StudentService.
   studentId: req.body.studentId,
   fileLink: req.body.fileLink,
 })));
+
+// GET: Fetch assignments mapped dynamically to a specific account ID
+router.get("/api/assignments/:teacherId", async (req, res) => {
+    try {
+        const teacherId = req.params.teacherId;
+
+        // Alias DB columns to the field names teacher.js/teacher-assignmentManage.html
+        // actually use (id, className, description, materialUrl).
+        const rows = await dbAll(`
+            SELECT
+                homeworkId AS id,
+                classId    AS className,
+                title      AS title,
+                note       AS description,
+                deadline   AS deadline,
+                joinLink   AS materialUrl,
+                points     AS points,
+                status     AS status,
+                createdAt  AS createdAt
+            FROM hw.homeworks
+            WHERE teacherId = ?
+            ORDER BY deadline ASC
+        `, [teacherId]);
+
+        // Split the stored "deadline" datetime back into dueDate/dueTime
+        // for the date/time inputs in the edit form.
+        const assignments = rows.map((r) => {
+            const d = r.deadline ? new Date(r.deadline) : null;
+            const valid = d && !isNaN(d.getTime());
+            return {
+                ...r,
+                dueDate: valid ? d.toISOString().slice(0, 10) : "",
+                dueTime: valid ? d.toISOString().slice(11, 16) : "23:59",
+            };
+        });
+
+        res.json(assignments);
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// POST: Create or Update an assignment for a specific account ID
+router.post("/api/assignments/:teacherId", async (req, res) => {
+
+    try {
+
+        const teacherId = req.params.teacherId;
+
+        const {
+            id,
+            className,
+            title,
+            description,
+            dueDate,
+            dueTime,
+            materialUrl,
+            points,
+            status,
+            createdAt
+        } = req.body;
+
+        if (!id || !title || !className || !dueDate) {
+            return res.status(400).json({ error: "Thiếu thông tin bắt buộc (tên bài tập, lớp, ngày đến hạn)." });
+        }
+
+        const deadline = new Date(`${dueDate}T${dueTime || "23:59"}:00`).toISOString();
+
+        const existing = await dbGet(
+            `SELECT homeworkId
+             FROM hw.homeworks
+             WHERE homeworkId = ? AND teacherId = ?`,
+            [id, teacherId]
+        );
+
+        if (existing) {
+
+            await dbRun(`
+                UPDATE hw.homeworks
+                SET
+                    classId=?,
+                    title=?,
+                    note=?,
+                    deadline=?,
+                    joinLink=?,
+                    points=?,
+                    status=?
+                WHERE homeworkId=? AND teacherId=?
+            `,[
+                className,
+                title,
+                description,
+                deadline,
+                materialUrl,
+                points,
+                status,
+                id,
+                teacherId
+            ]);
+
+        } else {
+
+            await dbRun(`
+                INSERT INTO hw.homeworks
+                (
+                    homeworkId,
+                    teacherId,
+                    classId,
+                    title,
+                    note,
+                    deadline,
+                    createdAt,
+                    joinLink,
+                    points,
+                    status
+                )
+                VALUES (?,?,?,?,?,?,?,?,?,?)
+            `,[
+                id,
+                teacherId,
+                className,
+                title,
+                description,
+                deadline,
+                createdAt || new Date().toISOString(),
+                materialUrl,
+                points,
+                status
+            ]);
+
+        }
+
+        res.json({
+            success:true
+        });
+
+    } catch(err){
+        res.status(500).json({
+            error:err.message
+        });
+    }
+
+});
+// DELETE: Remove an assignment dynamically matched to the account ID
+router.delete("/api/assignments/:teacherId/:id", async (req,res)=>{
+
+    try{
+
+        await dbRun(`
+            DELETE
+            FROM hw.homeworks
+            WHERE homeworkId=?
+            AND teacherId=?
+        `,[
+            req.params.id,
+            req.params.teacherId
+        ]);
+
+        res.json({
+            success:true
+        });
+
+    }catch(err){
+
+        res.status(500).json({
+            error:err.message
+        });
+
+    }
+
+});
+
+// GET: Dashboard stats + to-do list for the Teacher Overview page.
+// Everything here comes straight from SQLite (hw.homeworks / hw.submissions /
+// class_members) — nothing is stored in the browser.
+router.get("/api/teacher/:teacherId/overview", async (req, res) => {
+    try {
+        const teacherId = req.params.teacherId;
+
+        // 1) How many submitted answers are still waiting for a grade
+        const pendingGradingRow = await dbGet(`
+            SELECT COUNT(*) AS cnt
+            FROM hw.submissions s
+            JOIN hw.homeworks h ON h.homeworkId = s.homeworkId
+            WHERE h.teacherId = ? AND s.score IS NULL
+        `, [teacherId]);
+
+        // 2) Assignments due within the next 3 days (excluding drafts)
+        const dueSoonRow = await dbGet(`
+            SELECT COUNT(*) AS cnt
+            FROM hw.homeworks
+            WHERE teacherId = ?
+              AND status != 'draft'
+              AND deadline > datetime('now')
+              AND deadline <= datetime('now', '+3 days')
+        `, [teacherId]);
+
+        // 3) Overdue, still-not-graded-or-submitted assignments
+        const overdueRow = await dbGet(`
+            SELECT COUNT(*) AS cnt
+            FROM hw.homeworks
+            WHERE teacherId = ?
+              AND status != 'draft'
+              AND deadline < datetime('now')
+        `, [teacherId]);
+
+        // 4) Submission rate = (submissions received) / (expected = students in class × homeworks)
+        const submissionRows = await dbAll(`
+            SELECT
+                h.homeworkId,
+                COUNT(DISTINCT cm.userId) AS expected,
+                COUNT(DISTINCT s.studentId) AS submitted
+            FROM hw.homeworks h
+            LEFT JOIN class_members cm ON cm.classId = h.classId AND cm.role = 'student'
+            LEFT JOIN hw.submissions s ON s.homeworkId = h.homeworkId
+            WHERE h.teacherId = ?
+            GROUP BY h.homeworkId
+        `, [teacherId]);
+
+        let totalExpected = 0;
+        let totalSubmitted = 0;
+        for (const row of submissionRows) {
+            totalExpected += row.expected || 0;
+            totalSubmitted += row.submitted || 0;
+        }
+        const submissionRate = totalExpected > 0
+            ? Math.round((totalSubmitted / totalExpected) * 100)
+            : null;
+
+        // 5) "Cần xử lý trong hôm nay": the most recent ungraded submissions
+        const todoRows = await dbAll(`
+            SELECT
+                s.id, s.studentId, s.submittedAt,
+                h.title, h.classId, h.homeworkId,
+                st.fullName AS studentName
+            FROM hw.submissions s
+            JOIN hw.homeworks h ON h.homeworkId = s.homeworkId
+            LEFT JOIN users.students st ON st.id = s.studentId
+            WHERE h.teacherId = ? AND s.score IS NULL
+            ORDER BY s.submittedAt DESC
+            LIMIT 5
+        `, [teacherId]);
+
+        res.json({
+            success: true,
+            data: {
+                pendingGrading: pendingGradingRow?.cnt || 0,
+                dueSoon: dueSoonRow?.cnt || 0,
+                overdue: overdueRow?.cnt || 0,
+                submissionRate, // null when the teacher has no assignments yet
+                todo: todoRows,
+            }
+        });
+
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
 
 module.exports = router;

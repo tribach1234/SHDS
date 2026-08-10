@@ -109,31 +109,31 @@
 
       <div class="nav-label">Không gian giáo viên</div>
       <nav class="nav">
-        <a class="nav-item" href="#" onclick="return false;">
+        <a class="nav-item" href="teacher-overview.html">
           <svg>
             <use href="#i-home"></use>
           </svg>
           <span>Tổng quan</span>
         </a>
-        <a class="nav-item active" href="#" onclick="return false;" aria-current="page">
+        <a class="nav-item active" href="teacher-assignmentManage.html" aria-current="page">
           <svg>
             <use href="#i-task"></use>
           </svg>
           <span>Quản lý bài tập</span>
         </a>
-        <a class="nav-item" href="#" onclick="return false;">
+        <a class="nav-item" href="#" onclick="comingSoon('Lớp học'); return false;">
           <svg>
             <use href="#i-users"></use>
           </svg>
           <span>Lớp học</span>
         </a>
-        <a class="nav-item" href="#" onclick="return false;">
+        <a class="nav-item" href="#" onclick="comingSoon('Kết quả học tập'); return false;">
           <svg>
             <use href="#i-chart"></use>
           </svg>
           <span>Kết quả học tập</span>
         </a>
-        <a class="nav-item" href="#" onclick="return false;">
+        <a class="nav-item" href="#" onclick="comingSoon('Cài đặt'); return false;">
           <svg>
             <use href="#i-settings"></use>
           </svg>
@@ -142,10 +142,6 @@
       </nav>
 
       <div class="sidebar-spacer"></div>
-      <div class="sidebar-tip">
-        <strong>💡 Mẹo nhỏ</strong>
-        <span>Dữ liệu đang được lưu ngay trên trình duyệt bằng Local Storage, phù hợp để thử nghiệm giao diện.</span>
-      </div>
     </aside>
 
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -170,6 +166,9 @@
             <strong>Giáo viên</strong>
             <span>Teacher Workspace</span>
           </div>
+          <button type="button" onclick="handleLogout()" style="margin-left: 12px; background: transparent; border: 1px solid #ccc; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 12px;">
+            Đăng xuất
+          </button>
         </div>
       </header>
 
@@ -373,6 +372,7 @@
     </div>
   </div>
   <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
+  <script src="../shared_auth.js"></script>
   <script src="teacher.js"></script>
 </body>
 

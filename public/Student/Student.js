@@ -1,57 +1,14 @@
 // Student.js
-// Nối trang Student.html với các route thật trong routes.js:
-//   GET  /api/students/:studentId/classes
-//   GET  /api/students/:studentId/dashboard
-//   GET  /api/homeworks/:homeworkId
-//   POST /api/homeworks/:homeworkId/submit
-//   GET  /api/homeworks/:homeworkId/submission
-//   GET  /api/students/:studentId/submissions
-//
-// Gọi API server thật (không dùng Local Storage cho dữ liệu bài tập).
+// Re-uses authentication, profile setup, and logout provided globally by shared-auth.js
 
 /* ======================= CẤU HÌNH ======================= */
 
-// Cùng domain với trang HTML (routes.js đã có sẵn "/api/..." trong path)
-// -> để rỗng nếu Student.html được server chính (Express) phục vụ luôn qua express.static.
 const BASE_URL = "";
 
-// Ưu tiên lấy studentId từ URL (?studentId=...) để test nhiều tài khoản dễ dàng,
-// ví dụ: http://localhost:3000/Student/Student.html?studentId=test-student-01
-// Nếu không có trên URL, thử lấy từ localStorage (trang login lưu sau này),
-// cuối cùng mới fallback về "student-1".
-// Student.js
+// Re-use USER_ID already validated and resolved by shared-auth.js
+const STUDENT_ID = USER_ID;
 
-const urlParams = new URLSearchParams(window.location.search);
-const STUDENT_ID = urlParams.get("studentId") || localStorage.getItem("studentId"); //[cite: 2]
-const ROLE = localStorage.getItem("role"); //
-
-// Auth Guard: Redirect back to login if unauthenticated or wrong role
-if (!STUDENT_ID || ROLE !== "STUDENT") {
-  window.location.href = "/Login.html";
-}
-
-// Populate user profile info from localStorage
-function setupUserProfile() {
-  const fullName = localStorage.getItem("fullName") || "Học sinh"; //[cite: 4]
-  const avatarEl = document.getElementById("userAvatar");
-  const nameEl = document.getElementById("userName");
-
-  if (avatarEl) avatarEl.textContent = fullName.slice(0, 2).toUpperCase();
-  if (nameEl) nameEl.textContent = fullName;
-}
-
-// Clear session and return to login[cite: 4]
-window.handleLogout = function () {
-  localStorage.removeItem("studentId"); //[cite: 4]
-  localStorage.removeItem("fullName"); //[cite: 4]
-  localStorage.removeItem("role"); //[cite: 4]
-  window.location.href = "/Login.html";
-};
-
-// Execute profile setup on script init
-setupUserProfile();
-
-console.log("[Student.js] Đang test với studentId =", STUDENT_ID);
+console.log("[Student.js] Đang chạy với studentId =", STUDENT_ID);
 
 /* ======================= HELPER GỌI API ======================= */
 
@@ -79,7 +36,7 @@ async function apiPost(path, body) {
 
 /* ======================= STATE ======================= */
 
-let allHomeworks = []; // dữ liệu gốc từ /dashboard
+let allHomeworks = []; // Dữ liệu gốc từ /dashboard
 let classesMap = new Map(); // classId -> className (đổ vào bộ lọc)
 
 /* ======================= LOAD DỮ LIỆU ======================= */
@@ -243,7 +200,7 @@ window.openSubmitDialog = async function (homeworkId) {
       fileLink,
     });
     alert("Nộp bài thành công!");
-    await loadDashboard(); // tải lại để cập nhật trạng thái
+    await loadDashboard(); // Tải lại để cập nhật trạng thái
   } catch (err) {
     alert("Nộp bài thất bại: " + err.message);
   }

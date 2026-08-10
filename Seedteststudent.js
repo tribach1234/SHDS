@@ -5,7 +5,7 @@
 // dùng test toàn bộ luồng: xem lớp -> xem bài tập -> nộp bài -> xem điểm.
 
 const bcrypt = require("bcryptjs");
-const db = require("./backend/hocsinh/Database");
+const { db } = require("./modules/db");
 
 const STUDENT_ID = "test-student-01";
 const STUDENT_EMAIL = "teststudent01@tmts.io.vn";
