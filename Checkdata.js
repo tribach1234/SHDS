@@ -3,7 +3,7 @@
 // Liệt kê những gì ĐANG CÓ SẴN trong database thật của bạn — để biết nên test
 // với studentId/classId nào, thay vì đoán "student-1" có tồn tại hay không.
 
-const { db } = require("./modules/db");
+const db = require("./backend/hocsinh/Database");
 
 console.log("\n📋 STUDENTS (users.db):");
 console.table(db.prepare(`SELECT id, fullName, email FROM users.students LIMIT 20`).all());
