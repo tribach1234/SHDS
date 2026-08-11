@@ -21,19 +21,6 @@ async function apiGet(path) {
   return json.data;
 }
 
-async function apiPost(path, body) {
-  const res = await fetch(`${BASE_URL}${path}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  const json = await res.json();
-  if (!res.ok || json.success === false) {
-    throw new Error(json.error || `Lỗi server (${res.status})`);
-  }
-  return json.data;
-}
-
 /* ======================= STATE ======================= */
 
 let allHomeworks = []; // Dữ liệu gốc từ /dashboard
@@ -172,7 +159,7 @@ function renderList(homeworks) {
                 ${
                   hw.submissionStatus === "graded"
                     ? ""
-                    : `<button class="btn btn-primary" data-homework-id="${hw.homeworkId}" onclick="openSubmitDialog('${hw.homeworkId}')">Nộp bài</button>`
+                    : `<a class="btn btn-primary" href="/Student/Studentnopbai.html?homeworkId=${encodeURIComponent(hw.homeworkId)}" style="text-decoration:none;display:inline-flex;">Nộp bài</a>`
                 }
               </div>
             </div>
@@ -188,29 +175,15 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
-/* ======================= NỘP BÀI ======================= */
-
-window.openSubmitDialog = async function (homeworkId) {
-  const fileLink = prompt("Dán link bài làm (Scratch / GitHub / Drive...):");
-  if (!fileLink) return;
-
-  try {
-    await apiPost(`/api/homeworks/${homeworkId}/submit`, {
-      studentId: STUDENT_ID,
-      fileLink,
-    });
-    alert("Nộp bài thành công!");
-    await loadDashboard(); // Tải lại để cập nhật trạng thái
-  } catch (err) {
-    alert("Nộp bài thất bại: " + err.message);
-  }
-};
-
 /* ======================= SỰ KIỆN ======================= */
 
 document.getElementById("searchInput").addEventListener("input", applyFiltersAndRender);
 document.getElementById("classFilter").addEventListener("change", applyFiltersAndRender);
 document.getElementById("statusFilter").addEventListener("change", applyFiltersAndRender);
+
+document.getElementById("addAssignmentBtn").addEventListener("click", () => {
+  window.location.href = "/Student/Studentnopbai.html";
+});
 
 /* ======================= KHỞI ĐỘNG ======================= */
 

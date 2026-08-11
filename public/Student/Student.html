@@ -115,35 +115,35 @@
 
       <div class="nav-label">Không gian học sinh</div>
       <nav class="nav">
-        <a class="nav-item" href="#" onclick="return false;">
+        <a class="nav-item" href="Studentoverview.html">
           <svg>
             <use href="#i-home"></use>
           </svg>
           <span>Tổng quan</span>
         </a>
-        <a class="nav-item active" href="#" onclick="return false;" aria-current="page">
+        <a class="nav-item active" href="Student.html" aria-current="page">
           <svg>
             <use href="#i-task"></use>
           </svg>
           <span>Bài tập của tôi</span>
         </a>
-        <a class="nav-item" href="#" onclick="return false;">
+        <a class="nav-item" href="Studentnopbai.html">
+          <svg>
+            <use href="#i-task"></use>
+          </svg>
+          <span>Nộp bài</span>
+        </a>
+        <a class="nav-item" href="#" onclick="comingSoon('Thống kê và báo cáo'); return false;">
           <svg>
             <use href="#i-users"></use>
           </svg>
           <span>Thông kế và báo cáo</span>
         </a>
-        <a class="nav-item" href="#" onclick="return false;">
+        <a class="nav-item" href="Studentprogress.html">
           <svg>
             <use href="#i-chart"></use>
           </svg>
           <span>Kết quả và tiến độ</span>
-        </a>
-        <a class="nav-item" href="#" onclick="return false;">
-          <svg>
-            <use href="#i-settings"></use>
-          </svg>
-          <span>Cài đặt</span>
         </a>
       </nav>
 
@@ -241,7 +241,8 @@
             <option value="overdue">Quá hạn</option>
           </select>
 
-          <button class="btn btn-primary" id="addAssignmentBtn">
+          <button class="btn btn-primary" id="addAssignmentBtn" type="button">
+            Nộp bài
           </button>
         </div>
 

@@ -430,6 +430,36 @@ router.delete("/api/assignments/:teacherId/:id", async (req,res)=>{
 
 });
 
+router.get('/api/teacher/:teacherId/assignments/:homeworkId', helper((req) =>
+    StudentService.getAssignmentDetail(req.params.teacherId, req.params.homeworkId)
+));
+
+router.get('/api/teacher/:teacherId/assignments/:homeworkId/submissions', helper((req) =>
+    StudentService.getAssignmentSubmissions(req.params.teacherId, req.params.homeworkId)
+));
+
+router.get('/api/teacher/:teacherId/phuckhao', helper((req) =>
+    StudentService.getPhucKhaoRequests(req.params.teacherId)
+));
+
+router.post('/api/teacher/:teacherId/submissions/:submissionId/grade', helper((req) =>
+    StudentService.gradeSubmission({
+        submissionId: req.params.submissionId,
+        teacherId: req.params.teacherId,
+        score: req.body.score,
+        comment: req.body.comment,
+        appealStatus: req.body.appealStatus,
+    })
+));
+
+router.post('/api/submissions/:submissionId/regrade', helper((req) =>
+    StudentService.requestRegrade({
+        submissionId: req.params.submissionId,
+        studentId: req.body.studentId,
+        reason: req.body.reason,
+    })
+));
+
 // GET: Dashboard stats + to-do list for the Teacher Overview page.
 // Everything here comes straight from SQLite (hw.homeworks / hw.submissions /
 // class_members) — nothing is stored in the browser.

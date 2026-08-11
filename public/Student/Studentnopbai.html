@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#b9dda0" />
+  <link rel="stylesheet" href="Student.css">
+  <title>EduGreen - Nộp bài tập</title>
+
+  <style>
+    /* Chỉ những style riêng cho trang này — phần còn lại dùng chung Student.css */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      padding: 4px 0 18px;
+    }
+
+    .info-item.full { grid-column: 1 / -1; }
+
+    .info-item .info-label {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--ink-soft);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .3px;
+      text-transform: uppercase;
+    }
+
+    .info-item .info-value {
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--ink);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .info-item .info-value a {
+      color: var(--orange-600);
+      font-weight: 700;
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    .field label {
+      display: inline-block;
+      margin-bottom: 7px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .field input,
+    .field textarea {
+      width: 100%;
+      height: 46px;
+      padding: 0 13px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      color: var(--ink);
+      background: #f7f8f7;
+      outline: none;
+      transition: .2s ease;
+    }
+
+    .field input:focus {
+      border-color: var(--orange-500);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.14);
+    }
+
+    .form-message {
+      min-height: 20px;
+      margin-bottom: 10px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .form-message.success { color: var(--success); }
+    .form-message.error { color: var(--danger); }
+
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--ink-soft);
+      background: transparent;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+
+    .btn-back:hover { color: var(--orange-700); }
+  </style>
+</head>
+
+<body>
+  <!-- Bộ biểu tượng SVG dùng lại trong toàn trang (giống Student.html) -->
+  <svg aria-hidden="true" width="0" height="0" style="position:absolute">
+    <symbol id="i-book" viewBox="0 0 24 24">
+      <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.8A2.8 2.8 0 0 0 4 20.8V5.5Z" fill="none" stroke="currentColor"
+        stroke-width="1.8" stroke-linejoin="round" />
+      <path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20v3H6.5A2.5 2.5 0 0 1 4 18.5M8 7h8M8 11h6" fill="none"
+        stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+    </symbol>
+    <symbol id="i-home" viewBox="0 0 24 24">
+      <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V10Z" fill="none" stroke="currentColor"
+        stroke-width="1.8" stroke-linejoin="round" />
+    </symbol>
+    <symbol id="i-task" viewBox="0 0 24 24">
+      <rect x="4" y="3" width="16" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.8" />
+      <path d="m8 9 1.5 1.5L12 8M14 9h3M8 15h9" fill="none" stroke="currentColor" stroke-width="1.8"
+        stroke-linecap="round" stroke-linejoin="round" />
+    </symbol>
+    <symbol id="i-users" viewBox="0 0 24 24">
+      <circle cx="9" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="1.8" />
+      <path d="M3.5 20a5.5 5.5 0 0 1 11 0M16 5.3a3 3 0 0 1 0 5.4M16.5 14.7A5.5 5.5 0 0 1 20.5 20" fill="none"
+        stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+    </symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24">
+      <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" fill="none" stroke="currentColor" stroke-width="1.8"
+        stroke-linecap="round" />
+    </symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8" />
+      <path
+        d="M19.4 15a1.8 1.8 0 0 0 .36 2l.06.06-2.12 2.12-.06-.06a1.8 1.8 0 0 0-2-.36 1.8 1.8 0 0 0-1.1 1.65V20.5h-3v-.09A1.8 1.8 0 0 0 10.4 18.8a1.8 1.8 0 0 0-2 .36l-.06.06-2.12-2.12.06-.06a1.8 1.8 0 0 0 .36-2A1.8 1.8 0 0 0 5 13.9H4.9v-3H5A1.8 1.8 0 0 0 6.6 9.8a1.8 1.8 0 0 0-.36-2l-.06-.06 2.12-2.12.06.06a1.8 1.8 0 0 0 2 .36A1.8 1.8 0 0 0 11.5 4.4V4.3h3v.1a1.8 1.8 0 0 0 1.1 1.64 1.8 1.8 0 0 0 2-.36l.06-.06 2.12 2.12-.06.06a1.8 1.8 0 0 0-.36 2A1.8 1.8 0 0 0 21 10.9h.1v3H21a1.8 1.8 0 0 0-1.6 1.1Z"
+        fill="none" stroke="currentColor" stroke-width="1.45" stroke-linejoin="round" />
+    </symbol>
+    <symbol id="i-search" viewBox="0 0 24 24">
+      <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2" />
+      <path d="m20 20-4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+    </symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24">
+      <rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.8" />
+      <path d="M8 3v4M16 3v4M3 10h18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+    </symbol>
+    <symbol id="i-class" viewBox="0 0 24 24">
+      <path d="M3 5h18v14H3zM7 9h5M7 13h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+        stroke-linejoin="round" />
+    </symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8" />
+      <path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+    </symbol>
+    <symbol id="i-check" viewBox="0 0 24 24">
+      <path d="m5 12 4 4L19 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+        stroke-linejoin="round" />
+    </symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24">
+      <path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+    </symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24">
+      <path d="M12 3 2.7 20h18.6L12 3Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+      <path d="M12 9v5M12 17.3v.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+    </symbol>
+    <symbol id="i-arrow-left" viewBox="0 0 24 24">
+      <path d="M19 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+        stroke-linejoin="round" />
+    </symbol>
+  </svg>
+
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Điều hướng chính">
+      <div class="brand">
+        <div class="brand-mark"><svg>
+            <use href="#i-book"></use>
+          </svg></div>
+        <span>EduGreen</span>
+      </div>
+
+      <div class="nav-label">Không gian học sinh</div>
+      <nav class="nav">
+        <a class="nav-item" href="Studentoverview.html">
+          <svg>
+            <use href="#i-home"></use>
+          </svg>
+          <span>Tổng quan</span>
+        </a>
+        <a class="nav-item" href="Student.html">
+          <svg>
+            <use href="#i-task"></use>
+          </svg>
+          <span>Bài tập của tôi</span>
+        </a>
+        <a class="nav-item active" href="Studentnopbai.html" aria-current="page">
+          <svg>
+            <use href="#i-task"></use>
+          </svg>
+          <span>Nộp bài</span>
+        </a>
+        <a class="nav-item" href="#" onclick="comingSoon('Thống kê và báo cáo'); return false;">
+          <svg>
+            <use href="#i-users"></use>
+          </svg>
+          <span>Thông kế và báo cáo</span>
+        </a>
+        <a class="nav-item" href="Studentprogress.html">
+          <svg>
+            <use href="#i-chart"></use>
+          </svg>
+          <span>Kết quả và tiến độ</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-spacer"></div>
+      <div class="sidebar-tip">
+        <strong>💡 Mẹo nhỏ</strong>
+        <span>Chọn một bài tập chưa nộp bên dưới để mở form nộp bài.</span>
+      </div>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="heading-group">
+          <button class="mobile-menu" id="mobileMenuBtn" aria-label="Mở menu">
+            <svg>
+              <use href="#i-menu"></use>
+            </svg>
+          </button>
+          <div class="page-heading">
+            <h1>Nộp bài tập</h1>
+          </div>
+        </div>
+
+        <div class="teacher-chip" aria-label="Tài khoản học sinh">
+          <div class="avatar" id="userAvatar">HS</div>
+          <div class="teacher-text">
+            <strong id="userName">Học sinh</strong>
+            <span>Student Workspace</span>
+          </div>
+          <button type="button" onclick="handleLogout()" style="margin-left: 12px; background: transparent; border: 1px solid #ccc; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 12px;">
+            Đăng xuất
+          </button>
+        </div>
+      </header>
+
+      <!-- ===================== DANH SÁCH BÀI CHƯA NỘP ===================== -->
+      <section class="workspace" id="listSection">
+        <div class="list-header">
+          <h2>Bài tập chưa nộp</h2>
+          <span class="result-count" id="listCount">0 bài tập</span>
+        </div>
+        <div class="assignment-list" id="homeworkList">
+          <p style="padding:16px;color:#888">Đang tải dữ liệu...</p>
+        </div>
+      </section>
+
+      <!-- ===================== FORM NỘP BÀI ===================== -->
+      <section class="workspace" id="formSection" style="display:none; padding: 20px 24px 24px;">
+        <button type="button" class="btn-back" id="backToListBtn">
+          <svg width="16" height="16"><use href="#i-arrow-left"></use></svg>
+          Quay lại danh sách
+        </button>
+
+        <div class="list-header" style="padding: 0 0 8px;">
+          <h2 id="formTitle">Tên bài tập</h2>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Lớp học</span>
+            <span class="info-value" id="formClass">—</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Hạn nộp</span>
+            <span class="info-value" id="formDeadline">—</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Điểm tối đa</span>
+            <span class="info-value" id="formPoints">—</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Trạng thái</span>
+            <span class="info-value" id="formStatus">—</span>
+          </div>
+          <div class="info-item full">
+            <span class="info-label">Mô tả / Yêu cầu</span>
+            <span class="info-value" id="formNote">—</span>
+          </div>
+          <div class="info-item full" id="formMaterialWrap" style="display:none;">
+            <span class="info-label">Liên kết tài liệu</span>
+            <span class="info-value" id="formMaterialLink"></span>
+          </div>
+        </div>
+
+        <form id="submitForm" novalidate>
+          <input type="hidden" id="formHomeworkId" />
+          <div class="field">
+            <label for="fileLink">Link bài làm (Scratch / GitHub / Drive...) <span style="color:var(--danger)">*</span></label>
+            <input type="url" id="fileLink" placeholder="https://..." required autocomplete="off" />
+          </div>
+
+          <div class="form-message" id="formMessage"></div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+              <svg>
+                <use href="#i-check"></use>
+              </svg>
+              <span>Nộp bài</span>
+            </button>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <script src="../shared_auth.js"></script>
+  <script src="./Studentnopbai.js"></script>
+</body>
+
+</html>

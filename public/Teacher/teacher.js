@@ -227,6 +227,9 @@
               ${item.description ? `<p class="assignment-desc">${escapeHtml(item.description)}</p>` : ""}
             </div>
             <div class="card-actions" aria-label="Thao tác với ${escapeHtml(item.title)}">
+              <button class="icon-btn" type="button" data-action="submissions" title="Xem nộp bài" aria-label="Xem nộp bài">
+                <svg><use href="#i-users"></use></svg>
+              </button>
               <button class="icon-btn" type="button" data-action="duplicate" title="Nhân bản" aria-label="Nhân bản bài tập">
                 <svg><use href="#i-copy"></use></svg>
               </button>
@@ -472,6 +475,7 @@
       if (!id) return;
   
       const action = button.dataset.action;
+      if (action === "submissions") openSubmissionPage(id);
       if (action === "edit") openEditModal(id);
       if (action === "delete") requestDelete(id);
       if (action === "duplicate") duplicateAssignment(id);
@@ -485,6 +489,10 @@
       pendingDeleteId = null;
       closeModal(elements.deleteModal);
     });
+
+    function openSubmissionPage(homeworkId) {
+      window.location.href = `/Teacher/teacher-assignmentReview.html?homeworkId=${encodeURIComponent(homeworkId)}`;
+    }
     elements.confirmDeleteBtn.addEventListener("click", confirmDelete);
   
     [elements.assignmentModal, elements.deleteModal].forEach(modal => {

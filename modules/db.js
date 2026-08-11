@@ -3,8 +3,14 @@
 const path = require('path');
 const Database = require('better-sqlite3');
 
+const fs = require('fs');
 const dataDir = path.join(__dirname, '..', 'data');
 const classesDbPath = path.join(dataDir, 'classes.db');
+const phucKhaoDbPath = path.join(dataDir, 'phuckhao.db');
+
+if (!fs.existsSync(phucKhaoDbPath)) {
+  fs.writeFileSync(phucKhaoDbPath, '');
+}
 
 const db = new Database(classesDbPath);
 
@@ -20,10 +26,17 @@ try {
   // ignore attach error
 }
 
+try {
+  db.exec(`ATTACH DATABASE '${phucKhaoDbPath.replace(/'/g, "''")}' AS pk;`);
+} catch (err) {
+  // ignore attach error
+}
+
 // ── 1. Đảm bảo các schema phụ đã được ATTACH (Nếu trong Database.js chưa ATTACH) ──
 // Ví dụ:
 // db.exec(`ATTACH DATABASE './data/users.db' AS users;`);
 // db.exec(`ATTACH DATABASE './data/hw.db' AS hw;`);
+// db.exec(`ATTACH DATABASE './data/phuckhao.db' AS pk;`);
 
 // ── User tables (in attached "users" schema) ──────────────────────
 db.exec(`CREATE TABLE IF NOT EXISTS users.admins (
@@ -86,6 +99,34 @@ db.exec(`CREATE TABLE IF NOT EXISTS hw.homeworks (
   status TEXT DEFAULT 'published'
 )`);
 
+db.exec(`CREATE TABLE IF NOT EXISTS hw.submissions (
+  id TEXT PRIMARY KEY,
+  homeworkId TEXT,
+  studentId TEXT,
+  fileLink TEXT,
+  submittedAt TEXT,
+  score REAL,
+  comment TEXT,
+  appealReason TEXT,
+  appealStatus TEXT DEFAULT 'none',
+  appealSubmittedAt TEXT
+)`);
+
+db.exec(`CREATE TABLE IF NOT EXISTS pk.requests (
+  id TEXT PRIMARY KEY,
+  submissionId TEXT,
+  homeworkId TEXT,
+  studentId TEXT,
+  studentName TEXT,
+  classId TEXT,
+  className TEXT,
+  homeworkTitle TEXT,
+  appealReason TEXT,
+  appealStatus TEXT DEFAULT 'pending',
+  requestedAt TEXT,
+  updatedAt TEXT
+)`);
+
 // The CREATE TABLE above only applies to brand-new databases — SQLite skips
 // it (IF NOT EXISTS) if hw.db already exists from before teacherId/points/
 // status existed. Backfill those columns for existing databases too.
@@ -95,23 +136,17 @@ for (const alterStmt of [
   `ALTER TABLE hw.homeworks ADD COLUMN teacherId TEXT`,
   `ALTER TABLE hw.homeworks ADD COLUMN points REAL DEFAULT 10`,
   `ALTER TABLE hw.homeworks ADD COLUMN status TEXT DEFAULT 'published'`,
+  `ALTER TABLE hw.submissions ADD COLUMN appealReason TEXT`,
+  `ALTER TABLE hw.submissions ADD COLUMN appealStatus TEXT DEFAULT 'none'`,
+  `ALTER TABLE hw.submissions ADD COLUMN appealSubmittedAt TEXT`,
+  `ALTER TABLE pk.requests ADD COLUMN teacherId TEXT`,
 ]) {
   try {
     db.exec(alterStmt);
   } catch (err) {
-    // column already exists — ignore
+    // column already exists or table doesn't yet exist — ignore
   }
 }
-
-db.exec(`CREATE TABLE IF NOT EXISTS hw.submissions (
-  id TEXT PRIMARY KEY,
-  homeworkId TEXT,
-  studentId TEXT,
-  fileLink TEXT,
-  submittedAt TEXT,
-  score REAL,
-  comment TEXT
-)`);
 
 // ── Helper wrappers ───────────────────────────────────────────────
 // Chuẩn hóa tham số để tránh lỗi rã chuỗi khi truyền tham số đơn
