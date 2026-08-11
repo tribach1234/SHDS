@@ -5,8 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#b9dda0" />
-  <title>EduGreen - Quản lý bài tập giáo viên</title>
-  <link rel="stylesheet" href="teacher.css" />
+  <link rel="stylesheet" href="Student.css">
+  <title>EduGreen - Trang của học sinh</title>
 </head>
 
 <body>
@@ -96,6 +96,12 @@
       <path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.2 1.2M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.2-1.2"
         fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
     </symbol>
+    <symbol id="i-trending-up" viewBox="0 0 24 24">
+      <path d="M3 17L9 11L13 15L21 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+        stroke-linejoin="round" />
+      <path d="M15 7H21V13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+        stroke-linejoin="round" />
+    </symbol>
   </svg>
 
   <div class="app-shell">
@@ -107,7 +113,7 @@
         <span>EduGreen</span>
       </div>
 
-      <div class="nav-label">Không gian giáo viên</div>
+      <div class="nav-label">Không gian học sinh</div>
       <nav class="nav">
         <a class="nav-item" href="#" onclick="return false;">
           <svg>
@@ -119,19 +125,19 @@
           <svg>
             <use href="#i-task"></use>
           </svg>
-          <span>Quản lý bài tập</span>
+          <span>Bài tập của tôi</span>
         </a>
         <a class="nav-item" href="#" onclick="return false;">
           <svg>
             <use href="#i-users"></use>
           </svg>
-          <span>Lớp học</span>
+          <span>Thông kế và báo cáo</span>
         </a>
         <a class="nav-item" href="#" onclick="return false;">
           <svg>
             <use href="#i-chart"></use>
           </svg>
-          <span>Kết quả học tập</span>
+          <span>Kết quả và tiến độ</span>
         </a>
         <a class="nav-item" href="#" onclick="return false;">
           <svg>
@@ -144,7 +150,7 @@
       <div class="sidebar-spacer"></div>
       <div class="sidebar-tip">
         <strong>💡 Mẹo nhỏ</strong>
-        <span>Dữ liệu đang được lưu ngay trên trình duyệt bằng Local Storage, phù hợp để thử nghiệm giao diện.</span>
+        <span>Dữ liệu bài tập được lấy từ server. Đăng nhập tại trang Login để sử dụng tài khoản của bạn.</span>
       </div>
     </aside>
 
@@ -159,17 +165,19 @@
             </svg>
           </button>
           <div class="page-heading">
-            <h1>Quản lý bài tập</h1>
-            <p>Tạo, chỉnh sửa và theo dõi bài tập cho các lớp của bạn.</p>
+            <h1>Bài Tập của tôi</h1>
           </div>
         </div>
 
-        <div class="teacher-chip" aria-label="Tài khoản giáo viên">
-          <div class="avatar">GV</div>
+        <div class="teacher-chip" aria-label="Tài khoản học sinh">
+          <div class="avatar" id="userAvatar">HS</div>
           <div class="teacher-text">
-            <strong>Giáo viên</strong>
-            <span>Teacher Workspace</span>
+            <strong id="userName">Học sinh</strong>
+            <span>Student Workspace</span>
           </div>
+          <button type="button" onclick="handleLogout()" style="margin-left: 12px; background: transparent; border: 1px solid #ccc; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 12px;">
+            Đăng xuất
+          </button>
         </div>
       </header>
 
@@ -204,11 +212,11 @@
         <article class="stat-card">
           <div class="stat-top">
             <span class="stat-icon"><svg>
-                <use href="#i-check"></use>
+                <use href="#i-trending-up"></use>
               </svg></span>
           </div>
           <div class="stat-value" id="statCompleted">0</div>
-          <div class="stat-title">Đã hoàn thành</div>
+          <div class="stat-title">Điểm trung bình</div>
         </article>
       </section>
 
@@ -218,27 +226,22 @@
             <svg>
               <use href="#i-search"></use>
             </svg>
-            <input class="control" id="searchInput" type="search" placeholder="Tìm theo tên bài tập, lớp hoặc mô tả..."
+            <input class="control" id="searchInput" type="search" placeholder="Tìm theo tên bài tập, môn hoặc mô tả..."
               autocomplete="off" aria-label="Tìm kiếm bài tập" />
           </div>
 
-          <select class="control" id="classFilter" aria-label="Lọc theo lớp">
-            <option value="all">Tất cả lớp</option>
+          <select class="control" id="classFilter" aria-label="Lọc theo môn học">
+            <option value="all">Môn học</option>
           </select>
 
           <select class="control" id="statusFilter" aria-label="Lọc theo trạng thái">
-            <option value="all">Tất cả trạng thái</option>
-            <option value="published">Đã giao</option>
-            <option value="draft">Bản nháp</option>
+            <option value="all">Trạng thái</option>
+            <option value="incompleted">Chưa hoàn thành</option>
             <option value="completed">Hoàn thành</option>
             <option value="overdue">Quá hạn</option>
           </select>
 
           <button class="btn btn-primary" id="addAssignmentBtn">
-            <svg>
-              <use href="#i-plus"></use>
-            </svg>
-            <span>Giao bài mới</span>
           </button>
         </div>
 
@@ -251,129 +254,8 @@
       </section>
     </main>
   </div>
-
-  <!-- Modal tạo / chỉnh sửa bài tập -->
-  <div class="modal-backdrop" id="assignmentModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <div class="modal">
-      <div class="modal-header">
-        <div class="modal-title-wrap">
-          <div class="modal-title-icon"><svg>
-              <use href="#i-task"></use>
-            </svg></div>
-          <div>
-            <h2 id="modalTitle">Giao bài tập mới</h2>
-            <p id="modalSubtitle">Điền đầy đủ thông tin trước khi lưu.</p>
-          </div>
-        </div>
-        <button class="close-btn" type="button" data-close-modal aria-label="Đóng">
-          <svg>
-            <use href="#i-close"></use>
-          </svg>
-        </button>
-      </div>
-
-      <form id="assignmentForm" novalidate>
-        <div class="modal-body">
-          <input type="hidden" id="assignmentId" />
-
-          <div class="form-grid">
-            <div class="field full" id="fieldTitle">
-              <label for="title">Tên bài tập <span class="required">*</span></label>
-              <input id="title" type="text" maxlength="120" placeholder="Ví dụ: Bài tập chương 2 - Hàm số" />
-              <span class="field-error">Vui lòng nhập tên bài tập.</span>
-            </div>
-
-            <div class="field" id="fieldClassName">
-              <label for="className">Lớp học <span class="required">*</span></label>
-              <input id="className" type="text" maxlength="60" placeholder="Ví dụ: 10A1" list="classSuggestions" />
-              <datalist id="classSuggestions">
-                <option value="10A1"></option>
-                <option value="10A2"></option>
-                <option value="11A1"></option>
-                <option value="12A1"></option>
-              </datalist>
-              <span class="field-error">Vui lòng nhập lớp học.</span>
-            </div>
-
-            <div class="field" id="fieldPoints">
-              <label for="points">Điểm tối đa <span class="required">*</span></label>
-              <input id="points" type="number" min="1" max="1000" step="1" value="10" />
-              <span class="field-error">Điểm phải từ 1 đến 1000.</span>
-            </div>
-
-            <div class="field" id="fieldDueDate">
-              <label for="dueDate">Ngày đến hạn <span class="required">*</span></label>
-              <input id="dueDate" type="date" />
-              <span class="field-error">Vui lòng chọn ngày đến hạn.</span>
-            </div>
-
-            <div class="field" id="fieldDueTime">
-              <label for="dueTime">Giờ đến hạn <span class="required">*</span></label>
-              <input id="dueTime" type="time" value="23:59" />
-              <span class="field-error">Vui lòng chọn giờ đến hạn.</span>
-            </div>
-
-            <div class="field">
-              <label for="status">Trạng thái</label>
-              <select id="status">
-                <option value="published">Giao ngay</option>
-                <option value="draft">Lưu bản nháp</option>
-                <option value="completed">Đánh dấu hoàn thành</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label for="materialUrl">Liên kết tài liệu</label>
-              <input id="materialUrl" type="url" placeholder="https://..." />
-              <div class="helper">Có thể để trống. Liên kết sẽ được mở trong tab mới.</div>
-            </div>
-
-            <div class="field full">
-              <label for="description">Mô tả / yêu cầu bài tập</label>
-              <textarea id="description" maxlength="1000"
-                placeholder="Nhập hướng dẫn, nội dung cần hoàn thành, cách nộp bài..."></textarea>
-              <div class="helper"><span id="descriptionCount">0</span>/1000 ký tự</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button class="btn btn-secondary" type="button" data-close-modal>Hủy</button>
-          <button class="btn btn-primary" type="submit">
-            <svg>
-              <use href="#i-check"></use>
-            </svg>
-            <span id="saveButtonText">Lưu bài tập</span>
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal xác nhận xóa -->
-  <div class="modal-backdrop" id="deleteModal" role="dialog" aria-modal="true" aria-labelledby="deleteTitle">
-    <div class="modal confirm-modal">
-      <div class="confirm-content">
-        <div class="confirm-icon"><svg>
-            <use href="#i-trash"></use>
-          </svg></div>
-        <h2 id="deleteTitle">Xóa bài tập?</h2>
-        <p>Bài tập <strong id="deleteAssignmentName"></strong> sẽ bị xóa khỏi trình duyệt này. Thao tác không thể hoàn
-          tác.</p>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" type="button" id="cancelDeleteBtn">Giữ lại</button>
-        <button class="btn btn-danger" type="button" id="confirmDeleteBtn">
-          <svg>
-            <use href="#i-trash"></use>
-          </svg>
-          Xóa bài tập
-        </button>
-      </div>
-    </div>
-  </div>
-  <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
-  <script src="teacher.js"></script>
+  <script src="../shared_auth.js"></script>
+  <script src="./Student.js"></script>
 </body>
 
 </html>

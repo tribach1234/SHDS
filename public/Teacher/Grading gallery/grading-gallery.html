@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giao diện Chấm bài Giáo viên</title>
+    <link rel="stylesheet" href="grading-gallery.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>EduGreen - Hệ thống Chấm bài</h1>
+        <div>Giáo viên: <strong>Nguyễn Văn A</strong></div>
+    </header>
+
+    <div class="container">
+        <!-- CỘT TRÁI: XEM BÀI (VIEWER) -->
+        <div class="left-col">
+            <div class="tabs">
+                <button class="tab-btn active" data-target="scratch-tab">Scratch Embed</button>
+                <button class="tab-btn" data-target="web-tab">Web (Iframe)</button>
+                <button class="tab-btn" data-target="code-tab">Code Viewer</button>
+            </div>
+
+            <!-- 1. Scratch Viewer -->
+            <div id="scratch-tab" class="viewer-content active">
+                <!-- Thay src bằng link embed project Scratch của học viên -->
+                <iframe src="https://scratch.mit.edu/projects/530219660/embed" allowtransparency="true" frameborder="0"
+                    scrolling="no" allowfullscreen></iframe>
+            </div>
+
+            <!-- 2. Web Iframe Viewer -->
+            <div id="web-tab" class="viewer-content">
+                <iframe src="https://example.com" frameborder="0"></iframe>
+            </div>
+
+            <!-- 3. Code Viewer -->
+            <div id="code-tab" class="viewer-content">
+                <pre class="code-viewer"><code>
+// File: main.js (Bài nộp của học viên)
+function calculateTotal(items) {
+    let total = 0;
+    for(let i = 0; i < items.length; i++) {
+        total += items[i].price * items[i].quantity;
+    }
+    return total;
+}
+
+const cart = [
+    { id: 1, name: "Sách HTML", price: 50000, quantity: 2 },
+    { id: 2, name: "Khóa học JS", price: 200000, quantity: 1 }
+];
+
+console.log("Tổng tiền:", calculateTotal(cart));
+                </code></pre>
+            </div>
+        </div>
+
+        <!-- CỘT PHẢI: FORM CHẤM ĐIỂM -->
+        <div class="right-col">
+            <div class="student-info">
+                <h2>Học viên: Test test</h2>
+                <p>Bài tập: Xây dựng giỏ hàng cơ bản</p>
+                <p>Ngày nộp: 11/08/2026 14:30</p>
+            </div>
+
+            <form id="gradingForm" novalidate>
+                <div class="form-group">
+                    <label for="score">Điểm số (0 - 10) <span>*</span></label>
+                    <!-- Ràng buộc UI: type="number", min="0", max="10", step cho phép điểm lẻ -->
+                    <input type="number" id="score" class="form-control" min="0" max="10" step="0.5"
+                        placeholder="Ví dụ: 8.5" required>
+                    <div id="scoreError" class="error-msg">Vui lòng nhập điểm hợp lệ từ 0 đến 10.</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="comment">Nhận xét bài làm <span>*</span></label>
+                    <textarea id="comment" class="form-control" rows="6"
+                        placeholder="Nhập nhận xét chi tiết cho học viên..." required></textarea>
+                    <div id="commentError" class="error-msg">Nhận xét không được để trống (nhập ít nhất 10 ký tự).</div>
+                </div>
+
+                <button type="submit" class="submit-btn">Lưu kết quả chấm</button>
+                <div id="successMessage" class="alert"></div>
+            </form>
+        </div>
+    </div>
+
+    <script src="grading-gallery.js"></script>
+</body>
+
+</html>

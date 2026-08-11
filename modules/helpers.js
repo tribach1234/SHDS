@@ -1,4 +1,4 @@
-const { dbGet } = require('./db');
+const { dbGet } = require('../modules/db');
 
 function formatEmail(inputEmail) {
   if (!inputEmail) return '';
@@ -8,7 +8,7 @@ function formatEmail(inputEmail) {
 }
 
 async function checkEmailExists(email) {
-  const tables = ['admins', 'teachers', 'tas', 'students'];
+  const tables = ['users.admins', 'users.teachers', 'users.tas', 'users.students'];
   for (const table of tables) {
     const user = await dbGet(`SELECT email FROM ${table} WHERE email = ?`, [email]);
     if (user) return true;

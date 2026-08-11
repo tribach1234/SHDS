@@ -65,33 +65,29 @@
 
       <div class="nav-label">Không gian giáo viên</div>
       <nav class="nav">
-        <a class="nav-item active" href="#" aria-current="page">
+        <a class="nav-item active" href="teacher-overview.html" aria-current="page">
           <svg><use href="#i-home"></use></svg>
           <span>Tổng quan</span>
         </a>
-        <a class="nav-item" href="#">
+        <a class="nav-item" href="teacher-assignmentManage.html">
           <svg><use href="#i-task"></use></svg>
           <span>Quản lý bài tập</span>
         </a>
-        <a class="nav-item" href="#">
+        <a class="nav-item" href="#" onclick="comingSoon('Lớp học'); return false;">
           <svg><use href="#i-users"></use></svg>
           <span>Lớp học</span>
         </a>
-        <a class="nav-item" href="#">
+        <a class="nav-item" href="#" onclick="comingSoon('Kết quả học tập'); return false;">
           <svg><use href="#i-chart"></use></svg>
           <span>Kết quả học tập</span>
         </a>
-        <a class="nav-item" href="#">
+        <a class="nav-item" href="#" onclick="comingSoon('Cài đặt'); return false;">
           <svg><use href="#i-settings"></use></svg>
           <span>Cài đặt</span>
         </a>
       </nav>
 
       <div class="sidebar-spacer"></div>
-      <div class="sidebar-tip">
-        <strong>📌 Tổng quan</strong>
-        <span>Giám sát tiến độ nộp bài, câu hỏi và công việc cần xử lý trong ngày.</span>
-      </div>
     </aside>
 
     <main class="main">
@@ -111,6 +107,9 @@
             <strong>Giáo viên</strong>
             <span>Teacher Workspace</span>
           </div>
+          <button type="button" onclick="handleLogout()" style="margin-left: 12px; background: transparent; border: 1px solid #ccc; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 12px;">
+            Đăng xuất
+          </button>
         </div>
       </header>
 
@@ -119,28 +118,28 @@
           <div class="stat-top">
             <span class="stat-icon"><svg><use href="#i-task"></use></svg></span>
           </div>
-          <div class="stat-value">23</div>
+          <div class="stat-value" id="statPendingGrading">—</div>
           <div class="stat-title">Số bài chờ chấm</div>
         </article>
         <article class="stat-card">
           <div class="stat-top">
             <span class="stat-icon"><svg><use href="#i-alert"></use></svg></span>
           </div>
-          <div class="stat-value">7</div>
+          <div class="stat-value" id="statReports">—</div>
           <div class="stat-title">Thắc mắc/Báo cáo</div>
         </article>
         <article class="stat-card">
           <div class="stat-top">
             <span class="stat-icon"><svg><use href="#i-clock"></use></svg></span>
           </div>
-          <div class="stat-value">5</div>
+          <div class="stat-value" id="statDueSoon">—</div>
           <div class="stat-title">Sắp đến hạn</div>
         </article>
         <article class="stat-card">
           <div class="stat-top">
             <span class="stat-icon"><svg><use href="#i-check"></use></svg></span>
           </div>
-          <div class="stat-value">84%</div>
+          <div class="stat-value" id="statSubmissionRate">—</div>
           <div class="stat-title">Tỷ lệ nộp bài</div>
         </article>
       </section>
@@ -150,88 +149,27 @@
           <div class="overview-panel">
             <div class="list-header">
               <h2>Cần xử lý trong hôm nay</h2>
-              <span class="result-count">3 mục</span>
+              <span class="result-count" id="todoCount">0 mục</span>
             </div>
 
-            <div class="assignment-list">
-              <article class="assignment-card">
-                <div class="assignment-icon"><svg><use href="#i-task"></use></svg></div>
-                <div class="assignment-main">
-                  <div class="assignment-title-row">
-                    <h3 class="assignment-title">Bài tập chương 2 - Đại số</h3>
-                    <span class="badge badge-published">Chờ chấm</span>
-                  </div>
-                  <div class="assignment-meta">
-                    <span class="meta-item"><svg><use href="#i-users"></use></svg>10A1</span>
-                    <span class="meta-item"><svg><use href="#i-clock"></use></svg>Hạn 18:00</span>
-                  </div>
-                </div>
-              </article>
-
-              <article class="assignment-card">
-                <div class="assignment-icon"><svg><use href="#i-alert"></use></svg></div>
-                <div class="assignment-main">
-                  <div class="assignment-title-row">
-                    <h3 class="assignment-title">Thắc mắc về đề cương</h3>
-                    <span class="badge badge-draft">Cần phản hồi</span>
-                  </div>
-                  <div class="assignment-meta">
-                    <span class="meta-item"><svg><use href="#i-users"></use></svg>11A2</span>
-                    <span class="meta-item"><svg><use href="#i-clock"></use></svg>8 phút trước</span>
-                  </div>
-                </div>
-              </article>
-
-              <article class="assignment-card">
-                <div class="assignment-icon"><svg><use href="#i-check"></use></svg></div>
-                <div class="assignment-main">
-                  <div class="assignment-title-row">
-                    <h3 class="assignment-title">Nộp bài Tiểu luận</h3>
-                    <span class="badge badge-completed">Đã nộp</span>
-                  </div>
-                  <div class="assignment-meta">
-                    <span class="meta-item"><svg><use href="#i-users"></use></svg>12A1</span>
-                    <span class="meta-item"><svg><use href="#i-clock"></use></svg>Đã hoàn tất</span>
-                  </div>
-                </div>
-              </article>
+            <div class="assignment-list" id="todoList">
+              <p style="padding:16px;color:#888">Đang tải dữ liệu...</p>
             </div>
           </div>
 
           <div class="overview-panel">
             <div class="list-header">
               <h2>Thắc mắc / Báo cáo</h2>
-              <span class="result-count">4 tin mới</span>
+              <span class="result-count">Sắp ra mắt</span>
             </div>
 
             <div class="report-list">
               <div class="report-item">
                 <div>
-                  <strong>Học sinh 10A1 báo lỗi link tài liệu</strong>
-                  <span>Đã gửi lúc 09:15 · Cần kiểm tra lại đường dẫn.</span>
+                  <strong>Tính năng này chưa khả dụng</strong>
+                  <span>Chưa có bảng dữ liệu cho thắc mắc/báo cáo trong hệ thống — sẽ được bổ sung sau.</span>
                 </div>
-                <span class="report-badge">Mới</span>
-              </div>
-              <div class="report-item">
-                <div>
-                  <strong>11A2 thắc mắc về thời hạn nộp</strong>
-                  <span>Muốn xác nhận lại giờ chốt bài.</span>
-                </div>
-                <span class="report-badge">Đang xử lý</span>
-              </div>
-              <div class="report-item">
-                <div>
-                  <strong>12A1 cần hỗ trợ cách nộp bài</strong>
-                  <span>Học sinh chưa rõ quy trình upload.</span>
-                </div>
-                <span class="report-badge">Ưu tiên</span>
-              </div>
-              <div class="report-item">
-                <div>
-                  <strong>Báo cáo trùng bài nộp của 2 học sinh</strong>
-                  <span>Yêu cầu xác minh nội dung và xử lý.</span>
-                </div>
-                <span class="report-badge">Cần xem</span>
+                <span class="report-badge">Sắp ra mắt</span>
               </div>
             </div>
           </div>
@@ -239,6 +177,8 @@
       </section>
     </main>
   </div>
+  <script src="../shared_auth.js"></script>
+  <script src="teacher-overview.js"></script>
 </body>
 
 </html>
