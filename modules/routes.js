@@ -547,4 +547,63 @@ router.get("/api/teacher/:teacherId/overview", async (req, res) => {
     }
 });
 
+router.get("/api/teacher/:teacherId/submissions", async (req, res) => {
+    try {
+        const teacherId = req.params.teacherId;
+ 
+        const rows = await dbAll(`
+            SELECT
+                s.id            AS id,
+                s.homeworkId    AS homeworkId,
+                s.studentId     AS studentId,
+                s.fileLink      AS fileLink,
+                s.submittedAt   AS submittedAt,
+                s.score         AS score,
+                s.comment       AS comment,
+                h.title         AS homeworkTitle,
+                h.classId       AS classId,
+                h.points        AS maxPoints,
+                h.deadline      AS deadline,
+                st.fullName     AS studentName,
+                st.email        AS studentEmail
+            FROM hw.submissions s
+            JOIN hw.homeworks h ON h.homeworkId = s.homeworkId
+            LEFT JOIN users.students st ON st.id = s.studentId
+            WHERE h.teacherId = ?
+            ORDER BY s.submittedAt DESC
+        `, [teacherId]);
+ 
+        res.json({ success: true, data: rows });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+ 
+// POST: save/update the score + comment for one submission.
+router.post("/api/submissions/:id/grade", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { score, comment } = req.body;
+ 
+        if (score === undefined || score === null || score === "" || isNaN(Number(score))) {
+            return res.status(400).json({ success: false, error: "Điểm không hợp lệ." });
+        }
+ 
+        const existing = await dbGet(`SELECT id FROM hw.submissions WHERE id = ?`, [id]);
+        if (!existing) {
+            return res.status(404).json({ success: false, error: "Không tìm thấy bài nộp." });
+        }
+ 
+        await dbRun(
+            `UPDATE hw.submissions SET score = ?, comment = ? WHERE id = ?`,
+            [Number(score), comment ?? null, id]
+        );
+ 
+        const updated = await dbGet(`SELECT * FROM hw.submissions WHERE id = ?`, [id]);
+        res.json({ success: true, data: updated });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
 module.exports = router;

@@ -5,8 +5,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#b9dda0" />
-  <link rel="stylesheet" href="Student.css">
-  <title>EduGreen - Kết quả và tiến độ</title>
+  <title>EduGreen - Chấm bài học sinh</title>
+  <link rel="stylesheet" href="teacher.css" />
+  <link rel="stylesheet" href="teacher-grading.css" />
 </head>
 
 <body>
@@ -46,13 +47,6 @@
       <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2" />
       <path d="m20 20-4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
     </symbol>
-    <symbol id="i-menu" viewBox="0 0 24 24">
-      <path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-    </symbol>
-    <symbol id="i-check" viewBox="0 0 24 24">
-      <path d="m5 12 4 4L19 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
-        stroke-linejoin="round" />
-    </symbol>
     <symbol id="i-calendar" viewBox="0 0 24 24">
       <rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.8" />
       <path d="M8 3v4M16 3v4M3 10h18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
@@ -61,19 +55,31 @@
       <path d="M3 5h18v14H3zM7 9h5M7 13h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
         stroke-linejoin="round" />
     </symbol>
-    <symbol id="i-star" viewBox="0 0 24 24">
-      <path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z" fill="none"
-        stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
-    </symbol>
-    <symbol id="i-trending-up" viewBox="0 0 24 24">
-      <path d="M3 17L9 11L13 15L21 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-        stroke-linejoin="round" />
-      <path d="M15 7H21V13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-        stroke-linejoin="round" />
-    </symbol>
     <symbol id="i-clock" viewBox="0 0 24 24">
       <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8" />
       <path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+    </symbol>
+    <symbol id="i-check" viewBox="0 0 24 24">
+      <path d="m5 12 4 4L19 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+        stroke-linejoin="round" />
+    </symbol>
+    <symbol id="i-close" viewBox="0 0 24 24">
+      <path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+    </symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24">
+      <path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+    </symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24">
+      <path d="M12 3 2.7 20h18.6L12 3Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+      <path d="M12 9v5M12 17.3v.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+    </symbol>
+    <symbol id="i-link" viewBox="0 0 24 24">
+      <path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.2 1.2M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.2-1.2"
+        fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+    </symbol>
+    <symbol id="i-star" viewBox="0 0 24 24">
+      <path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z" fill="none"
+        stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
     </symbol>
   </svg>
 
@@ -86,36 +92,47 @@
         <span>EduGreen</span>
       </div>
 
-      <div class="nav-label">Không gian học sinh</div>
+      <div class="nav-label">Không gian giáo viên</div>
       <nav class="nav">
-        <a class="nav-item" href="Studentoverview.html">
+        <a class="nav-item" href="teacher-overview.html">
           <svg>
             <use href="#i-home"></use>
           </svg>
           <span>Tổng quan</span>
         </a>
-        <a class="nav-item" href="Student.html">
+        <a class="nav-item" href="teacher-assignmentManage.html">
           <svg>
             <use href="#i-task"></use>
           </svg>
-          <span>Bài tập của tôi</span>
+          <span>Quản lý bài tập</span>
         </a>
-        <a class="nav-item" href="Studentnopbai.html">
+        <a class="nav-item active" href="teacher-grading.html" aria-current="page">
           <svg>
-            <use href="#i-task"></use>
+            <use href="#i-check"></use>
           </svg>
-          <span>Nộp bài</span>
+          <span>Chấm bài</span>
         </a>
-        <a class="nav-item active" href="Studentprogress.html" aria-current="page">
+        <a class="nav-item" href="#" onclick="comingSoon('Lớp học'); return false;">
+          <svg>
+            <use href="#i-users"></use>
+          </svg>
+          <span>Lớp học</span>
+        </a>
+        <a class="nav-item" href="#" onclick="comingSoon('Kết quả học tập'); return false;">
           <svg>
             <use href="#i-chart"></use>
           </svg>
-          <span>Kết quả và tiến độ</span>
+          <span>Kết quả học tập</span>
+        </a>
+        <a class="nav-item" href="#" onclick="comingSoon('Cài đặt'); return false;">
+          <svg>
+            <use href="#i-settings"></use>
+          </svg>
+          <span>Cài đặt</span>
         </a>
       </nav>
 
       <div class="sidebar-spacer"></div>
-     
     </aside>
 
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -129,16 +146,16 @@
             </svg>
           </button>
           <div class="page-heading">
-            <h1>Kết quả và tiến độ</h1>
-            <p>Danh sách bài đã nộp cùng điểm số và nhận xét từ giáo viên.</p>
+            <h1>Chấm bài</h1>
+            <p>Xem bài học sinh đã nộp, chấm điểm và xem thử mô phỏng bài làm.</p>
           </div>
         </div>
 
-        <div class="teacher-chip" aria-label="Tài khoản học sinh">
-          <div class="avatar" id="userAvatar">HS</div>
+        <div class="teacher-chip" aria-label="Tài khoản giáo viên">
+          <div class="avatar">GV</div>
           <div class="teacher-text">
-            <strong id="userName">Học sinh</strong>
-            <span>Student Workspace</span>
+            <strong>Giáo viên</strong>
+            <span>Teacher Workspace</span>
           </div>
           <button type="button" onclick="handleLogout()" style="margin-left: 12px; background: transparent; border: 1px solid #ccc; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 12px;">
             Đăng xuất
@@ -146,11 +163,11 @@
         </div>
       </header>
 
-      <section class="stats" aria-label="Thống kê kết quả">
+      <section class="stats" aria-label="Thống kê chấm bài">
         <article class="stat-card primary">
           <div class="stat-top">
             <span class="stat-icon"><svg>
-                <use href="#i-check"></use>
+                <use href="#i-task"></use>
               </svg></span>
           </div>
           <div class="stat-value" id="statTotal">0</div>
@@ -159,28 +176,28 @@
         <article class="stat-card">
           <div class="stat-top">
             <span class="stat-icon"><svg>
-                <use href="#i-star"></use>
-              </svg></span>
-          </div>
-          <div class="stat-value" id="statGraded">0</div>
-          <div class="stat-title">Đã chấm điểm</div>
-        </article>
-        <article class="stat-card">
-          <div class="stat-top">
-            <span class="stat-icon"><svg>
-                <use href="#i-clock"></use>
+                <use href="#i-alert"></use>
               </svg></span>
           </div>
           <div class="stat-value" id="statPending">0</div>
-          <div class="stat-title">Đang chờ chấm</div>
+          <div class="stat-title">Chờ chấm</div>
         </article>
         <article class="stat-card">
           <div class="stat-top">
             <span class="stat-icon"><svg>
-                <use href="#i-trending-up"></use>
+                <use href="#i-check"></use>
               </svg></span>
           </div>
-          <div class="stat-value" id="statAvgScore">—</div>
+          <div class="stat-value" id="statGraded">0</div>
+          <div class="stat-title">Đã chấm</div>
+        </article>
+        <article class="stat-card">
+          <div class="stat-top">
+            <span class="stat-icon"><svg>
+                <use href="#i-star"></use>
+              </svg></span>
+          </div>
+          <div class="stat-value" id="statAvg">—</div>
           <div class="stat-title">Điểm trung bình</div>
         </article>
       </section>
@@ -191,7 +208,7 @@
             <svg>
               <use href="#i-search"></use>
             </svg>
-            <input class="control" id="searchInput" type="search" placeholder="Tìm theo tên bài tập hoặc lớp..."
+            <input class="control" id="searchInput" type="search" placeholder="Tìm theo học sinh, bài tập hoặc lớp..."
               autocomplete="off" aria-label="Tìm kiếm bài nộp" />
           </div>
 
@@ -201,46 +218,10 @@
 
           <select class="control" id="statusFilter" aria-label="Lọc theo trạng thái">
             <option value="all">Tất cả trạng thái</option>
-            <option value="graded">Đã chấm</option>
             <option value="pending">Chờ chấm</option>
+            <option value="graded">Đã chấm</option>
           </select>
         </div>
-
-        <!--
-          Chart switcher: the dropdown menu below is intentionally left
-          empty. Studentprogress.js builds its contents from a single
-          CHART_DEFINITIONS array, so adding/removing/reordering charts
-          only requires editing that array — no HTML edits needed here.
-        -->
-        <section class="chart-area">
-          <div class="chart-dropdown" id="chartSwitcher" aria-label="Chọn biểu đồ">
-            <button type="button" class="chart-dropdown-toggle" id="chartDropdownButton" aria-haspopup="true" aria-expanded="false">
-              <span id="chartDropdownLabel">Bật biểu đồ</span>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
-            <div class="chart-dropdown-menu hidden" id="chartDropdownMenu" role="menu">
-              <!-- Populated dynamically by Studentprogress.js -->
-            </div>
-          </div>
-
-          <section class="chart-panel" id="pieChartSection" data-chart="pie" aria-label="Biểu đồ trạng thái nộp bài">
-            <div class="chart-card">
-              <div class="chart-card-title">Phân bổ bài nộp theo trạng thái</div>
-              <svg id="scorePieChart" viewBox="0 0 180 180" aria-hidden="true"></svg>
-            </div>
-            <div class="chart-legend" id="pieLegend" aria-label="Chú giải biểu đồ trạng thái nộp bài"></div>
-          </section>
-
-          <section class="chart-panel chart-panel-full" id="lineChartSection" data-chart="line" aria-label="Biểu đồ điểm trung bình theo tháng" hidden>
-            <div class="line-chart-toolbar">
-              <div class="chart-card-title">Điểm trung bình theo tháng</div>
-              <div class="year-toggle" id="yearToggle"></div>
-            </div>
-            <div class="line-chart-card">
-              <svg id="scoreLineChart" viewBox="0 0 560 280" aria-hidden="true"></svg>
-            </div>
-          </section>
-        </section>
 
         <div class="list-header">
           <h2>Danh sách bài đã nộp</h2>
@@ -253,8 +234,89 @@
       </section>
     </main>
   </div>
+
+  <!-- Modal chấm bài -->
+  <div class="modal-backdrop" id="gradingModal" role="dialog" aria-modal="true" aria-labelledby="gradingModalTitle">
+    <div class="modal grading-modal">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-title-icon"><svg>
+              <use href="#i-check"></use>
+            </svg></div>
+          <div>
+            <h2 id="gradingModalTitle">Chấm bài</h2>
+            <p id="gradingModalSubtitle">—</p>
+          </div>
+        </div>
+        <button class="close-btn" type="button" data-close-modal aria-label="Đóng">
+          <svg>
+            <use href="#i-close"></use>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body grading-body">
+        <div class="submission-info">
+          <div class="info-row">
+            <span class="info-label"><svg><use href="#i-users"></use></svg>Học sinh</span>
+            <span class="info-value" id="infoStudent">—</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label"><svg><use href="#i-class"></use></svg>Lớp</span>
+            <span class="info-value" id="infoClass">—</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label"><svg><use href="#i-calendar"></use></svg>Ngày nộp</span>
+            <span class="info-value" id="infoSubmittedAt">—</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label"><svg><use href="#i-link"></use></svg>Bài làm</span>
+            <span class="info-value" id="infoLink">—</span>
+          </div>
+        </div>
+
+        <form id="gradingForm" class="grading-form" novalidate>
+          <input type="hidden" id="submissionId" />
+          <div class="grading-form-row">
+            <div class="field" id="fieldScore">
+              <label for="scoreInput">Điểm số <span class="required">*</span></label>
+              <input id="scoreInput" type="number" min="0" step="0.1" />
+              <span class="field-error">Vui lòng nhập điểm hợp lệ.</span>
+            </div>
+            <div class="field">
+              <label for="maxPointsDisplay">Điểm tối đa</label>
+              <input id="maxPointsDisplay" type="text" disabled />
+            </div>
+          </div>
+          <div class="field full">
+            <label for="commentInput">Nhận xét cho học sinh</label>
+            <textarea id="commentInput" rows="3" placeholder="Nhận xét về bài làm..."></textarea>
+          </div>
+          <div class="grading-form-actions">
+            <button class="btn btn-secondary" type="button" data-close-modal>Đóng</button>
+            <button class="btn btn-primary" type="submit">
+              <svg><use href="#i-check"></use></svg>
+              <span>Lưu điểm</span>
+            </button>
+          </div>
+        </form>
+
+        <div class="simulation-section">
+          <div class="simulation-header">
+            <h3>Mô phỏng bài làm</h3>
+            <span class="simulation-hint">Tự động nhận diện Scratch / Python từ liên kết bài nộp</span>
+          </div>
+          <div class="simulation-preview" id="simulationPreview">
+            <p class="preview-empty">Chọn một bài nộp để xem mô phỏng.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
   <script src="../shared_auth.js"></script>
-  <script src="Studentprogress.js"></script>
+  <script src="teacher-grading.js"></script>
 </body>
 
 </html>

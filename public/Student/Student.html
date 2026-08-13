@@ -113,7 +113,7 @@
         <span>EduGreen</span>
       </div>
 
-      <div class="nav-label">Không gian học sinh</div>
+       <div class="nav-label">Không gian học sinh</div>
       <nav class="nav">
         <a class="nav-item" href="Studentoverview.html">
           <svg>
@@ -121,7 +121,7 @@
           </svg>
           <span>Tổng quan</span>
         </a>
-        <a class="nav-item active" href="Student.html" aria-current="page">
+        <a class="nav-item active" href="Student.html">
           <svg>
             <use href="#i-task"></use>
           </svg>
@@ -133,13 +133,7 @@
           </svg>
           <span>Nộp bài</span>
         </a>
-        <a class="nav-item" href="#" onclick="comingSoon('Thống kê và báo cáo'); return false;">
-          <svg>
-            <use href="#i-users"></use>
-          </svg>
-          <span>Thông kế và báo cáo</span>
-        </a>
-        <a class="nav-item" href="Studentprogress.html">
+        <a class="nav-item" href="Studentprogress.html" aria-current="page">
           <svg>
             <use href="#i-chart"></use>
           </svg>
@@ -148,10 +142,7 @@
       </nav>
 
       <div class="sidebar-spacer"></div>
-      <div class="sidebar-tip">
-        <strong>💡 Mẹo nhỏ</strong>
-        <span>Dữ liệu bài tập được lấy từ server. Đăng nhập tại trang Login để sử dụng tài khoản của bạn.</span>
-      </div>
+     
     </aside>
 
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -241,8 +232,7 @@
             <option value="overdue">Quá hạn</option>
           </select>
 
-          <button class="btn btn-primary" id="addAssignmentBtn" type="button">
-            Nộp bài
+          <button class="btn btn-primary" id="addAssignmentBtn">
           </button>
         </div>
 
@@ -255,6 +245,50 @@
       </section>
     </main>
   </div>
+
+  <!-- Modal xem chi tiết bài tập -->
+  <div class="modal-backdrop" id="homeworkDetailModal" role="dialog" aria-modal="true" aria-labelledby="detailModalTitle">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-title-icon"><svg>
+              <use href="#i-task"></use>
+            </svg></div>
+          <div>
+            <h2 id="detailModalTitle">Chi tiết bài tập</h2>
+            <p id="detailModalMeta">—</p>
+          </div>
+        </div>
+        <button class="close-btn" type="button" onclick="closeHomeworkDetail()" aria-label="Đóng">
+          <svg>
+            <use href="#i-close"></use>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="assignment-meta" id="detailMetaRow" style="margin-bottom:18px;"></div>
+
+        <h3 style="margin:0 0 8px;font-size:14px;">Mô tả / yêu cầu bài tập</h3>
+        <p id="detailNote" style="white-space:pre-wrap;color:var(--ink-soft);font-size:14px;line-height:1.75;margin:0 0 18px;">—</p>
+
+        <div id="detailMaterial" style="margin-bottom:18px;"></div>
+
+        <div id="detailSubmissionBox" style="border-top:1px solid var(--line);padding-top:16px;"></div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" onclick="closeHomeworkDetail()">Đóng</button>
+        <button class="btn btn-primary" type="button" id="detailSubmitBtn" style="display:none;" onclick="handleDetailSubmit()">
+          <svg>
+            <use href="#i-check"></use>
+          </svg>
+          <span>Nộp bài</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script src="../shared_auth.js"></script>
   <script src="./Student.js"></script>
 </body>

@@ -7,10 +7,12 @@ const fs = require('fs');
 const dataDir = path.join(__dirname, '..', 'data');
 const classesDbPath = path.join(dataDir, 'classes.db');
 const phucKhaoDbPath = path.join(dataDir, 'phuckhao.db');
+const usersDbPath = path.join(dataDir, 'users.db');
+const hwDbPath = path.join(dataDir, 'homeworks.db');
 
-if (!fs.existsSync(phucKhaoDbPath)) {
-  fs.writeFileSync(phucKhaoDbPath, '');
-}
+if (!fs.existsSync(usersDbPath)) fs.writeFileSync(usersDbPath, '');
+if (!fs.existsSync(hwDbPath)) fs.writeFileSync(hwDbPath, '');
+if (!fs.existsSync(phucKhaoDbPath)) fs.writeFileSync(phucKhaoDbPath, '');
 
 const db = new Database(classesDbPath);
 
