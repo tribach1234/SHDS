@@ -1,16 +1,14 @@
 // teacher-assignmentReview.js
 // Powers the "Kiểm tra bài nộp" (Assignment Review) page
-// Merged with enhanced grading capabilities from teacher-grading.js
 
 (() => {
   "use strict";
 
   const HOMEWORK_ID = new URLSearchParams(window.location.search).get('homeworkId');
+  const SUBMISSION_ID = new URLSearchParams(window.location.search).get('submissionId');
   const API_BASE = '/api';
   const TEACHER_ID = window.TEACHER_ID; // Defined in shared_auth.js
-
   const $ = (selector, root = document) => root.querySelector(selector);
-  const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
   let currentSubmissions = [];
   let currentSubmission = null;
@@ -69,8 +67,6 @@
     setTimeout(() => toast.remove(), 3500);
   }
 
-  // ── Simulation preview (Scratch / Python auto-detect) ──────────────
-  
   function isValidHttpUrl(value) {
     try {
       const url = new URL(value);
@@ -140,7 +136,7 @@
     return `
       <div style="font-weight:bold; margin-bottom:8px;">🔗 Xem trước bài làm</div>
       <iframe style="width:100%; height:400px; border:1px solid #cbd5e1; border-radius:8px;" src="${safeLink}" loading="lazy"></iframe>
-      <p style="margin-top:8px; font-size:0.9em; color:#64748b;">Nếu không hiển thị được (do trang chặn nhúng), hãy <a href="${safeLink}" target="_blank" rel="noopener noreferrer">mở bài làm trong tab mới</a>.</p>
+      <p style="margin-top:8px; font-size:0.9em; color:#64748b;">Nếu không hiển thị được, hãy <a href="${safeLink}" target="_blank" rel="noopener noreferrer">mở bài làm trong tab mới</a>.</p>
     `;
   }
 
@@ -209,12 +205,11 @@
                 <span class="badge ${graded ? 'badge-completed' : 'badge-published'}">${graded ? 'Đã chấm' : 'Chờ chấm'}</span>
               </div>
               <div class="assignment-meta">
-                <span class="meta-item"><svg><use href="#i-class"></use></svg>${escapeHtml(submission.className || '')}</span>
                 <span class="meta-item"><svg><use href="#i-clock"></use></svg>${formatDateTime(submission.submittedAt)}</span>
                 ${graded ? `<span class="meta-item"><svg><use href="#i-star"></use></svg>Điểm: ${submission.score}</span>` : ''}
               </div>
               ${submission.comment ? `<p class="assignment-desc" style="margin-top:8px;"><strong>Nhận xét:</strong> ${escapeHtml(submission.comment)}</p>` : ''}
-              ${appealPending ? '<div style="margin-top:8px;"><span class="badge badge-warning">Phúc khảo đang chờ</span></div>' : ''}
+              ${appealPending ? '<div style="margin-top:8px;"><span class="badge badge-warning" style="background:#fef3c7;color:#d97706;padding:2px 8px;border-radius:4px;font-size:12px;">Phúc khảo đang chờ</span></div>' : ''}
               ${submission.appealStatus && submission.appealStatus !== 'none' && submission.appealReason ? `<p class="assignment-desc" style="margin-top:4px;"><strong>Lý do phúc khảo:</strong> ${escapeHtml(submission.appealReason)}</p>` : ''}
             </div>
             <div class="card-actions" style="display:flex; align-items:center; gap:8px;">
@@ -230,107 +225,79 @@
 
   // ── Integrated Grading Modal ──────────────────────────────────────
   
-  function renderGradeDialog() {
-    if (document.getElementById('gradeModal')) return;
+  function renderGradeDialog(submission) {
+    const existingModal = document.getElementById('gradeModal');
+    if (existingModal) existingModal.remove();
 
     const modal = document.createElement('div');
     modal.id = 'gradeModal';
-    modal.className = 'modal-backdrop open';
+    modal.className = 'modal-overlay active';
     
-    // Injecting a 2-column layout to handle the dynamic simulation capabilities gracefully 
     modal.innerHTML = `
-      <style>
-        .split-layout { display: flex; flex-wrap: wrap; gap: 32px; padding: 28px; }
-        .split-left { flex: 0 0 360px; max-width: 100%; }
-        .split-right { flex: 1 1 650px; border-left: 1px solid #e2e8f0; padding-left: 32px; min-height: 550px; }
-        @media (max-width: 900px) {
-          .split-left { flex: 1 1 100%; }
-          .split-right { border-left: none; padding-left: 0; border-top: 1px solid #e2e8f0; padding-top: 24px; min-height: auto; }
-        }
-      </style>
-      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="gradeModalTitle" style="max-width:1400px; width:95%; max-height:90vh; overflow-y:auto;">
-        <div class="modal-header">
-          <div class="modal-title-wrap">
-            <div class="modal-title-icon"><svg><use href="#i-check"></use></svg></div>
-            <div>
-              <h2 id="gradeModalTitle">Chấm bài</h2>
-              <p id="gradeModalSubtitle">Nhập điểm, nhận xét và xem mô phỏng bài làm.</p>
-            </div>
-          </div>
-          <button class="close-btn" type="button" data-close-modal aria-label="Đóng"><svg><use href="#i-close"></use></svg></button>
+      <div class="modal-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:12px;">
+          <h2 style="margin:0; font-size:18px;">Chấm bài - ${escapeHtml(submission.studentName || 'Học sinh')}</h2>
+          <button class="close-btn" type="button" data-close-modal style="background:none; border:none; font-size:20px; cursor:pointer;">&times;</button>
         </div>
         
-        <div class="modal-body split-layout">
+        <div class="split-layout">
           <div class="split-left">
-            <div style="background:#f8fafc; padding:16px; border-radius:8px; margin-bottom:24px; font-size:14px;">
-              <div style="margin-bottom:8px;"><strong>Học sinh:</strong> <span id="infoStudent">—</span></div>
-              <div style="margin-bottom:8px;"><strong>Ngày nộp:</strong> <span id="infoSubmittedAt">—</span></div>
-              <div style="word-break:break-all;"><strong>Bài làm:</strong> <span id="infoLink">—</span></div>
+            <div style="background:#f8fafc; padding:12px; border-radius:8px; margin-bottom:16px; font-size:14px;">
+              <div style="margin-bottom:6px;"><strong>Ngày nộp:</strong> ${formatDateTime(submission.submittedAt)}</div>
+              <div style="word-break:break-all;"><strong>Bài làm:</strong> ${submission.fileLink ? `<a href="${escapeHtml(submission.fileLink)}" target="_blank" style="color:#0284c7;">${escapeHtml(submission.fileLink)}</a>` : '—'}</div>
             </div>
 
             <form id="gradeForm" novalidate>
-              <input type="hidden" id="gradeSubmissionId" />
+              <input type="hidden" id="gradeSubmissionId" value="${escapeHtml(submission.id)}" />
               
-              <div class="field" style="margin-bottom:16px;">
-                <label for="gradeScore">Điểm số <span class="required">*</span></label>
-                <input id="gradeScore" type="number" min="0" step="0.1" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px;" />
+              <div style="margin-bottom:16px;">
+                <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;">Điểm số <span style="color:red">*</span></label>
+                <input id="gradeScore" type="number" min="0" step="0.1" value="${submission.score != null ? submission.score : ''}" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; box-sizing:border-box;" required />
               </div>
               
-              <div class="field" style="margin-bottom:16px;">
-                <label for="gradeComment">Nhận xét cho học sinh</label>
-                <textarea id="gradeComment" rows="5" placeholder="Nhập nhận xét..." style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; resize:vertical;"></textarea>
+              <div style="margin-bottom:16px;">
+                <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;">Nhận xét cho học sinh</label>
+                <textarea id="gradeComment" rows="4" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; box-sizing:border-box; resize:vertical;">${escapeHtml(submission.comment || '')}</textarea>
               </div>
               
-              <div class="field" style="margin-bottom:24px;">
-                <label for="gradeAppealStatus">Trạng thái phúc khảo</label>
-                <select id="gradeAppealStatus" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px;">
-                  <option value="">Không thay đổi</option>
-                  <option value="pending">Chờ phúc khảo</option>
-                  <option value="resolved">Đã giải quyết</option>
+              <div style="margin-bottom:24px;">
+                <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;">Trạng thái phúc khảo</label>
+                <select id="gradeAppealStatus" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; box-sizing:border-box;">
+                  <option value="done" ${submission.appealStatus === 'done' || submission.appealStatus === 'approved' ? 'selected' : ''}>Đã duyệt / Hoàn tất</option>
+                  <option value="pending" ${submission.appealStatus === 'pending' ? 'selected' : ''}>Chờ phúc khảo</option>
+                  <option value="rejected" ${submission.appealStatus === 'rejected' ? 'selected' : ''}>Từ chối</option>
                 </select>
               </div>
 
               <div style="display:flex; gap:12px; justify-content:flex-end;">
-                <button class="btn btn-secondary" type="button" data-close-modal>Hủy</button>
-                <button class="btn btn-primary" type="submit">
-                  <svg><use href="#i-check"></use></svg>
-                  <span>Lưu điểm</span>
-                </button>
+                <button class="btn" type="button" data-close-modal style="padding:8px 16px; border:1px solid #ccc; border-radius:6px; background:#fff; cursor:pointer;">Hủy</button>
+                <button class="btn btn-primary" type="submit" style="padding:8px 16px; background:#10b981; color:#fff; border:none; border-radius:6px; cursor:pointer;">Lưu điểm</button>
               </div>
             </form>
           </div>
 
           <div class="split-right">
-            <div id="simulationPreview">
-              <p class="preview-empty" style="color:#888;">Đang tải mô phỏng...</p>
-            </div>
+            ${buildPreviewHtml(submission.fileLink)}
           </div>
         </div>
       </div>`;
 
     document.body.appendChild(modal);
 
-    modal.querySelectorAll('[data-close-modal]').forEach((button) => {
-      button.addEventListener('click', () => {
-        modal.classList.remove('open');
-        setTimeout(() => modal.remove(), 200); 
-      });
+    // Xử lý đóng modal
+    modal.querySelectorAll('[data-close-modal]').forEach((btn) => {
+      btn.addEventListener('click', () => modal.remove());
     });
 
-    modal.addEventListener('mousedown', (event) => {
-      if (event.target === modal) {
-        modal.classList.remove('open');
-        setTimeout(() => modal.remove(), 200);
-      }
-    });
-
-    document.getElementById('gradeForm').addEventListener('submit', async (event) => {
+    // Xử lý nộp Form chấm bài trực tiếp tại đây
+    const gradeForm = modal.querySelector('#gradeForm');
+    gradeForm.addEventListener('submit', async (event) => {
       event.preventDefault();
       
       const submissionId = document.getElementById('gradeSubmissionId').value;
       const score = document.getElementById('gradeScore').value;
       const comment = document.getElementById('gradeComment').value.trim();
-      const appealStatus = document.getElementById('gradeAppealStatus').value;
+      const appealStatus = document.getElementById('gradeAppealStatus').value || 'done';
 
       if (score === "" || isNaN(Number(score)) || Number(score) < 0) {
         document.getElementById('gradeScore').focus();
@@ -342,17 +309,19 @@
         await apiPost(`${API_BASE}/teacher/${encodeURIComponent(TEACHER_ID)}/submissions/${encodeURIComponent(submissionId)}/grade`, {
           score: Number(score),
           comment,
-          appealStatus: appealStatus || undefined,
+          appealStatus,
+          homeworkId: HOMEWORK_ID
         });
         
-        modal.classList.remove('open');
-        setTimeout(() => modal.remove(), 200);
-        showToast("Đã lưu điểm", "Điểm và nhận xét đã được lưu thành công.");
+        modal.remove();
+        showToast("Đã lưu điểm", "Bài làm đã được chấm lại thành công.");
         await loadPageData();
       } catch (err) {
         showToast("Không thể lưu điểm", err.message, "error");
       }
     });
+
+    setTimeout(() => document.getElementById('gradeScore').focus(), 100);
   }
   
   // ── Page Initialization ──────────────────────────────────────────
@@ -373,6 +342,14 @@
       currentSubmissions = submissions;
       renderAssignmentDetail(assignment);
       renderSubmissions(submissions);
+
+      // Tự động mở Modal chấm bài nếu chuyển hướng từ trang Phúc khảo
+      if (SUBMISSION_ID) {
+        const targetSub = currentSubmissions.find(s => String(s.id) === String(SUBMISSION_ID));
+        if (targetSub) {
+          renderGradeDialog(targetSub);
+        }
+      }
     } catch (err) {
       console.error(err);
       document.getElementById('submissionList').innerHTML = `<p style="padding:16px;color:#c0392b">❌ Không tải được dữ liệu: ${escapeHtml(err.message)}</p>`;
@@ -387,36 +364,10 @@
     const submissionId = gradeButton.dataset.submissionId;
     if (!submissionId) return;
 
-    currentSubmission = currentSubmissions.find((submission) => submission.id === submissionId) || null;
+    currentSubmission = currentSubmissions.find((submission) => String(submission.id) === String(submissionId)) || null;
     if (!currentSubmission) return;
 
-    renderGradeDialog();
-    
-    // Fill form elements
-    document.getElementById('gradeSubmissionId').value = submissionId;
-    document.getElementById('gradeScore').value = currentSubmission.score != null ? currentSubmission.score : '';
-    document.getElementById('gradeComment').value = currentSubmission.comment || '';
-    document.getElementById('gradeAppealStatus').value = currentSubmission.appealStatus || '';
-    
-    // Fill static context info
-    const who = currentSubmission.studentName || currentSubmission.studentId || "Không rõ học sinh";
-    document.getElementById('infoStudent').textContent = who;
-    document.getElementById('infoSubmittedAt').textContent = formatDateTime(currentSubmission.submittedAt);
-    
-    const infoLink = document.getElementById('infoLink');
-    if (currentSubmission.fileLink && isValidHttpUrl(currentSubmission.fileLink)) {
-      infoLink.innerHTML = `<a href="${escapeHtml(currentSubmission.fileLink)}" target="_blank" rel="noopener noreferrer" style="color:#0284c7;text-decoration:underline;">${escapeHtml(currentSubmission.fileLink)}</a>`;
-    } else if (currentSubmission.fileLink) {
-      infoLink.textContent = currentSubmission.fileLink; 
-    } else {
-      infoLink.textContent = "—";
-    }
-
-    // Generate specific Simulation Preview
-    document.getElementById('simulationPreview').innerHTML = buildPreviewHtml(currentSubmission.fileLink);
-    
-    // Optional quality of life: instantly focus score input
-    setTimeout(() => document.getElementById('gradeScore').focus(), 100);
+    renderGradeDialog(currentSubmission);
   }
 
   // ── Event Listeners ──────────────────────────────────────────────
@@ -430,5 +381,4 @@
     
     loadPageData();
   });
-
 })();

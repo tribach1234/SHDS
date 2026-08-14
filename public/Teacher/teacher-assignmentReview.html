@@ -7,6 +7,47 @@
   <meta name="theme-color" content="#b9dda0" />
   <title>EduGreen - Xem bài nộp</title>
   <link rel="stylesheet" href="teacher.css" />
+  <style>
+    /* Bổ sung CSS Modal Chấm bài & Mô phỏng */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .modal-content {
+      background: #fff;
+      padding: 24px;
+      border-radius: 16px;
+      width: 95%;
+      max-width: 1200px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+    .split-layout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      margin-top: 16px;
+    }
+    .split-left { flex: 0 0 360px; max-width: 100%; }
+    .split-right { flex: 1 1 600px; border-left: 1px solid #e2e8f0; padding-left: 24px; min-height: 400px; }
+    @media (max-width: 900px) {
+      .split-left { flex: 1 1 100%; }
+      .split-right { border-left: none; padding-left: 0; border-top: 1px solid #e2e8f0; padding-top: 20px; }
+    }
+  </style>
 </head>
 
 <body>
@@ -22,6 +63,7 @@
     <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2.7 20h18.6L12 3Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" /><path d="M12 9v5M12 17.3v.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></symbol>
     <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" /></symbol>
     <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.2 1.2M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.2-1.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   </svg>
 
   <div class="app-shell">

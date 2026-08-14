@@ -3,17 +3,19 @@
 // Include this BEFORE any page-specific script (e.g., teacher.js, Student.js).
 
 const ROLE = localStorage.getItem("role");
-const USER_ID = localStorage.getItem("teacherId") || localStorage.getItem("studentId");
+const USER_ID = localStorage.getItem("teacherId") || localStorage.getItem("studentId") || localStorage.getItem("adminId");
 window.TEACHER_ID = USER_ID;
 
 // 1. Auth guard: Check client-side state
 const path = window.location.pathname.toLowerCase();
 const isInvalidTeacher = path.includes("teacher") && ROLE !== "TEACHER";
 const isInvalidStudent = path.includes("student") && ROLE !== "STUDENT";
+const isInvalidAdmin   = path.includes("/admin/") && ROLE !== "ADMIN";
 
-if (!USER_ID || !ROLE || isInvalidTeacher || isInvalidStudent) {
+if (!USER_ID || !ROLE || isInvalidTeacher || isInvalidStudent || isInvalidAdmin) {
   window.location.href = "/Login.html";
 }
+
 
 // 2. Server-side session verification
 async function verifySession() {

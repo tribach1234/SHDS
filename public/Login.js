@@ -18,7 +18,9 @@ loginBtn.addEventListener('click', () => {
 const ROLE_REDIRECTS = {
     STUDENT: (email) => `/Student/Student.html?studentId=${encodeURIComponent(email)}`,
     TEACHER: (email) => `/Teacher/teacher-overview.html?teacherId=${encodeURIComponent(email)}`,
+    ADMIN:   (email) => `/Admin/admin-dashboard.html?adminId=${encodeURIComponent(email)}`,
 };
+
 
 // ── Login Form ────────────────────────────────────────────────────
 const loginForm = document.getElementById('loginForm');
@@ -49,6 +51,8 @@ loginForm.addEventListener('submit', async (e) => {
         localStorage.setItem('role', data.user.role);
         localStorage.setItem('studentId', data.user.id);
         localStorage.setItem('teacherId', data.user.id);
+        localStorage.setItem('adminId', data.user.id);
+
 
         const redirect = ROLE_REDIRECTS[data.user.role];
         if (redirect) {

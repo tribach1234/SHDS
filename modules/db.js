@@ -46,14 +46,22 @@ db.exec(`CREATE TABLE IF NOT EXISTS users.admins (
   fullName TEXT,
   email TEXT,
   pass TEXT,
-  activate TEXT DEFAULT 'false'
+  activate TEXT DEFAULT 'false',
+  createdAt TEXT
 )`);
 
-db.exec(`CREATE TABLE IF NOT EXISTS users.teachers (
+// Backfill createdAt for existing admins tables that lack it
+try { db.exec(`ALTER TABLE users.admins ADD COLUMN createdAt TEXT`); } catch (_) {}
+
+db.exec(`CREATE TABLE IF NOT EXISTS users.admin_activity (
   id TEXT PRIMARY KEY,
-  fullName TEXT,
-  email TEXT,
-  pass TEXT
+  adminId TEXT,
+  adminName TEXT,
+  action TEXT,
+  targetType TEXT,
+  targetId TEXT,
+  targetName TEXT,
+  createdAt TEXT
 )`);
 
 db.exec(`CREATE TABLE IF NOT EXISTS users.tas (
@@ -67,8 +75,21 @@ db.exec(`CREATE TABLE IF NOT EXISTS users.students (
   id TEXT PRIMARY KEY,
   fullName TEXT,
   email TEXT,
-  pass TEXT
+  pass TEXT,
+  createdAt TEXT
 )`);
+// Backfill createdAt for students
+try { db.exec(`ALTER TABLE users.students ADD COLUMN createdAt TEXT`); } catch (_) {}
+
+db.exec(`CREATE TABLE IF NOT EXISTS users.teachers (
+  id TEXT PRIMARY KEY,
+  fullName TEXT,
+  email TEXT,
+  pass TEXT,
+  createdAt TEXT
+)`);
+// Backfill createdAt for teachers (re-create covered by IF NOT EXISTS; alter for existing)
+try { db.exec(`ALTER TABLE users.teachers ADD COLUMN createdAt TEXT`); } catch (_) {}
 
 // ── Class tables (in main "classes.db" schema) ────────────────────
 db.exec(`CREATE TABLE IF NOT EXISTS classes (

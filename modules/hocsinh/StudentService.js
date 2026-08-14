@@ -149,8 +149,6 @@ async function getSubmissions(studentId) {
 }
 
 // Yêu cầu phúc khảo
-// Yêu cầu phúc khảo
-// Yêu cầu phúc khảo
 async function requestRegrade({ submissionId, studentId, reason }) {
     if (!reason || !reason.trim()) {
         const err = new Error("Vui lòng cung cấp lý do phúc khảo.");
@@ -158,7 +156,6 @@ async function requestRegrade({ submissionId, studentId, reason }) {
         throw err;
     }
 
-    // Cập nhật câu truy vấn: Lấy teacherId từ class_members tương ứng với classId của bài tập
     const submission = await dbGet(
         `select 
             s.id as submissionId,
@@ -245,13 +242,15 @@ async function getPhucKhaoRequests(teacherId) {
     );
 }
 
+// SỬA ĐỔI: Cho phép lấy chi tiết bài tập nếu là GV của lớp hoặc tạo bài tập
 async function getAssignmentDetail(teacherId, homeworkId) {
     const assignment = await dbGet(
         `select h.*, c.className
          from hw.homeworks h
          join classes c on c.classId = h.classId
-         where h.homeworkId = ? and h.teacherId = ?`,
-        [homeworkId, teacherId]
+         left join class_members cm on cm.classId = h.classId and cm.userId = ?
+         where h.homeworkId = ? and (h.teacherId = ? or cm.userId = ? or h.teacherId is null)`,
+        [teacherId, homeworkId, teacherId, teacherId]
     );
 
     if (!assignment) {
@@ -263,6 +262,7 @@ async function getAssignmentDetail(teacherId, homeworkId) {
     return assignment;
 }
 
+// SỬA ĐỔI: Cho phép lấy danh sách bài nộp linh hoạt hơn
 async function getAssignmentSubmissions(teacherId, homeworkId) {
     const rows = await dbAll(
         `select s.*, st.fullName as studentName, h.title as homeworkTitle, h.points as points, h.classId, c.className,
@@ -271,22 +271,24 @@ async function getAssignmentSubmissions(teacherId, homeworkId) {
          join hw.homeworks h on h.homeworkId = s.homeworkId
          join users.students st on st.id = s.studentId
          join classes c on c.classId = h.classId
-         where s.homeworkId = ? and h.teacherId = ?
+         left join class_members cm on cm.classId = h.classId and cm.userId = ?
+         where s.homeworkId = ? and (h.teacherId = ? or cm.userId = ? or h.teacherId is null)
          order by s.submittedAt desc`,
-        [homeworkId, teacherId]
+        [teacherId, homeworkId, teacherId, teacherId]
     );
 
     return rows;
 }
 
-// Chấm bài / Cập nhật điểm & trạng thái phúc khảo
+// SỬA ĐỔI: Chấm bài / Cập nhật điểm & trạng thái phúc khảo
 async function gradeSubmission({ submissionId, teacherId, score, comment, appealStatus }) {
     const row = await dbGet(
         `select s.*, h.teacherId
          from hw.submissions s
          join hw.homeworks h on h.homeworkId = s.homeworkId
-         where s.id = ? and h.teacherId = ?`,
-        [submissionId, teacherId]
+         left join class_members cm on cm.classId = h.classId and cm.userId = ?
+         where s.id = ? and (h.teacherId = ? or cm.userId = ? or h.teacherId is null)`,
+        [teacherId, submissionId, teacherId, teacherId]
     );
 
     if (!row) {

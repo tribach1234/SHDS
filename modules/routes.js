@@ -624,4 +624,763 @@ router.get(
   )
 );
 
+// ════════════════════════════════════════════════════════════
+// ADMIN ROUTES
+// ════════════════════════════════════════════════════════════
+
+const { randomUUID } = require('crypto');
+
+// ── Admin auth middleware ─────────────────────────────────────
+function requireAdmin(req, res, next) {
+  if (!req.session || !req.session.user) {
+    return res.status(401).json({ success: false, message: 'Chưa đăng nhập!' });
+  }
+  if (req.session.user.role !== 'ADMIN') {
+    return res.status(403).json({ success: false, message: 'Truy cập bị từ chối! Chỉ dành cho Admin.' });
+  }
+  next();
+}
+
+// ── Activity logger helper ────────────────────────────────────
+async function logActivity(req, { action, targetType, targetId, targetName }) {
+  try {
+    const admin = req.session.user;
+    await dbRun(
+      `INSERT INTO users.admin_activity (id, adminId, adminName, action, targetType, targetId, targetName, createdAt)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [randomUUID(), admin.id, admin.fullName, action, targetType, targetId || '', targetName || '', new Date().toISOString()]
+    );
+  } catch (err) {
+    console.error('[activity log]', err.message);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// DASHBOARD STATS
+// ─────────────────────────────────────────────────────────────
+router.get('/api/admin/stats', requireAdmin, async (req, res) => {
+  try {
+    const [studentCount, teacherCount, adminCount, classCount, activeClassCount] = await Promise.all([
+      dbGet(`SELECT COUNT(*) AS cnt FROM users.students`),
+      dbGet(`SELECT COUNT(*) AS cnt FROM users.teachers`),
+      dbGet(`SELECT COUNT(*) AS cnt FROM users.admins`),
+      dbGet(`SELECT COUNT(*) AS cnt FROM classes`),
+      dbGet(`SELECT COUNT(*) AS cnt FROM classes WHERE status = 'active'`),
+    ]);
+    const recentAccounts = await dbAll(`
+      SELECT 'student' AS role, id, fullName, email, createdAt FROM users.students WHERE createdAt IS NOT NULL
+      UNION ALL
+      SELECT 'teacher' AS role, id, fullName, email, createdAt FROM users.teachers WHERE createdAt IS NOT NULL
+      UNION ALL
+      SELECT 'admin' AS role, id, fullName, email, createdAt FROM users.admins WHERE createdAt IS NOT NULL
+      ORDER BY createdAt DESC LIMIT 8
+    `);
+    const recentClasses = await dbAll(`SELECT * FROM classes ORDER BY rowid DESC LIMIT 5`);
+    return res.json({
+      success: true, data: {
+        students: studentCount?.cnt || 0,
+        teachers: teacherCount?.cnt || 0,
+        admins: adminCount?.cnt || 0,
+        classes: classCount?.cnt || 0,
+        activeClasses: activeClassCount?.cnt || 0,
+        recentAccounts,
+        recentClasses,
+      }
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────
+// STUDENT MANAGEMENT
+// ─────────────────────────────────────────────────────────────
+router.get('/api/admin/students', requireAdmin, async (req, res) => {
+  try {
+    const { search = '', classId = '', sort = 'fullName', order = 'asc', page = 1, limit = 20 } = req.query;
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+    const allowedSorts = ['fullName', 'email', 'id', 'createdAt'];
+    const sortCol = allowedSorts.includes(sort) ? sort : 'fullName';
+    const sortDir = order === 'desc' ? 'DESC' : 'ASC';
+    const searchParam = `%${search}%`;
+
+    let query = `
+      SELECT s.id, s.fullName, s.email, s.createdAt,
+        GROUP_CONCAT(cm.classId) AS classes
+      FROM users.students s
+      LEFT JOIN class_members cm ON cm.userId = s.id AND cm.role = 'student'
+      WHERE (s.fullName LIKE ? OR s.email LIKE ? OR s.id LIKE ?)
+    `;
+    const params = [searchParam, searchParam, searchParam];
+
+    if (classId && classId !== 'all') {
+      query += ` AND cm.classId = ?`;
+      params.push(classId);
+    }
+    query += ` GROUP BY s.id ORDER BY s.${sortCol} ${sortDir} LIMIT ? OFFSET ?`;
+    params.push(parseInt(limit), offset);
+
+    const rows = await dbAll(query, params);
+
+    let countQuery = `SELECT COUNT(DISTINCT s.id) AS cnt FROM users.students s
+      LEFT JOIN class_members cm ON cm.userId = s.id
+      WHERE (s.fullName LIKE ? OR s.email LIKE ? OR s.id LIKE ?)`;
+    const countParams = [searchParam, searchParam, searchParam];
+    if (classId && classId !== 'all') { countQuery += ` AND cm.classId = ?`; countParams.push(classId); }
+    const total = await dbGet(countQuery, countParams);
+
+    return res.json({ success: true, data: rows, total: total?.cnt || 0 });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+router.post('/api/admin/students', requireAdmin, async (req, res) => {
+  try {
+    const { id, fullName, email, pass, classId } = req.body;
+    if (!id || !fullName || !email || !pass) {
+      return res.status(400).json({ success: false, message: 'Vui lòng điền đầy đủ thông tin!' });
+    }
+    const fullEmail = formatEmail(email);
+    const existEmail = await checkEmailExists(fullEmail);
+    if (existEmail) return res.status(400).json({ success: false, message: `Email ${fullEmail} đã tồn tại!` });
+    const existId = await dbGet(`SELECT id FROM users.students WHERE id = ?`, [id]);
+    if (existId) return res.status(400).json({ success: false, message: `Mã học sinh "${id}" đã tồn tại!` });
+    const hashed = await hashPassword(pass);
+    const now = new Date().toISOString();
+    await dbRun(`INSERT INTO users.students (id, fullName, email, pass, createdAt) VALUES (?, ?, ?, ?, ?)`,
+      [id, fullName, fullEmail, hashed, now]);
+    if (classId) {
+      const cls = await dbGet(`SELECT className FROM classes WHERE classId = ?`, [classId]);
+      if (cls) {
+        await dbRun(`INSERT OR IGNORE INTO class_members (classId, userId, fullName, role) VALUES (?, ?, ?, 'student')`,
+          [classId, id, fullName]);
+      }
+    }
+    await logActivity(req, { action: 'Tạo học sinh', targetType: 'student', targetId: id, targetName: fullName });
+    return res.json({ success: true, message: `Đã tạo học sinh ${fullName} thành công!` });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+router.get('/api/admin/students/:id', requireAdmin, async (req, res) => {
+  try {
+    const student = await dbGet(`SELECT id, fullName, email, createdAt FROM users.students WHERE id = ?`, [req.params.id]);
+    if (!student) return res.status(404).json({ success: false, message: 'Không tìm thấy học sinh!' });
+    const classes = await dbAll(`
+      SELECT cm.classId, c.className FROM class_members cm
+      JOIN classes c ON c.classId = cm.classId
+      WHERE cm.userId = ? AND cm.role = 'student'`, [req.params.id]);
+    return res.json({ success: true, data: { ...student, classes } });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+router.put('/api/admin/students/:id', requireAdmin, async (req, res) => {
+  try {
+    const { fullName, email, pass } = req.body;
+    const student = await dbGet(`SELECT * FROM users.students WHERE id = ?`, [req.params.id]);
+    if (!student) return res.status(404).json({ success: false, message: 'Không tìm thấy học sinh!' });
+    const newEmail = email ? formatEmail(email) : student.email;
+    if (email && newEmail !== student.email) {
+      const existEmail = await checkEmailExists(newEmail);
+      if (existEmail) return res.status(400).json({ success: false, message: `Email ${newEmail} đã tồn tại!` });
+    }
+    const newPass = pass ? await hashPassword(pass) : student.pass;
+    const newName = fullName || student.fullName;
+    await dbRun(`UPDATE users.students SET fullName = ?, email = ?, pass = ? WHERE id = ?`,
+      [newName, newEmail, newPass, req.params.id]);
+    // Update fullName in class_members
+    await dbRun(`UPDATE class_members SET fullName = ? WHERE userId = ?`, [newName, req.params.id]);
+    await logActivity(req, { action: 'Cập nhật học sinh', targetType: 'student', targetId: req.params.id, targetName: newName });
+    return res.json({ success: true, message: 'Cập nhật học sinh thành công!' });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+router.delete('/api/admin/students/:id', requireAdmin, async (req, res) => {
+  try {
+    const student = await dbGet(`SELECT * FROM users.students WHERE id = ?`, [req.params.id]);
+    if (!student) return res.status(404).json({ success: false, message: 'Không tìm thấy học sinh!' });
+    await dbRun(`DELETE FROM class_members WHERE userId = ?`, [req.params.id]);
+    await dbRun(`DELETE FROM users.students WHERE id = ?`, [req.params.id]);
+    await logActivity(req, { action: 'Xóa học sinh', targetType: 'student', targetId: req.params.id, targetName: student.fullName });
+    return res.json({ success: true, message: 'Đã xóa học sinh thành công!' });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────
+// TEACHER MANAGEMENT
+// ─────────────────────────────────────────────────────────────
+router.get('/api/admin/teachers', requireAdmin, async (req, res) => {
+  try {
+    const { search = '', sort = 'fullName', order = 'asc', page = 1, limit = 20 } = req.query;
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+    const allowedSorts = ['fullName', 'email', 'id', 'createdAt'];
+    const sortCol = allowedSorts.includes(sort) ? sort : 'fullName';
+    const sortDir = order === 'desc' ? 'DESC' : 'ASC';
+    const searchParam = `%${search}%`;
+    const rows = await dbAll(`
+      SELECT t.id, t.fullName, t.email, t.createdAt,
+        GROUP_CONCAT(cm.classId) AS classes
+      FROM users.teachers t
+      LEFT JOIN class_members cm ON cm.userId = t.id AND cm.role = 'teacher'
+      WHERE (t.fullName LIKE ? OR t.email LIKE ? OR t.id LIKE ?)
+      GROUP BY t.id ORDER BY t.${sortCol} ${sortDir} LIMIT ? OFFSET ?`,
+      [searchParam, searchParam, searchParam, parseInt(limit), offset]);
+    const total = await dbGet(`SELECT COUNT(*) AS cnt FROM users.teachers WHERE fullName LIKE ? OR email LIKE ? OR id LIKE ?`,
+      [searchParam, searchParam, searchParam]);
+    return res.json({ success: true, data: rows, total: total?.cnt || 0 });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+router.post('/api/admin/teachers', requireAdmin, async (req, res) => {
+  try {
+    const { id, fullName, email, pass } = req.body;
+    if (!id || !fullName || !email || !pass) {
+      return res.status(400).json({ success: false, message: 'Vui lòng điền đầy đủ thông tin!' });
+    }
+    const fullEmail = formatEmail(email);
+    const existEmail = await checkEmailExists(fullEmail);
+    if (existEmail) return res.status(400).json({ success: false, message: `Email ${fullEmail} đã tồn tại!` });
+    const existId = await dbGet(`SELECT id FROM users.teachers WHERE id = ?`, [id]);
+    if (existId) return res.status(400).json({ success: false, message: `Mã giáo viên "${id}" đã tồn tại!` });
+    const hashed = await hashPassword(pass);
+    await dbRun(`INSERT INTO users.teachers (id, fullName, email, pass, createdAt) VALUES (?, ?, ?, ?, ?)`,
+      [id, fullName, fullEmail, hashed, new Date().toISOString()]);
+    await logActivity(req, { action: 'Tạo giáo viên', targetType: 'teacher', targetId: id, targetName: fullName });
+    return res.json({ success: true, message: `Đã tạo giáo viên ${fullName} thành công!` });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+router.get('/api/admin/teachers/:id', requireAdmin, async (req, res) => {
+  try {
+    const teacher = await dbGet(`SELECT id, fullName, email, createdAt FROM users.teachers WHERE id = ?`, [req.params.id]);
+    if (!teacher) return res.status(404).json({ success: false, message: 'Không tìm thấy giáo viên!' });
+    const classes = await dbAll(`
+      SELECT cm.classId, c.className FROM class_members cm
+      JOIN classes c ON c.classId = cm.classId
+      WHERE cm.userId = ? AND cm.role = 'teacher'`, [req.params.id]);
+    return res.json({ success: true, data: { ...teacher, classes } });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+router.put('/api/admin/teachers/:id', requireAdmin, async (req, res) => {
+  try {
+    const { fullName, email, pass } = req.body;
+    const teacher = await dbGet(`SELECT * FROM users.teachers WHERE id = ?`, [req.params.id]);
+    if (!teacher) return res.status(404).json({ success: false, message: 'Không tìm thấy giáo viên!' });
+    const newEmail = email ? formatEmail(email) : teacher.email;
+    if (email && newEmail !== teacher.email) {
+      const existEmail = await checkEmailExists(newEmail);
+      if (existEmail) return res.status(400).json({ success: false, message: `Email ${newEmail} đã tồn tại!` });
+    }
+    const newPass = pass ? await hashPassword(pass) : teacher.pass;
+    const newName = fullName || teacher.fullName;
+    await dbRun(`UPDATE users.teachers SET fullName = ?, email = ?, pass = ? WHERE id = ?`,
+      [newName, newEmail, newPass, req.params.id]);
+    await dbRun(`UPDATE class_members SET fullName = ? WHERE userId = ?`, [newName, req.params.id]);
+    await logActivity(req, { action: 'Cập nhật giáo viên', targetType: 'teacher', targetId: req.params.id, targetName: newName });
+    return res.json({ success: true, message: 'Cập nhật giáo viên thành công!' });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+router.delete('/api/admin/teachers/:id', requireAdmin, async (req, res) => {
+  try {
+    const teacher = await dbGet(`SELECT * FROM users.teachers WHERE id = ?`, [req.params.id]);
+    if (!teacher) return res.status(404).json({ success: false, message: 'Không tìm thấy giáo viên!' });
+    await dbRun(`DELETE FROM class_members WHERE userId = ?`, [req.params.id]);
+    await dbRun(`DELETE FROM users.teachers WHERE id = ?`, [req.params.id]);
+    await logActivity(req, { action: 'Xóa giáo viên', targetType: 'teacher', targetId: req.params.id, targetName: teacher.fullName });
+    return res.json({ success: true, message: 'Đã xóa giáo viên thành công!' });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────
+// CLASS MANAGEMENT
+// ─────────────────────────────────────────────────────────────
+router.get('/api/admin/classes', requireAdmin, async (req, res) => {
+  try {
+    const { search = '', sort = 'className', order = 'asc', page = 1, limit = 20 } = req.query;
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+    const allowedSorts = ['className', 'classId', 'status'];
+    const sortCol = allowedSorts.includes(sort) ? sort : 'className';
+    const sortDir = order === 'desc' ? 'DESC' : 'ASC';
+    const searchParam = `%${search}%`;
+    const rows = await dbAll(`
+      SELECT c.classId, c.className, c.description, c.status, c.note,
+        COUNT(DISTINCT CASE WHEN cm.role = 'student' THEN cm.userId END) AS studentCount,
+        COUNT(DISTINCT CASE WHEN cm.role = 'teacher' THEN cm.userId END) AS teacherCount
+      FROM classes c
+      LEFT JOIN class_members cm ON cm.classId = c.classId
+      WHERE c.className LIKE ? OR c.classId LIKE ? OR c.description LIKE ?
+      GROUP BY c.classId ORDER BY c.${sortCol} ${sortDir} LIMIT ? OFFSET ?`,
+      [searchParam, searchParam, searchParam, parseInt(limit), offset]);
+    const total = await dbGet(`SELECT COUNT(*) AS cnt FROM classes WHERE className LIKE ? OR classId LIKE ?`, [searchParam, searchParam]);
+    return res.json({ success: true, data: rows, total: total?.cnt || 0 });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+router.post('/api/admin/classes', requireAdmin, async (req, res) => {
+  try {
+    const { classId, className, description, status, note } = req.body;
+    if (!classId || !className) {
+      return res.status(400).json({ success: false, message: 'Mã lớp và tên lớp là bắt buộc!' });
+    }
+    const exist = await dbGet(`SELECT classId FROM classes WHERE classId = ?`, [classId]);
+    if (exist) return res.status(400).json({ success: false, message: `Mã lớp "${classId}" đã tồn tại!` });
+    await dbRun(`INSERT INTO classes (classId, className, description, status, note) VALUES (?, ?, ?, ?, ?)`,
+      [classId, className, description || '', status || 'active', note || '']);
+    await logActivity(req, { action: 'Tạo lớp học', targetType: 'class', targetId: classId, targetName: className });
+    return res.json({ success: true, message: `Đã tạo lớp ${className} thành công!` });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+router.get('/api/admin/classes/:classId', requireAdmin, async (req, res) => {
+  try {
+    const cls = await dbGet(`SELECT * FROM classes WHERE classId = ?`, [req.params.classId]);
+    if (!cls) return res.status(404).json({ success: false, message: 'Không tìm thấy lớp học!' });
+    const members = await dbAll(`
+      SELECT cm.userId, cm.fullName, cm.role,
+        COALESCE(s.email, t.email) AS email
+      FROM class_members cm
+      LEFT JOIN users.students s ON s.id = cm.userId AND cm.role = 'student'
+      LEFT JOIN users.teachers t ON t.id = cm.userId AND cm.role = 'teacher'
+      WHERE cm.classId = ? ORDER BY cm.role, cm.fullName`, [req.params.classId]);
+    return res.json({ success: true, data: { ...cls, members } });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+router.put('/api/admin/classes/:classId', requireAdmin, async (req, res) => {
+  try {
+    const { className, description, status, note } = req.body;
+    const cls = await dbGet(`SELECT * FROM classes WHERE classId = ?`, [req.params.classId]);
+    if (!cls) return res.status(404).json({ success: false, message: 'Không tìm thấy lớp học!' });
+    await dbRun(`UPDATE classes SET className = ?, description = ?, status = ?, note = ? WHERE classId = ?`,
+      [className || cls.className, description ?? cls.description, status || cls.status, note ?? cls.note, req.params.classId]);
+    await logActivity(req, { action: 'Cập nhật lớp học', targetType: 'class', targetId: req.params.classId, targetName: className || cls.className });
+    return res.json({ success: true, message: 'Cập nhật lớp học thành công!' });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+router.delete('/api/admin/classes/:classId', requireAdmin, async (req, res) => {
+  try {
+    const cls = await dbGet(`SELECT * FROM classes WHERE classId = ?`, [req.params.classId]);
+    if (!cls) return res.status(404).json({ success: false, message: 'Không tìm thấy lớp học!' });
+    await dbRun(`DELETE FROM class_members WHERE classId = ?`, [req.params.classId]);
+    await dbRun(`DELETE FROM classes WHERE classId = ?`, [req.params.classId]);
+    await logActivity(req, { action: 'Xóa lớp học', targetType: 'class', targetId: req.params.classId, targetName: cls.className });
+    return res.json({ success: true, message: 'Đã xóa lớp học thành công!' });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────
+// CLASS MEMBERSHIP
+// ─────────────────────────────────────────────────────────────
+router.post('/api/admin/classes/:classId/members', requireAdmin, async (req, res) => {
+  try {
+    const { userId, role } = req.body;
+    if (!userId || !role) return res.status(400).json({ success: false, message: 'Thiếu userId hoặc role!' });
+    const cls = await dbGet(`SELECT classId FROM classes WHERE classId = ?`, [req.params.classId]);
+    if (!cls) return res.status(404).json({ success: false, message: 'Lớp không tồn tại!' });
+    const existing = await dbGet(`SELECT userId FROM class_members WHERE classId = ? AND userId = ?`, [req.params.classId, userId]);
+    if (existing) return res.status(400).json({ success: false, message: 'Thành viên đã có trong lớp!' });
+    let member = null;
+    if (role === 'student') member = await dbGet(`SELECT id, fullName FROM users.students WHERE id = ?`, [userId]);
+    else if (role === 'teacher') member = await dbGet(`SELECT id, fullName FROM users.teachers WHERE id = ?`, [userId]);
+    if (!member) return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng!' });
+    await dbRun(`INSERT INTO class_members (classId, userId, fullName, role) VALUES (?, ?, ?, ?)`,
+      [req.params.classId, member.id, member.fullName, role]);
+    await logActivity(req, { action: `Thêm ${role === 'student' ? 'học sinh' : 'giáo viên'} vào lớp ${req.params.classId}`, targetType: role, targetId: member.id, targetName: member.fullName });
+    return res.json({ success: true, message: 'Đã thêm vào lớp!' });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+router.delete('/api/admin/classes/:classId/members/:userId', requireAdmin, async (req, res) => {
+  try {
+    const member = await dbGet(`SELECT * FROM class_members WHERE classId = ? AND userId = ?`,
+      [req.params.classId, req.params.userId]);
+    if (!member) return res.status(404).json({ success: false, message: 'Thành viên không có trong lớp!' });
+    await dbRun(`DELETE FROM class_members WHERE classId = ? AND userId = ?`, [req.params.classId, req.params.userId]);
+    await logActivity(req, { action: `Xóa khỏi lớp ${req.params.classId}`, targetType: member.role, targetId: member.userId, targetName: member.fullName });
+    return res.json({ success: true, message: 'Đã xóa khỏi lớp!' });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// Search users not yet in a class (for add-member dropdowns)
+router.get('/api/admin/classes/:classId/available-users', requireAdmin, async (req, res) => {
+  try {
+    const { role = 'student', search = '' } = req.query;
+    const searchParam = `%${search}%`;
+    const table = role === 'teacher' ? 'users.teachers' : 'users.students';
+    const rows = await dbAll(`
+      SELECT u.id, u.fullName, u.email FROM ${table} u
+      WHERE (u.fullName LIKE ? OR u.id LIKE ?)
+        AND u.id NOT IN (SELECT userId FROM class_members WHERE classId = ? AND role = ?)
+      ORDER BY u.fullName LIMIT 30`, [searchParam, searchParam, req.params.classId, role]);
+    return res.json({ success: true, data: rows });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────
+// ADMIN ACCOUNT MANAGEMENT
+// ─────────────────────────────────────────────────────────────
+router.get('/api/admin/admins', requireAdmin, async (req, res) => {
+  try {
+    const { search = '', page = 1, limit = 20 } = req.query;
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+    const searchParam = `%${search}%`;
+    const rows = await dbAll(`SELECT id, fullName, email, activate, createdAt FROM users.admins
+      WHERE fullName LIKE ? OR email LIKE ? OR id LIKE ?
+      ORDER BY createdAt DESC LIMIT ? OFFSET ?`,
+      [searchParam, searchParam, searchParam, parseInt(limit), offset]);
+    const total = await dbGet(`SELECT COUNT(*) AS cnt FROM users.admins WHERE fullName LIKE ? OR email LIKE ? OR id LIKE ?`,
+      [searchParam, searchParam, searchParam]);
+    return res.json({ success: true, data: rows, total: total?.cnt || 0 });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+router.post('/api/admin/admins', requireAdmin, async (req, res) => {
+  try {
+    const { fullName, email, pass } = req.body;
+    if (!fullName || !email || !pass) {
+      return res.status(400).json({ success: false, message: 'Vui lòng điền đầy đủ thông tin!' });
+    }
+    const fullEmail = formatEmail(email);
+    const existEmail = await checkEmailExists(fullEmail);
+    if (existEmail) return res.status(400).json({ success: false, message: `Email ${fullEmail} đã tồn tại!` });
+    const hashed = await hashPassword(pass);
+    const now = new Date().toISOString();
+    await dbRun(`INSERT INTO users.admins (id, fullName, email, pass, activate, createdAt) VALUES (?, ?, ?, ?, 'true', ?)`,
+      [fullEmail, fullName, fullEmail, hashed, now]);
+    await logActivity(req, { action: 'Tạo admin', targetType: 'admin', targetId: fullEmail, targetName: fullName });
+    return res.json({ success: true, message: `Đã tạo tài khoản Admin ${fullName} thành công!` });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+router.put('/api/admin/admins/:id', requireAdmin, async (req, res) => {
+  try {
+    const { fullName, pass } = req.body;
+    const admin = await dbGet(`SELECT * FROM users.admins WHERE id = ?`, [decodeURIComponent(req.params.id)]);
+    if (!admin) return res.status(404).json({ success: false, message: 'Không tìm thấy admin!' });
+    const newName = fullName || admin.fullName;
+    const newPass = pass ? await hashPassword(pass) : admin.pass;
+    await dbRun(`UPDATE users.admins SET fullName = ?, pass = ? WHERE id = ?`, [newName, newPass, admin.id]);
+    await logActivity(req, { action: 'Cập nhật admin', targetType: 'admin', targetId: admin.id, targetName: newName });
+    return res.json({ success: true, message: 'Cập nhật admin thành công!' });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+router.delete('/api/admin/admins/:id', requireAdmin, async (req, res) => {
+  try {
+    const targetId = decodeURIComponent(req.params.id);
+    if (targetId === req.session.user.id) {
+      return res.status(400).json({ success: false, message: 'Không thể xóa chính tài khoản đang đăng nhập!' });
+    }
+    const total = await dbGet(`SELECT COUNT(*) AS cnt FROM users.admins`);
+    if (total?.cnt <= 1) {
+      return res.status(400).json({ success: false, message: 'Không thể xóa admin cuối cùng trong hệ thống!' });
+    }
+    const admin = await dbGet(`SELECT * FROM users.admins WHERE id = ?`, [targetId]);
+    if (!admin) return res.status(404).json({ success: false, message: 'Không tìm thấy admin!' });
+    await dbRun(`DELETE FROM users.admins WHERE id = ?`, [targetId]);
+    await logActivity(req, { action: 'Xóa admin', targetType: 'admin', targetId: targetId, targetName: admin.fullName });
+    return res.json({ success: true, message: 'Đã xóa admin thành công!' });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────
+// ACTIVITY LOG
+// ─────────────────────────────────────────────────────────────
+router.get('/api/admin/activity', requireAdmin, async (req, res) => {
+  try {
+    const { search = '', page = 1, limit = 30 } = req.query;
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+    const searchParam = `%${search}%`;
+    const rows = await dbAll(`
+      SELECT * FROM users.admin_activity
+      WHERE action LIKE ? OR adminName LIKE ? OR targetName LIKE ?
+      ORDER BY createdAt DESC LIMIT ? OFFSET ?`,
+      [searchParam, searchParam, searchParam, parseInt(limit), offset]);
+    const total = await dbGet(`SELECT COUNT(*) AS cnt FROM users.admin_activity WHERE action LIKE ? OR adminName LIKE ? OR targetName LIKE ?`,
+      [searchParam, searchParam, searchParam]);
+    return res.json({ success: true, data: rows, total: total?.cnt || 0 });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// Utility: list all classes (for dropdowns in admin UI)
+router.get('/api/admin/all-classes', requireAdmin, async (req, res) => {
+  try {
+    const rows = await dbAll(`SELECT classId, className, status FROM classes ORDER BY className`);
+    return res.json({ success: true, data: rows });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// GET: Danh sách giáo viên (có phân trang & tìm kiếm)
+router.get('/api/admin/teachers', async (req, res) => {
+  try {
+    const { search = '', page = 1, limit = 20 } = req.query;
+    const offset = (page - 1) * limit;
+    const searchParam = `%${search}%`;
+
+    const query = `
+      SELECT id, fullName, email, createdAt
+      FROM users.teachers 
+      WHERE fullName LIKE ? OR email LIKE ? OR id LIKE ?
+      ORDER BY createdAt DESC
+      LIMIT ? OFFSET ?
+    `;
+    const countQuery = `
+      SELECT COUNT(*) as total 
+      FROM users.teachers 
+      WHERE fullName LIKE ? OR email LIKE ? OR id LIKE ?
+    `;
+
+    const teachers = await dbAll(query, [searchParam, searchParam, searchParam, parseInt(limit), parseInt(offset)]);
+    const totalRow = await dbGet(countQuery, [searchParam, searchParam, searchParam]);
+
+    res.json({ success: true, data: teachers, total: totalRow.total });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// GET: Chi tiết 1 giáo viên
+router.get('/api/admin/teachers/:id', async (req, res) => {
+  try {
+    const teacher = await dbGet('SELECT id, fullName, email, createdAt FROM users.teachers WHERE id = ?', [req.params.id]);
+    if (!teacher) throw new Error('Không tìm thấy giáo viên');
+    res.json({ success: true, data: teacher });
+  } catch (error) {
+    res.status(404).json({ success: false, message: error.message });
+  }
+});
+
+// POST: Thêm mới giáo viên
+router.post('/api/admin/teachers', async (req, res) => {
+  try {
+    const { id, fullName, email, pass } = req.body;
+    if (!id || !fullName || !email || !pass) throw new Error('Vui lòng điền đủ thông tin bắt buộc');
+    
+    const existing = await dbGet('SELECT id FROM users.teachers WHERE id = ? OR email = ?', [id, email]);
+    if (existing) throw new Error('Mã giáo viên hoặc Email đã tồn tại trong hệ thống');
+
+    const hashedPass = await hashPassword(pass);
+    const createdAt = new Date().toISOString();
+
+    await dbRun(
+      'INSERT INTO users.teachers (id, fullName, email, pass, createdAt) VALUES (?, ?, ?, ?, ?)', 
+      [id, fullName, email, hashedPass, createdAt]
+    );
+    res.json({ success: true, message: 'Thêm giáo viên thành công' });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+});
+
+// PUT: Cập nhật giáo viên
+router.put('/api/admin/teachers/:id', async (req, res) => {
+  try {
+    const { fullName, email, pass } = req.body;
+    
+    if (pass) {
+      const hashedPass = await hashPassword(pass);
+      await dbRun(
+        'UPDATE users.teachers SET fullName = ?, email = ?, pass = ? WHERE id = ?', 
+        [fullName, email, hashedPass, req.params.id]
+      );
+    } else {
+      await dbRun(
+        'UPDATE users.teachers SET fullName = ?, email = ? WHERE id = ?', 
+        [fullName, email, req.params.id]
+      );
+    }
+    res.json({ success: true, message: 'Cập nhật thông tin giáo viên thành công' });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+});
+
+// DELETE: Xóa giáo viên
+router.delete('/api/admin/teachers/:id', async (req, res) => {
+  try {
+    // Kiểm tra xem giáo viên có đang phụ trách lớp nào không
+    const assignedClasses = await dbGet('SELECT COUNT(*) as count FROM classes WHERE teacherId = ?', [req.params.id]);
+    if (assignedClasses && assignedClasses.count > 0) {
+      throw new Error(`Không thể xóa! Giáo viên đang phân công phụ trách ${assignedClasses.count} lớp học.`);
+    }
+
+    await dbRun('DELETE FROM users.teachers WHERE id = ?', [req.params.id]);
+    res.json({ success: true, message: 'Xóa giáo viên thành công' });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+});
+
+// GET: Danh sách lớp học (kèm thông tin tên giáo viên)
+router.get('/api/admin/classes', async (req, res) => {
+  try {
+    const { search = '', page = 1, limit = 20 } = req.query;
+    const offset = (page - 1) * limit;
+    const searchParam = `%${search}%`;
+
+    const query = `
+      SELECT 
+        c.id, 
+        c.name, 
+        COALESCE(c.teacherId, c.teacher_id) as teacherId, 
+        c.schedule, 
+        c.createdAt, 
+        COALESCE(t.fullName, t.full_name, t.name) as teacherName
+      FROM classes c
+      LEFT JOIN users.teachers t ON (c.teacherId = t.id OR c.teacher_id = t.id)
+      WHERE c.name LIKE ? OR c.id LIKE ? OR t.fullName LIKE ?
+      ORDER BY c.createdAt DESC
+      LIMIT ? OFFSET ?
+    `;
+
+    const classes = await dbAll(query, [searchParam, searchParam, searchParam, parseInt(limit), parseInt(offset)]);
+    const countRow = await dbGet('SELECT COUNT(*) as total FROM classes');
+
+    res.json({ success: true, data: classes, total: countRow.total });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+// GET: Lấy chi tiết lớp học
+router.get('/api/admin/classes/:id', async (req, res) => {
+  try {
+    const cls = await dbGet('SELECT * FROM classes WHERE id = ?', [req.params.id]);
+    if (!cls) throw new Error('Không tìm thấy lớp học');
+    res.json({ success: true, data: cls });
+  } catch (error) {
+    res.status(404).json({ success: false, message: error.message });
+  }
+});
+
+// POST: Tạo lớp học mới
+router.post('/api/admin/classes', async (req, res) => {
+  try {
+    const { id, name, teacherId, schedule } = req.body;
+    if (!id || !name) throw new Error('Mã lớp và tên lớp là bắt buộc');
+
+    const existing = await dbGet('SELECT id FROM classes WHERE id = ?', [id]);
+    if (existing) throw new Error('Mã lớp học đã tồn tại');
+
+    const createdAt = new Date().toISOString();
+    await dbRun(
+      'INSERT INTO classes (id, name, teacherId, schedule, createdAt) VALUES (?, ?, ?, ?, ?)',
+      [id, name, teacherId || null, schedule || '', createdAt]
+    );
+
+    res.json({ success: true, message: 'Tạo lớp học thành công' });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+});
+
+// PUT: Cập nhật lớp học
+router.put('/api/admin/classes/:id', async (req, res) => {
+  try {
+    const { name, teacherId, schedule } = req.body;
+    if (!name) throw new Error('Tên lớp không được để trống');
+
+    await dbRun(
+      'UPDATE classes SET name = ?, teacherId = ?, schedule = ? WHERE id = ?',
+      [name, teacherId || null, schedule || '', req.params.id]
+    );
+
+    res.json({ success: true, message: 'Cập nhật lớp học thành công' });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+});
+
+// DELETE: Xóa lớp học
+router.delete('/api/admin/classes/:id', async (req, res) => {
+  try {
+    await dbRun('DELETE FROM classes WHERE id = ?', [req.params.id]);
+    res.json({ success: true, message: 'Xóa lớp học thành công' });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+});
+
+router.post('/api/teacher/:teacherId/submissions/:submissionId/grade', requireTeacher, helper((req) =>
+    StudentService.gradeSubmission({
+        submissionId: req.params.submissionId,
+        teacherId: req.params.teacherId,
+        score: req.body.score,
+        comment: req.body.comment,
+        appealStatus: req.body.appealStatus,
+    })
+));
+
+// GET: Lấy danh sách yêu cầu phúc khảo của học sinh
+// GET: Lấy danh sách yêu cầu phúc khảo của học sinh
+router.get("/api/student/:studentId/phuckhao", helper(async (req) => {
+  const { studentId } = req.params;
+
+  const rows = await dbAll(`
+    SELECT 
+      s.id,
+      s.score,
+      s.appealStatus,
+      s.appealReason,
+      s.submittedAt,
+      s.submittedAt AS updatedAt,  -- Gán tạm submittedAt làm updatedAt để tránh lỗi DB
+      h.title AS homeworkTitle,
+      h.classId AS className
+    FROM hw.submissions s
+    JOIN hw.homeworks h ON h.homeworkId = s.homeworkId
+    WHERE s.studentId = ? AND (s.appealReason IS NOT NULL OR s.appealStatus IS NOT NULL)
+    ORDER BY s.submittedAt DESC
+  `, [studentId]);
+
+  return rows;
+}));
+
 module.exports = router;

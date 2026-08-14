@@ -52,7 +52,8 @@ function renderRequestList(requests) {
       const className = escapeHtml(req.className || req.classId || '—');
       const homeworkTitle = escapeHtml(req.homeworkTitle || 'Buổi học/Bài tập');
       const reason = escapeHtml(req.appealReason || 'Không có lý do được cung cấp.');
-      const actionUrl = `teacher-assignmentManage.html?homeworkId=${encodeURIComponent(req.homeworkId)}&submissionId=${encodeURIComponent(req.submissionId)}`;
+      // Inside renderRequestList() in teacher-phuckhao.js:
+const actionUrl = `teacher-assignmentReview.html?homeworkId=${encodeURIComponent(req.homeworkId)}&submissionId=${encodeURIComponent(req.submissionId)}`;
       const formattedTime = formatDate(req.requestedAt || req.submittedAt);
       const scoreText = req.score != null ? `Điểm: ${req.score}` : null;
 
