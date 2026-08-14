@@ -109,41 +109,21 @@
 
       <div class="nav-label">Không gian giáo viên</div>
       <nav class="nav">
-        <a class="nav-item" href="teacher-overview.html">
-          <svg>
-            <use href="#i-home"></use>
-          </svg>
+        <a class="nav-item " href="teacher-overview.html" aria-current="page">
+          <svg><use href="#i-home"></use></svg>
           <span>Tổng quan</span>
         </a>
-        <a class="nav-item active" href="teacher-assignmentManage.html" aria-current="page">
-          <svg>
-            <use href="#i-task"></use>
-          </svg>
+        <a class="nav-item active" href="teacher-assignmentManage.html">
+          <svg><use href="#i-task"></use></svg>
           <span>Quản lý bài tập</span>
         </a>
-        <a class="nav-item" href="teacher-phuckhao.html">
-          <svg>
-            <use href="#i-alert"></use>
-          </svg>
+        <a class="nav-item " href="teacher-phuckhao.html">
+          <svg><use href="#i-alert"></use></svg>
           <span>Phúc khảo</span>
         </a>
-        <a class="nav-item" href="#" onclick="comingSoon('Lớp học'); return false;">
-          <svg>
-            <use href="#i-users"></use>
-          </svg>
+        <a class="nav-item" href="teacher-classroom.html">
+          <svg><use href="#i-users"></use></svg>
           <span>Lớp học</span>
-        </a>
-        <a class="nav-item" href="#" onclick="comingSoon('Kết quả học tập'); return false;">
-          <svg>
-            <use href="#i-chart"></use>
-          </svg>
-          <span>Kết quả học tập</span>
-        </a>
-        <a class="nav-item" href="teacher-grading.html">
-          <svg>
-            <use href="#i-check"></use>
-          </svg>
-          <span>Chấm bài</span>
         </a>
       </nav>
 
@@ -290,14 +270,10 @@
 
             <div class="field" id="fieldClassName">
               <label for="className">Lớp học <span class="required">*</span></label>
-              <input id="className" type="text" maxlength="60" placeholder="Ví dụ: 10A1" list="classSuggestions" />
-              <datalist id="classSuggestions">
-                <option value="10A1"></option>
-                <option value="10A2"></option>
-                <option value="11A1"></option>
-                <option value="12A1"></option>
-              </datalist>
-              <span class="field-error">Vui lòng nhập lớp học.</span>
+              <select id="className">
+                <option value="">-- Chọn lớp học --</option>
+              </select>
+              <span class="field-error">Vui lòng chọn lớp học.</span>
             </div>
 
             <div class="field" id="fieldPoints">

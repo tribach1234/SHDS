@@ -10,6 +10,161 @@
 </head>
 
 <body>
+  <style>
+/* Card Container */
+.assignment-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.assignment-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Soft Orange Icon Box on the Left */
+.status-icon-box {
+  width: 52px;
+  height: 52px;
+  min-width: 52px;
+  background-color: #ffeedd;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-icon-box .check-icon {
+  width: 24px;
+  height: 24px;
+  stroke: #d9531e;
+}
+
+/* Card Content Area */
+.card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Title & Badge Row */
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.card-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-badge-pending { background: #fef3c7; color: #92400e; }
+.status-badge-approved { background: #d1fae5; color: #065f46; }
+.status-badge-rejected { background: #fee2e2; color: #991b1b; }
+.status-badge-completed, .status-badge-default { background: #f3f4f6; color: #4b5563; }
+
+/* Metadata Row */
+.card-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.meta-item svg {
+  width: 16px;
+  height: 16px;
+  stroke: #6b7280;
+}
+
+/* Larger & Highlighted Reason Block */
+.reason-block {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-top: 4px;
+}
+
+.reason-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #dc2626;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.reason-header svg {
+  width: 16px;
+  height: 16px;
+  stroke: #dc2626;
+}
+
+.reason-text-large {
+  margin: 0;
+  font-size: 16px; /* Larger font size */
+  font-weight: 600;
+  color: #1e293b;
+  line-height: 1.5;
+}
+
+/* Action Button */
+.card-action {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.btn-appeal {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: #10b981;
+  color: #ffffff;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+.btn-appeal:hover {
+  background: #059669;
+}
+  </style>
   <svg aria-hidden="true" width="0" height="0" style="position:absolute">
     <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.8A2.8 2.8 0 0 0 4 20.8V5.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" /><path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20v3H6.5A2.5 2.5 0 0 1 4 18.5M8 7h8M8 11h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></symbol>
     <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V10Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" /></symbol>
@@ -30,8 +185,8 @@
       </div>
 
       <div class="nav-label">Không gian giáo viên</div>
-      <nav class="nav">
-        <a class="nav-item" href="teacher-overview.html">
+       <nav class="nav">
+        <a class="nav-item " href="teacher-overview.html" aria-current="page">
           <svg><use href="#i-home"></use></svg>
           <span>Tổng quan</span>
         </a>
@@ -39,26 +194,15 @@
           <svg><use href="#i-task"></use></svg>
           <span>Quản lý bài tập</span>
         </a>
-        <a class="nav-item active" href="teacher-phuckhao.html" aria-current="page">
+        <a class="nav-item active" href="teacher-phuckhao.html">
           <svg><use href="#i-alert"></use></svg>
           <span>Phúc khảo</span>
         </a>
-        <a class="nav-item" href="#" onclick="comingSoon('Lớp học'); return false;">
+        <a class="nav-item" href="teacher-classroom.html">
           <svg><use href="#i-users"></use></svg>
           <span>Lớp học</span>
         </a>
-        <a class="nav-item" href="#" onclick="comingSoon('Kết quả học tập'); return false;">
-          <svg><use href="#i-chart"></use></svg>
-          <span>Kết quả học tập</span>
-        </a>
-        <a class="nav-item" href="teacher-grading.html">
-          <svg>
-            <use href="#i-check"></use>
-          </svg>
-          <span>Chấm bài</span>
-        </a>
       </nav>
-
       <div class="sidebar-spacer"></div>
     </aside>
 

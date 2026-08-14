@@ -1,11 +1,29 @@
 const express = require('express');
 const router = express.Router();
 const StudentService = require("./hocsinh/StudentService");
+const TeacherClassService = require("../public/Teacher/teacher-classservice");
 
 const { dbGet, dbRun, dbAll } = require("./db");
 const { hashPassword, verifyPassword } = require('./auth');
 const { formatEmail, checkEmailExists } = require('./helpers');
 const { activationTokens, generateAndSendActivationEmail, DOMAIN } = require('./mailer');
+
+// IDOR & Session Protection Guard
+function requireTeacher(req, res, next) {
+  if (!req.session || !req.session.user) {
+    return res.status(401).json({ success: false, message: "Chưa đăng nhập!" });
+  }
+
+  if (req.session.user.role !== "TEACHER") {
+    return res.status(403).json({ success: false, message: "Truy cập bị từ chối!" });
+  }
+
+  if (req.params.teacherId && req.params.teacherId !== req.session.user.id) {
+    return res.status(403).json({ success: false, message: "Bạn không có quyền xem dữ liệu của giáo viên khác!" });
+  }
+
+  next();
+}
 
 function helper(fn) {
   return async (req, res) => {
@@ -22,7 +40,16 @@ function helper(fn) {
   };
 }
 
-/// LOGIN/REGISTER AND AUTH
+/// AUTHENTICATION ROUTES
+
+// Get current session user
+router.get('/api/me', (req, res) => {
+  if (req.session && req.session.user) {
+    return res.json({ success: true, user: req.session.user });
+  }
+  return res.status(401).json({ success: false, message: "Chưa đăng nhập!" });
+});
+
 router.get('/retry', async (req, res) => {
   const testEmail = 'tommi2k10@gmail.com';
   try {
@@ -55,8 +82,8 @@ router.post('/api/register-admin', async (req, res) => {
     }
 
     const fullEmail = formatEmail(email);
-
     const isExist = await checkEmailExists(fullEmail);
+
     if (isExist) {
       return res.status(400).json({ success: false, message: `Email ${fullEmail} đã tồn tại trong hệ thống!` });
     }
@@ -158,7 +185,6 @@ router.post('/api/login', async (req, res) => {
       return res.status(401).json({ success: false, message: 'Tài khoản không tồn tại!' });
     }
 
-    // Accepts plain-text comparison (testing) OR Bcrypt hash comparison
     const isPassValid = (pass === matchedUser.pass) || await verifyPassword(pass, matchedUser.pass);
     if (!isPassValid) {
       return res.status(401).json({ success: false, message: 'Mật khẩu không chính xác!' });
@@ -188,19 +214,37 @@ router.post('/api/login', async (req, res) => {
       }
     }
 
+    req.session.user = {
+      id: matchedUser.id,
+      fullName: matchedUser.fullName,
+      email: matchedUser.email,
+      role: matchedRole,
+      activate: matchedUser.activate || 'true'
+    };
+
     return res.json({
       success: true,
       message: 'Đăng nhập thành công!',
-      user: {
-        id: matchedUser.id,
-        fullName: matchedUser.fullName,
-        email: matchedUser.email,
-        role: matchedRole,
-        activate: matchedUser.activate || 'true'
-      }
+      user: req.session.user
     });
+
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// Route đăng xuất
+router.post('/api/logout', (req, res) => {
+  if (req.session) {
+    req.session.destroy(err => {
+      if (err) {
+        return res.status(500).json({ success: false, message: "Lỗi khi đăng xuất!" });
+      }
+      res.clearCookie('connect.sid');
+      return res.json({ success: true, message: "Đăng xuất thành công!" });
+    });
+  } else {
+    return res.json({ success: true });
   }
 });
 
@@ -258,13 +302,13 @@ router.post("/api/homeworks/:homeworkId/submit", helper((req) => StudentService.
   fileLink: req.body.fileLink,
 })));
 
-// GET: Fetch assignments mapped dynamically to a specific account ID
-router.get("/api/assignments/:teacherId", async (req, res) => {
-    try {
-        const teacherId = req.params.teacherId;
+/// TEACHER ASSIGNMENT & OVERVIEW ROUTES (PROTECTED WITH requireTeacher)
 
-        // Alias DB columns to the field names teacher.js/teacher-assignmentManage.html
-        // actually use (id, className, description, materialUrl).
+// GET: Fetch assignments mapped dynamically to a specific account ID
+router.get("/api/assignments/:teacherId", requireTeacher, async (req, res) => {
+    try {
+        const teacherId = req.params.teacherId; 
+
         const rows = await dbAll(`
             SELECT
                 homeworkId AS id,
@@ -281,8 +325,6 @@ router.get("/api/assignments/:teacherId", async (req, res) => {
             ORDER BY deadline ASC
         `, [teacherId]);
 
-        // Split the stored "deadline" datetime back into dueDate/dueTime
-        // for the date/time inputs in the edit form.
         const assignments = rows.map((r) => {
             const d = r.deadline ? new Date(r.deadline) : null;
             const valid = d && !isNaN(d.getTime());
@@ -294,19 +336,15 @@ router.get("/api/assignments/:teacherId", async (req, res) => {
         });
 
         res.json(assignments);
-
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-// POST: Create or Update an assignment for a specific account ID
-router.post("/api/assignments/:teacherId", async (req, res) => {
-
+// POST: Create or Update an assignment
+router.post("/api/assignments/:teacherId", requireTeacher, async (req, res) => {
     try {
-
         const teacherId = req.params.teacherId;
-
         const {
             id,
             className,
@@ -327,122 +365,55 @@ router.post("/api/assignments/:teacherId", async (req, res) => {
         const deadline = new Date(`${dueDate}T${dueTime || "23:59"}:00`).toISOString();
 
         const existing = await dbGet(
-            `SELECT homeworkId
-             FROM hw.homeworks
-             WHERE homeworkId = ? AND teacherId = ?`,
+            `SELECT homeworkId FROM hw.homeworks WHERE homeworkId = ? AND teacherId = ?`,
             [id, teacherId]
         );
 
         if (existing) {
-
             await dbRun(`
                 UPDATE hw.homeworks
-                SET
-                    classId=?,
-                    title=?,
-                    note=?,
-                    deadline=?,
-                    joinLink=?,
-                    points=?,
-                    status=?
+                SET classId=?, title=?, note=?, deadline=?, joinLink=?, points=?, status=?
                 WHERE homeworkId=? AND teacherId=?
-            `,[
-                className,
-                title,
-                description,
-                deadline,
-                materialUrl,
-                points,
-                status,
-                id,
-                teacherId
-            ]);
-
+            `, [className, title, description, deadline, materialUrl, points, status, id, teacherId]);
         } else {
-
             await dbRun(`
-                INSERT INTO hw.homeworks
-                (
-                    homeworkId,
-                    teacherId,
-                    classId,
-                    title,
-                    note,
-                    deadline,
-                    createdAt,
-                    joinLink,
-                    points,
-                    status
-                )
+                INSERT INTO hw.homeworks (homeworkId, teacherId, classId, title, note, deadline, createdAt, joinLink, points, status)
                 VALUES (?,?,?,?,?,?,?,?,?,?)
-            `,[
-                id,
-                teacherId,
-                className,
-                title,
-                description,
-                deadline,
-                createdAt || new Date().toISOString(),
-                materialUrl,
-                points,
-                status
-            ]);
-
+            `, [id, teacherId, className, title, description, deadline, createdAt || new Date().toISOString(), materialUrl, points, status]);
         }
 
-        res.json({
-            success:true
-        });
-
-    } catch(err){
-        res.status(500).json({
-            error:err.message
-        });
+        res.json({ success: true });
+    } catch(err) {
+        res.status(500).json({ error: err.message });
     }
-
 });
-// DELETE: Remove an assignment dynamically matched to the account ID
-router.delete("/api/assignments/:teacherId/:id", async (req,res)=>{
 
-    try{
-
-        await dbRun(`
-            DELETE
-            FROM hw.homeworks
-            WHERE homeworkId=?
-            AND teacherId=?
-        `,[
+// DELETE: Remove an assignment
+router.delete("/api/assignments/:teacherId/:id", requireTeacher, async (req, res) => {
+    try {
+        await dbRun(`DELETE FROM hw.homeworks WHERE homeworkId=? AND teacherId=?`, [
             req.params.id,
             req.params.teacherId
         ]);
-
-        res.json({
-            success:true
-        });
-
-    }catch(err){
-
-        res.status(500).json({
-            error:err.message
-        });
-
+        res.json({ success: true });
+    } catch(err) {
+        res.status(500).json({ error: err.message });
     }
-
 });
 
-router.get('/api/teacher/:teacherId/assignments/:homeworkId', helper((req) =>
+router.get('/api/teacher/:teacherId/assignments/:homeworkId', requireTeacher, helper((req) =>
     StudentService.getAssignmentDetail(req.params.teacherId, req.params.homeworkId)
 ));
 
-router.get('/api/teacher/:teacherId/assignments/:homeworkId/submissions', helper((req) =>
+router.get('/api/teacher/:teacherId/assignments/:homeworkId/submissions', requireTeacher, helper((req) =>
     StudentService.getAssignmentSubmissions(req.params.teacherId, req.params.homeworkId)
 ));
 
-router.get('/api/teacher/:teacherId/phuckhao', helper((req) =>
+router.get('/api/teacher/:teacherId/phuckhao', requireTeacher, helper((req) =>
     StudentService.getPhucKhaoRequests(req.params.teacherId)
 ));
 
-router.post('/api/teacher/:teacherId/submissions/:submissionId/grade', helper((req) =>
+router.post('/api/teacher/:teacherId/submissions/:submissionId/grade', requireTeacher, helper((req) =>
     StudentService.gradeSubmission({
         submissionId: req.params.submissionId,
         teacherId: req.params.teacherId,
@@ -460,14 +431,11 @@ router.post('/api/submissions/:submissionId/regrade', helper((req) =>
     })
 ));
 
-// GET: Dashboard stats + to-do list for the Teacher Overview page.
-// Everything here comes straight from SQLite (hw.homeworks / hw.submissions /
-// class_members) — nothing is stored in the browser.
-router.get("/api/teacher/:teacherId/overview", async (req, res) => {
+// GET: Overview dashboard stats
+router.get("/api/teacher/:teacherId/overview", requireTeacher, async (req, res) => {
     try {
         const teacherId = req.params.teacherId;
 
-        // 1) How many submitted answers are still waiting for a grade
         const pendingGradingRow = await dbGet(`
             SELECT COUNT(*) AS cnt
             FROM hw.submissions s
@@ -475,7 +443,6 @@ router.get("/api/teacher/:teacherId/overview", async (req, res) => {
             WHERE h.teacherId = ? AND s.score IS NULL
         `, [teacherId]);
 
-        // 2) Assignments due within the next 3 days (excluding drafts)
         const dueSoonRow = await dbGet(`
             SELECT COUNT(*) AS cnt
             FROM hw.homeworks
@@ -485,7 +452,6 @@ router.get("/api/teacher/:teacherId/overview", async (req, res) => {
               AND deadline <= datetime('now', '+3 days')
         `, [teacherId]);
 
-        // 3) Overdue, still-not-graded-or-submitted assignments
         const overdueRow = await dbGet(`
             SELECT COUNT(*) AS cnt
             FROM hw.homeworks
@@ -494,7 +460,6 @@ router.get("/api/teacher/:teacherId/overview", async (req, res) => {
               AND deadline < datetime('now')
         `, [teacherId]);
 
-        // 4) Submission rate = (submissions received) / (expected = students in class × homeworks)
         const submissionRows = await dbAll(`
             SELECT
                 h.homeworkId,
@@ -517,7 +482,6 @@ router.get("/api/teacher/:teacherId/overview", async (req, res) => {
             ? Math.round((totalSubmitted / totalExpected) * 100)
             : null;
 
-        // 5) "Cần xử lý trong hôm nay": the most recent ungraded submissions
         const todoRows = await dbAll(`
             SELECT
                 s.id, s.studentId, s.submittedAt,
@@ -537,7 +501,7 @@ router.get("/api/teacher/:teacherId/overview", async (req, res) => {
                 pendingGrading: pendingGradingRow?.cnt || 0,
                 dueSoon: dueSoonRow?.cnt || 0,
                 overdue: overdueRow?.cnt || 0,
-                submissionRate, // null when the teacher has no assignments yet
+                submissionRate,
                 todo: todoRows,
             }
         });
@@ -547,7 +511,7 @@ router.get("/api/teacher/:teacherId/overview", async (req, res) => {
     }
 });
 
-router.get("/api/teacher/:teacherId/submissions", async (req, res) => {
+router.get("/api/teacher/:teacherId/submissions", requireTeacher, async (req, res) => {
     try {
         const teacherId = req.params.teacherId;
  
@@ -579,7 +543,7 @@ router.get("/api/teacher/:teacherId/submissions", async (req, res) => {
     }
 });
  
-// POST: save/update the score + comment for one submission.
+// POST: save/update submission score + comment
 router.post("/api/submissions/:id/grade", async (req, res) => {
     try {
         const { id } = req.params;
@@ -605,5 +569,59 @@ router.post("/api/submissions/:id/grade", async (req, res) => {
         res.status(500).json({ success: false, error: err.message });
     }
 });
+
+// Teacher Class Management
+router.get("/api/teacher/:teacherId/classes", requireTeacher, async (req, res, next) => {
+  try {
+    const data = await TeacherClassService.getClassesByTeacher(req.params.teacherId);
+    res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get("/api/classes/:classId/sessions", async (req, res, next) => {
+  try {
+    const data = await TeacherClassService.getClassSessions(req.params.classId);
+    res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get("/api/classes/:classId/roster", async (req, res, next) => {
+  try {
+    const { homeworkId } = req.query;
+    const data = await TeacherClassService.getClassRoster(req.params.classId, homeworkId);
+    res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post("/api/classes/:classId/attendance", async (req, res, next) => {
+  try {
+    const { homeworkId, records } = req.body;
+    const data = await TeacherClassService.saveAttendance({
+      classId: req.params.classId,
+      homeworkId,
+      records,
+    });
+    res.json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get(
+  "/api/students/:studentId/profile",
+  helper((req) =>
+    TeacherClassService.getStudentProfile(
+      req.params.studentId,
+      req.query.classId,
+      req.query.limit
+    )
+  )
+);
 
 module.exports = router;

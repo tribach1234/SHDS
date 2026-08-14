@@ -1,0 +1,170 @@
+/* teacher-classroom.css — extends teacher.css, only adds new components */
+
+.class-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+  padding: 10px 16px 18px;
+}
+
+.class-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 17px;
+  background: #fff;
+  transition: 0.2s ease;
+}
+
+.class-card:hover {
+  border-color: #cbdcc0;
+  box-shadow: 0 10px 24px rgba(35, 38, 45, 0.07);
+  transform: translateY(-1px);
+}
+
+.class-card-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.class-card-title {
+  margin: 0 0 2px;
+  font-size: 15px;
+  font-weight: 850;
+}
+
+.class-card-attendance {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.roster-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+
+.roster-toolbar select#sessionSelect {
+  max-width: 320px;
+  flex: 1 1 260px;
+}
+
+.roster-stats {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px 0;
+  flex-wrap: wrap;
+}
+
+.roster-list {
+  display: grid;
+  gap: 12px;
+  padding: 10px 16px 18px;
+}
+
+.roster-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.attendance-btn {
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 11px;
+  font-weight: 800;
+  font-size: 12px;
+  cursor: pointer;
+  border: 1px solid var(--line);
+  background: #f5f6f5;
+  color: var(--ink-soft);
+  transition: 0.2s ease;
+}
+
+.attendance-btn.attended.active {
+  color: var(--success);
+  background: var(--success-bg);
+  border-color: #bfe3c9;
+}
+
+.attendance-btn.late.active {
+  color: var(--warning);
+  background: var(--warning-bg);
+  border-color: #f0dfb0;
+}
+
+.attendance-btn.absent.active {
+  color: var(--danger);
+  background: var(--danger-bg);
+  border-color: #f0cece;
+}
+
+.hw-limit-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
+.hw-limit-label select {
+  min-width: 120px;
+}
+
+.profile-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.mini-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #f7f8f7;
+  text-align: center;
+}
+
+.mini-stat-value {
+  font-size: 20px;
+  font-weight: 850;
+}
+
+.mini-stat-title {
+  font-size: 11px;
+  color: var(--ink-soft);
+  font-weight: 650;
+}
+
+#profileModal .modal {
+  width: min(720px, 100%);
+}
+
+@media (max-width: 640px) {
+  .profile-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .roster-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .roster-toolbar select#sessionSelect {
+    max-width: none;
+    flex-basis: 100%;
+  }
+}

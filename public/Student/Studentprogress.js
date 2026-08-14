@@ -207,26 +207,11 @@ function renderLineChart(submissions, year) {
   `;
 }
 
-/* =======================================================================
-   CHART SWITCHER — fully config-driven
-
-   CHART_DEFINITIONS is the single source of truth for which charts exist
-   on this page, in what order, with what label, and whether they're
-   visible by default. Both the dropdown menu markup and the panel
-   lookup are generated from this array at runtime, so adding, removing,
-   or reordering charts means editing this array only — no HTML edits,
-   no new if/else branches in JS.
-
-   The HTML side only needs a <section class="chart-panel" data-chart="X">
-   for each entry here, and an empty #chartDropdownMenu container.
-   ======================================================================= */
-
 const CHART_DEFINITIONS = [
   { id: "pie", label: "Trạng thái nộp bài", defaultActive: true },
   { id: "line", label: "Điểm trung bình theo tháng", defaultActive: false },
 ];
 
-// Built once at setup time: [ <section data-chart='pie'>, <section data-chart='line'>, ... ]
 let chartSections = [];
 
 function renderChartDropdownMenu() {
@@ -277,8 +262,6 @@ function setChartVisibility(chart, visible) {
 }
 
 function setupChartSwitcher() {
-  // Locate every chart panel by its data-chart attribute, keyed by
-  // the same ids used in CHART_DEFINITIONS.
   chartSections = Array.from(document.querySelectorAll("section.chart-panel[data-chart]"));
 
   renderChartDropdownMenu();
@@ -287,7 +270,6 @@ function setupChartSwitcher() {
   const dropdownMenu = document.getElementById("chartDropdownMenu");
   const items = document.querySelectorAll("#chartSwitcher .chart-toggle-item");
 
-  // initialize visibility from CHART_DEFINITIONS defaults
   items.forEach((item) => {
     const chart = item.dataset.chart;
     const visible = item.classList.contains("active");
@@ -300,7 +282,6 @@ function setupChartSwitcher() {
     });
   });
 
-  // dropdown open/close
   if (dropdownButton && dropdownMenu) {
     dropdownButton.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -406,28 +387,74 @@ document.getElementById("searchInput").addEventListener("input", renderList);
 document.getElementById("classFilter").addEventListener("change", renderList);
 document.getElementById("statusFilter").addEventListener("change", renderList);
 
-document.getElementById("submissionList").addEventListener("click", async (event) => {
+// MODAL REGRADE HANDLERS
+const regradeModal = document.getElementById("regradeModal");
+const regradeForm = document.getElementById("regradeForm");
+const regradeSubmissionIdInput = document.getElementById("regradeSubmissionId");
+const regradeReasonInput = document.getElementById("regradeReason");
+const closeRegradeModalBtn = document.getElementById("closeRegradeModal");
+const cancelRegradeModalBtn = document.getElementById("cancelRegradeModal");
+
+function openRegradeModal(submissionId) {
+  if (!regradeModal) return;
+  regradeSubmissionIdInput.value = submissionId;
+  regradeReasonInput.value = "";
+  regradeModal.removeAttribute("hidden");
+  regradeReasonInput.focus();
+}
+
+function closeRegradeModal() {
+  if (!regradeModal) return;
+  regradeModal.setAttribute("hidden", "true");
+  regradeSubmissionIdInput.value = "";
+  regradeReasonInput.value = "";
+}
+
+if (closeRegradeModalBtn) closeRegradeModalBtn.addEventListener("click", closeRegradeModal);
+if (cancelRegradeModalBtn) cancelRegradeModalBtn.addEventListener("click", closeRegradeModal);
+
+if (regradeModal) {
+  regradeModal.addEventListener("click", (e) => {
+    if (e.target === regradeModal) closeRegradeModal();
+  });
+}
+
+if (regradeForm) {
+  regradeForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const submissionId = regradeSubmissionIdInput.value;
+    const reason = regradeReasonInput.value.trim();
+
+    if (!submissionId || !reason) return;
+
+    const submitBtn = document.getElementById("submitRegradeBtn");
+    if (submitBtn) submitBtn.disabled = true;
+
+    try {
+      await apiPost(`/api/submissions/${encodeURIComponent(submissionId)}/regrade`, {
+        studentId: STUDENT_ID,
+        reason: reason,
+      });
+      closeRegradeModal();
+      window.alert("Yêu cầu phúc khảo đã được gửi đến giáo viên.");
+      await loadSubmissions();
+    } catch (err) {
+      window.alert(`Không thể gửi yêu cầu phúc khảo: ${err.message}`);
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
+    }
+  });
+}
+
+// Open Regrade Modal on button click
+document.getElementById("submissionList").addEventListener("click", (event) => {
   const button = event.target.closest('.regrade-button');
   if (!button) return;
 
   const submissionId = button.dataset.submissionId;
   if (!submissionId) return;
 
-  const reason = window.prompt('Vui lòng nhập lý do phúc khảo cho bài này:');
-  if (!reason || !reason.trim()) {
-    return;
-  }
-
-  try {
-    await apiPost(`/api/submissions/${encodeURIComponent(submissionId)}/regrade`, {
-      studentId: STUDENT_ID,
-      reason: reason.trim(),
-    });
-    window.alert('Yêu cầu phúc khảo đã được gửi đến giáo viên.');
-    await loadSubmissions();
-  } catch (err) {
-    window.alert(`Không thể gửi yêu cầu phúc khảo: ${err.message}`);
-  }
+  openRegradeModal(submissionId);
 });
 
 loadSubmissions();

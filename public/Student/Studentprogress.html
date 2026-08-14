@@ -7,6 +7,111 @@
   <meta name="theme-color" content="#b9dda0" />
   <link rel="stylesheet" href="Student.css">
   <title>EduGreen - Kết quả và tiến độ</title>
+  <style>
+    /* Modal Phúc Khảo Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      backdrop-filter: blur(2px);
+    }
+    .modal-overlay[hidden] {
+      display: none !important;
+    }
+    .modal-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 24px;
+      width: 90%;
+      max-width: 480px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .modal-header h3 {
+      margin: 0;
+      font-size: 18px;
+      color: #1f2937;
+    }
+    .modal-close {
+      background: transparent;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #64748b;
+      line-height: 1;
+    }
+    .modal-close:hover {
+      color: #1f2937;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      font-size: 14px;
+      color: #374151;
+    }
+    .form-group textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 14px;
+      resize: vertical;
+      box-sizing: border-box;
+    }
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #28a745;
+      box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.15);
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+    .modal-actions .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      font-size: 14px;
+    }
+    .modal-actions .btn-secondary {
+      background: #f3f4f6;
+      color: #374151;
+    }
+    .modal-actions .btn-secondary:hover {
+      background: #e5e7eb;
+    }
+    .modal-actions .btn-primary {
+      background: #28a745;
+      color: #ffffff;
+    }
+    .modal-actions .btn-primary:hover {
+      background: #218838;
+    }
+    .modal-actions .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  </style>
 </head>
 
 <body>
@@ -206,21 +311,13 @@
           </select>
         </div>
 
-        <!--
-          Chart switcher: the dropdown menu below is intentionally left
-          empty. Studentprogress.js builds its contents from a single
-          CHART_DEFINITIONS array, so adding/removing/reordering charts
-          only requires editing that array — no HTML edits needed here.
-        -->
         <section class="chart-area">
           <div class="chart-dropdown" id="chartSwitcher" aria-label="Chọn biểu đồ">
             <button type="button" class="chart-dropdown-toggle" id="chartDropdownButton" aria-haspopup="true" aria-expanded="false">
               <span id="chartDropdownLabel">Bật biểu đồ</span>
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
-            <div class="chart-dropdown-menu hidden" id="chartDropdownMenu" role="menu">
-              <!-- Populated dynamically by Studentprogress.js -->
-            </div>
+            <div class="chart-dropdown-menu hidden" id="chartDropdownMenu" role="menu"></div>
           </div>
 
           <section class="chart-panel" id="pieChartSection" data-chart="pie" aria-label="Biểu đồ trạng thái nộp bài">
@@ -253,6 +350,28 @@
       </section>
     </main>
   </div>
+
+  <!-- Modal Form Phúc Khảo -->
+  <div id="regradeModal" class="modal-overlay" hidden>
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Gửi yêu cầu phúc khảo</h3>
+        <button type="button" class="modal-close" id="closeRegradeModal" aria-label="Đóng">&times;</button>
+      </div>
+      <form id="regradeForm">
+        <input type="hidden" id="regradeSubmissionId" value="" />
+        <div class="form-group">
+          <label for="regradeReason">Lý do phúc khảo <span style="color:#e74c3c">*</span></label>
+          <textarea id="regradeReason" rows="4" placeholder="Nhập chi tiết lý do bạn muốn phúc khảo bài làm..." required></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="cancelRegradeModal">Hủy</button>
+          <button type="submit" class="btn btn-primary" id="submitRegradeBtn">Gửi yêu cầu</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script src="../shared_auth.js"></script>
   <script src="Studentprogress.js"></script>
 </body>

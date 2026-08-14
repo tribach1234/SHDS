@@ -149,6 +149,8 @@ async function getSubmissions(studentId) {
 }
 
 // Yêu cầu phúc khảo
+// Yêu cầu phúc khảo
+// Yêu cầu phúc khảo
 async function requestRegrade({ submissionId, studentId, reason }) {
     if (!reason || !reason.trim()) {
         const err = new Error("Vui lòng cung cấp lý do phúc khảo.");
@@ -156,11 +158,22 @@ async function requestRegrade({ submissionId, studentId, reason }) {
         throw err;
     }
 
+    // Cập nhật câu truy vấn: Lấy teacherId từ class_members tương ứng với classId của bài tập
     const submission = await dbGet(
-        `select s.*, h.teacherId, h.homeworkId, h.title as homeworkTitle, c.classId, c.className, st.fullName as studentName
+        `select 
+            s.id as submissionId,
+            s.homeworkId,
+            s.studentId,
+            s.score,
+            COALESCE(cm.userId, h.teacherId) as teacherId, 
+            h.title as homeworkTitle, 
+            c.classId, 
+            c.className, 
+            st.fullName as studentName
          from hw.submissions s
          join hw.homeworks h on h.homeworkId = s.homeworkId
          join classes c on c.classId = h.classId
+         left join class_members cm on cm.classId = c.classId and cm.role in ('LEC', 'teacher')
          join users.students st on st.id = s.studentId
          where s.id = ? and s.studentId = ?`,
         [submissionId, studentId]
@@ -178,7 +191,9 @@ async function requestRegrade({ submissionId, studentId, reason }) {
         throw err;
     }
 
+    const teacherId = submission.teacherId;
     const now = new Date().toISOString();
+
     await dbRun(
         `update hw.submissions set appealReason = ?, appealStatus = 'pending', appealSubmittedAt = ? where id = ?`,
         [reason.trim(), now, submissionId]
@@ -190,16 +205,16 @@ async function requestRegrade({ submissionId, studentId, reason }) {
     if (existingRequest) {
         await dbRun(
             `update pk.requests
-             set appealReason = ?, appealStatus = 'pending', requestedAt = ?, updatedAt = ?
+             set appealReason = ?, appealStatus = 'pending', requestedAt = ?, updatedAt = ?, teacherId = ?
              where id = ?`,
-            [reason.trim(), now, now, requestId]
+            [reason.trim(), now, now, teacherId, requestId]
         );
     } else {
         await dbRun(
             `insert into pk.requests
              (id, submissionId, homeworkId, teacherId, studentId, studentName, classId, className, homeworkTitle, appealReason, appealStatus, requestedAt, updatedAt)
              values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)`,
-            [requestId, submissionId, submission.homeworkId, submission.teacherId, submission.studentId, submission.studentName, submission.classId, submission.className, submission.homeworkTitle, reason.trim(), now, now]
+            [requestId, submissionId, submission.homeworkId, teacherId, submission.studentId, submission.studentName, submission.classId, submission.className, submission.homeworkTitle, reason.trim(), now, now]
         );
     }
 
@@ -208,11 +223,25 @@ async function requestRegrade({ submissionId, studentId, reason }) {
 
 async function getPhucKhaoRequests(teacherId) {
     return await dbAll(
-        `select *
-         from pk.requests
-         where teacherId = ?
-         order by requestedAt desc`,
-        [teacherId]
+        `select 
+            r.id,
+            r.submissionId,
+            r.homeworkId,
+            r.studentId,
+            r.studentName,
+            r.classId,
+            r.className,
+            r.homeworkTitle,
+            r.appealReason,
+            r.appealStatus,
+            r.requestedAt,
+            r.updatedAt,
+            COALESCE(r.teacherId, h.teacherId) as teacherId
+         from pk.requests r
+         join hw.homeworks h on h.homeworkId = r.homeworkId
+         where h.teacherId = ? or r.teacherId = ?
+         order by r.requestedAt desc`,
+        [teacherId, teacherId]
     );
 }
 

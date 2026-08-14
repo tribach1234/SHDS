@@ -34,31 +34,97 @@ function renderRequestList(requests) {
 
   container.innerHTML = requests
     .map((req) => {
-      const statusLabel = req.appealStatus === 'pending' ? 'Đang chờ xử lý' : req.appealStatus;
-      const statusClass = req.appealStatus === 'pending' ? 'badge-warning' : 'badge-completed';
+      // 1. Status Mapping
+      const STATUS_MAP = {
+        pending: { label: 'Đang chờ xử lý', badgeClass: 'status-badge-pending' },
+        approved: { label: 'Đã chấp nhận', badgeClass: 'status-badge-approved' },
+        rejected: { label: 'Đã từ chối', badgeClass: 'status-badge-rejected' },
+        completed: { label: 'Đã chấm', badgeClass: 'status-badge-completed' }
+      };
 
+      const status = STATUS_MAP[req.appealStatus] || {
+        label: escapeHtml(req.appealStatus || 'Đã chấm'),
+        badgeClass: 'status-badge-completed'
+      };
+
+      // 2. Data formatting
+      const studentName = escapeHtml(req.studentName || req.studentId || 'Học sinh');
+      const className = escapeHtml(req.className || req.classId || '—');
+      const homeworkTitle = escapeHtml(req.homeworkTitle || 'Buổi học/Bài tập');
+      const reason = escapeHtml(req.appealReason || 'Không có lý do được cung cấp.');
+      const actionUrl = `teacher-assignmentManage.html?homeworkId=${encodeURIComponent(req.homeworkId)}&submissionId=${encodeURIComponent(req.submissionId)}`;
+      const formattedTime = formatDate(req.requestedAt || req.submittedAt);
+      const scoreText = req.score != null ? `Điểm: ${req.score}` : null;
+
+      // 3. Render Card matching screenshot layout
       return `
-        <article class="assignment-card" style="border:1px solid #e2e2e2; border-radius:8px; padding:16px; margin-bottom:12px; background:#fff;">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
-            <div class="assignment-main">
-              <div class="assignment-title-row" style="display:flex; align-items:center; gap:10px;">
-                <h3 class="assignment-title" style="margin:0;">${escapeHtml(req.studentName || req.studentId)}</h3>
-                <span class="badge ${statusClass}">${escapeHtml(statusLabel)}</span>
-              </div>
-              <div class="assignment-meta" style="margin-top:6px; font-size:13px; color:#666;">
-                <span class="meta-item">Lớp: <b>${escapeHtml(req.className || req.classId || '—')}</b></span> · 
-                <span class="meta-item">Gửi lúc: ${formatDate(req.requestedAt)}</span>
-              </div>
-              <p class="assignment-desc" style="margin:8px 0 4px 0;"><strong>Bài tập:</strong> ${escapeHtml(req.homeworkTitle || '—')}</p>
-              <p class="assignment-desc" style="margin:4px 0;"><strong>Lý do phúc khảo:</strong> <span style="color:#c0392b;">${escapeHtml(req.appealReason || 'Không có')}</span></p>
-              <p class="assignment-desc" style="margin:4px 0; font-size:12px; color:#888;">Cập nhật lần cuối: ${formatDate(req.updatedAt)}</p>
+        <article class="assignment-card">
+          <!-- Left Icon Box -->
+          <div class="status-icon-box">
+            <svg class="check-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+
+          <!-- Main Content -->
+          <div class="card-content">
+            <!-- Header: Title & Status Badge -->
+            <div class="card-header">
+              <h3 class="card-title">${homeworkTitle}</h3>
+              <span class="status-badge ${status.badgeClass}">${status.label}</span>
             </div>
-            
-            <div style="text-align:right; white-space:nowrap;">
-              <a href="teacher-assignmentManage.html?homeworkId=${encodeURIComponent(req.homeworkId)}&submissionId=${encodeURIComponent(req.submissionId)}" 
-                 style="display:inline-block; padding:6px 12px; background:#27ae60; color:#fff; border-radius:6px; text-decoration:none; font-size:13px; font-weight:600;">
-                 Chấm lại / Xử lý
-              </a>
+
+            <!-- Metadata Row -->
+            <div class="card-meta">
+              <span class="meta-item">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="5" width="20" height="14" rx="2" />
+                  <line x1="2" y1="10" x2="22" y2="10" />
+                </svg>
+                ${className}
+              </span>
+
+              <span class="meta-item">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                  <line x1="16" y1="2" x2="16" y2="6" />
+                  <line x1="8" y1="2" x2="8" y2="6" />
+                  <line x1="3" y1="10" x2="21" y2="10" />
+                </svg>
+                Nộp lúc: ${formattedTime}
+              </span>
+
+              <span class="meta-item">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                ${studentName}
+              </span>
+
+              ${scoreText ? `
+              <span class="meta-item">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                </svg>
+                ${scoreText}
+              </span>` : ''}
+            </div>
+
+            <!-- Enlarged Prominent Reason Callout Block -->
+            <div class="reason-block">
+              <div class="reason-header">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                Lý do phúc khảo:
+              </div>
+              <p class="reason-text-large">${reason}</p>
+            </div>
+
+            <!-- Action Button -->
+            <div class="card-action">
+              <a href="${actionUrl}" class="btn-appeal">Chấm lại / Xử lý &rarr;</a>
             </div>
           </div>
         </article>`;

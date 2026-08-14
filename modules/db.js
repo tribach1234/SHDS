@@ -134,6 +134,7 @@ db.exec(`CREATE TABLE IF NOT EXISTS pk.requests (
 // status existed. Backfill those columns for existing databases too.
 // SQLite has no "ADD COLUMN IF NOT EXISTS", so try each and ignore the
 // "duplicate column name" error when it's already there.
+// db.js
 for (const alterStmt of [
   `ALTER TABLE hw.homeworks ADD COLUMN teacherId TEXT`,
   `ALTER TABLE hw.homeworks ADD COLUMN points REAL DEFAULT 10`,
@@ -148,6 +149,21 @@ for (const alterStmt of [
   } catch (err) {
     // column already exists or table doesn't yet exist — ignore
   }
+}
+
+// ⬇️ ADD THIS RIGHT BELOW THE FOR-LOOP ABOVE ⬇️
+try {
+  db.exec(`
+    UPDATE pk.requests
+    SET teacherId = (
+      SELECT h.teacherId 
+      FROM hw.homeworks h 
+      WHERE h.homeworkId = pk.requests.homeworkId
+    )
+    WHERE teacherId IS NULL OR teacherId = '';
+  `);
+} catch (err) {
+  // ignore error if database is brand new
 }
 
 // ── Helper wrappers ───────────────────────────────────────────────

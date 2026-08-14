@@ -66,7 +66,7 @@ function populateClassFilter(classes) {
   select.innerHTML = `<option value="all">Môn học</option>`;
   classes.forEach((c) => {
     const opt = document.createElement("option");
-    opt.value = c.classId;
+    opt.value = c.className; // <-- Changed from c.classId to c.className
     opt.textContent = c.className;
     select.appendChild(opt);
   });
@@ -123,7 +123,7 @@ function getStatusMeta(hw) {
 
 function applyFiltersAndRender() {
   const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
-  const classId = document.getElementById("classFilter").value;
+  const selectedClassName = document.getElementById("classFilter").value; // <-- Selected class name
   const statusFilter = document.getElementById("statusFilter").value;
 
   let filtered = allHomeworks.filter((hw) => {
@@ -133,7 +133,8 @@ function applyFiltersAndRender() {
       hw.className?.toLowerCase().includes(keyword) ||
       hw.note?.toLowerCase().includes(keyword);
 
-    const matchClass = classId === "all" || hw.classId === classId;
+    // <-- Changed from hw.classId to hw.className
+    const matchClass = selectedClassName === "all" || hw.className === selectedClassName;
 
     let matchStatus = true;
     if (statusFilter === "completed") matchStatus = hw.submissionStatus === "graded";
@@ -165,11 +166,11 @@ function renderList(homeworks) {
       // Nút "Nộp bài" chỉ hiện khi học sinh CHƯA nộp — không hiện khi đã
       // nộp (chờ chấm) hay đã được chấm điểm.
       const submitButtonHtml =
-        hw.submissionStatus === "not_submitted"
-          ? `<button class="btn btn-primary" data-homework-id="${hw.homeworkId}" onclick="event.stopPropagation(); openSubmitDialog('${hw.homeworkId}')">
-               <span>Nộp bài</span>
-             </button>`
-          : "";
+          hw.submissionStatus === "not_submitted"
+            ? `<button class="btn btn-primary" data-homework-id="${hw.homeworkId}" onclick="event.stopPropagation(); openSubmitDialog('${hw.homeworkId}')">
+                <span>Nộp bài</span>
+              </button>`
+            : "";
 
       const descriptionHtml = hw.note
         ? `<p class="assignment-desc">${escapeHtml(hw.note)}</p>`
@@ -292,10 +293,12 @@ window.closeHomeworkDetail = function () {
   document.body.style.overflow = "";
 };
 
-window.handleDetailSubmit = async function () {
+window.handleDetailSubmit = function () {
   const id = document.getElementById("detailSubmitBtn").dataset.homeworkId;
   closeHomeworkDetail();
-  if (id) await window.openSubmitDialog(id);
+  if (id) {
+    window.openSubmitDialog(id);
+  }
 };
 
 // Đóng modal khi click ra ngoài, hoặc nhấn Esc
@@ -319,19 +322,10 @@ document.addEventListener("keydown", (event) => {
 
 /* ======================= NỘP BÀI ======================= */
 
-window.openSubmitDialog = async function (homeworkId) {
-  const fileLink = prompt("Dán link bài làm (Scratch / GitHub / Drive...):");
-  if (!fileLink) return;
-
-  try {
-    await apiPost(`/api/homeworks/${homeworkId}/submit`, {
-      studentId: STUDENT_ID,
-      fileLink,
-    });
-    alert("Nộp bài thành công!");
-    await loadDashboard(); // Tải lại để cập nhật trạng thái
-  } catch (err) {
-    alert("Nộp bài thất bại: " + err.message);
+// Redirect to Studentnopbai.html and pass the homework ID in the URL
+window.openSubmitDialog = function (homeworkId) {
+  if (homeworkId) {
+    window.location.href = `Studentnopbai.html?homeworkId=${encodeURIComponent(homeworkId)}`;
   }
 };
 
