@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Quản lý bài tập - EduAdmin</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link rel="stylesheet" href="Admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#002204",
+                        "surface-container-high": "#dee8ff",
+                        "surface-container-highest": "#d8e3fa",
+                        "surface-container-low": "#f0f3ff",
+                        "surface-tint": "#186d2c",
+                        "error-container": "#ffdad6",
+                        "inverse-on-surface": "#ebf1ff",
+                        "surface": "#f9f9ff",
+                        "on-tertiary-fixed-variant": "#414844",
+                        "outline": "#707a6d",
+                        "inverse-primary": "#87d98b",
+                        "tertiary-container": "#a7aea8",
+                        "outline-variant": "#bfc9bb",
+                        "on-error": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "on-background": "#111c2c",
+                        "on-secondary-fixed-variant": "#294f29",
+                        "primary-fixed": "#a2f6a5",
+                        "background": "#f9f9ff",
+                        "surface-dim": "#cfdaf1",
+                        "on-primary-fixed-variant": "#00531b",
+                        "on-tertiary-container": "#3b423d",
+                        "on-secondary-container": "#466e44",
+                        "secondary-fixed-dim": "#a6d2a0",
+                        "secondary": "#40673f",
+                        "tertiary-fixed-dim": "#c1c8c2",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed": "#161d19",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-container": "#004b18",
+                        "on-surface-variant": "#40493e",
+                        "secondary-container": "#c1eeba",
+                        "primary": "#186d2c",
+                        "surface-container": "#e7eeff",
+                        "on-primary-fixed": "#002107",
+                        "on-surface": "#111c2c",
+                        "primary-fixed-dim": "#87d98b",
+                        "on-secondary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "primary-container": "#6dbe73",
+                        "inverse-surface": "#263142",
+                        "surface-bright": "#f9f9ff",
+                        "surface-variant": "#d8e3fa",
+                        "tertiary-fixed": "#dde4dd",
+                        "tertiary": "#59605b",
+                        "error": "#ba1a1a",
+                        "secondary-fixed": "#c1eeba"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sidebar-width": "280px",
+                        "max-content-width": "1440px",
+                        "container-padding": "24px",
+                        "gutter": "20px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "label-caps": [
+                            "Plus Jakarta Sans"
+                        ],
+                        "headline-md": [
+                            "Plus Jakarta Sans"
+                        ],
+                        "headline-xl": [
+                            "Plus Jakarta Sans"
+                        ],
+                        "body-lg": [
+                            "Plus Jakarta Sans"
+                        ],
+                        "label-sm": [
+                            "Plus Jakarta Sans"
+                        ],
+                        "headline-xl-mobile": [
+                            "Plus Jakarta Sans"
+                        ],
+                        "headline-lg": [
+                            "Plus Jakarta Sans"
+                        ],
+                        "body-md": [
+                            "Plus Jakarta Sans"
+                        ]
+                    },
+                    "fontSize": {
+                        "label-caps": [
+                            "12px",
+                            {
+                                "lineHeight": "16px",
+                                "letterSpacing": "0.05em",
+                                "fontWeight": "800"
+                            }
+                        ],
+                        "headline-md": [
+                            "20px",
+                            {
+                                "lineHeight": "28px",
+                                "fontWeight": "600"
+                            }
+                        ],
+                        "headline-xl": [
+                            "32px",
+                            {
+                                "lineHeight": "40px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                            }
+                        ],
+                        "body-lg": [
+                            "16px",
+                            {
+                                "lineHeight": "24px",
+                                "fontWeight": "400"
+                            }
+                        ],
+                        "label-sm": [
+                            "12px",
+                            {
+                                "lineHeight": "16px",
+                                "fontWeight": "500"
+                            }
+                        ],
+                        "headline-xl-mobile": [
+                            "26px",
+                            {
+                                "lineHeight": "32px",
+                                "fontWeight": "700"
+                            }
+                        ],
+                        "headline-lg": [
+                            "24px",
+                            {
+                                "lineHeight": "32px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "700"
+                            }
+                        ],
+                        "body-md": [
+                            "14px",
+                            {
+                                "lineHeight": "20px",
+                                "fontWeight": "400"
+                            }
+                        ]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            background-color: #ebf1ff;
+            /* fallback */
+        }
+
+        /* Soft shadows as per guidelines */
+        .shadow-soft {
+            box-shadow: 0px 4px 20px rgba(17, 28, 44, 0.04);
+        }
+
+        .shadow-soft-hover:hover {
+            box-shadow: 0px 8px 24px rgba(17, 28, 44, 0.08);
+            transform: scale(1.01);
+        }
+
+        .bg-canvas-tint {
+            background-color: #f4f9f4;
+            /* Subtle organic tint */
+            background-image: radial-gradient(circle at 10% 20%, rgba(162, 246, 165, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(24, 109, 44, 0.05) 0%, transparent 40%);
+        }
+    </style>
+</head>
+
+<body class="bg-canvas-tint text-on-surface font-body-md antialiased min-h-screen flex">
+    <!-- Sidebar Navigation -->
+    <aside
+        class="w-sidebar-width h-screen fixed left-0 top-0 rounded-r-3xl bg-secondary-container dark:bg-secondary flex flex-col py-8 z-20 overflow-y-auto"
+        style="box-shadow: 4px 0 20px rgba(0,0,0,0.02);">
+        <div class="px-8 mb-10 flex items-center gap-3">
+            <span
+                class="material-symbols-outlined text-headline-lg font-headline-lg text-primary dark:text-on-primary-fixed"
+                style="font-variation-settings: 'FILL' 1;">eco</span>
+            <div class="flex flex-col">
+                <span
+                    class="text-headline-md font-headline-md text-primary dark:text-inverse-primary tracking-tight">EduAdmin</span>
+            </div>
+        </div>
+        <div class="px-8 mb-6">
+            <p class="text-label-caps font-label-caps text-on-secondary-container opacity-60 mb-4 uppercase">QUẢN TRỊ HỆ
+                THỐNG</p>
+        </div>
+        <nav class="flex-1 flex flex-col gap-2">
+            <a class="flex items-center gap-4 px-10 py-3 text-on-secondary-container dark:text-on-secondary opacity-80 hover:opacity-100 hover:bg-surface-container-low dark:hover:bg-inverse-surface transition-all duration-200"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                <span class="text-label-sm font-label-sm">Tổng quan</span>
+            </a><a
+                class="flex items-center gap-4 px-10 py-3 text-on-secondary-container dark:text-on-secondary opacity-80 hover:opacity-100 hover:bg-surface-container-low dark:hover:bg-inverse-surface transition-all duration-200"
+                href="#"><span class="material-symbols-outlined">group</span><span
+                    class="text-label-sm font-label-sm">Quản lý giáo viên</span></a>
+            <a class="flex items-center gap-4 bg-surface dark:bg-inverse-surface text-primary dark:text-inverse-primary rounded-l-full ml-4 pl-6 py-3 shadow-sm hover:bg-surface-container-low transition-all duration-200"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="menu_book"
+                    style="font-variation-settings: 'FILL' 1;">menu_book</span>
+                <span class="text-label-sm font-label-sm font-bold">Quản lý bài tập</span>
+            </a>
+            <a class="flex items-center gap-4 px-10 py-3 text-on-secondary-container dark:text-on-secondary opacity-80 hover:opacity-100 hover:bg-surface-container-low dark:hover:bg-inverse-surface transition-all duration-200"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="school">school</span>
+                <span class="text-label-sm font-label-sm">Lớp học</span>
+            </a>
+            <a class="flex items-center gap-4 px-10 py-3 text-on-secondary-container dark:text-on-secondary opacity-80 hover:opacity-100 hover:bg-surface-container-low dark:hover:bg-inverse-surface transition-all duration-200"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+                <span class="text-label-sm font-label-sm">Kết quả học tập</span>
+            </a>
+            <a class="flex items-center gap-4 px-10 py-3 text-on-secondary-container dark:text-on-secondary opacity-80 hover:opacity-100 hover:bg-surface-container-low dark:hover:bg-inverse-surface transition-all duration-200"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="settings">settings</span>
+                <span class="text-label-sm font-label-sm">Cài đặt</span>
+            </a>
+        </nav>
+        <div class="mt-auto px-6">
+            <div class="bg-surface-container p-4 rounded-2xl">
+                <p class="text-label-sm font-label-sm font-bold text-on-surface mb-1 flex items-center gap-2"><span
+                        class="material-symbols-outlined text-primary text-[18px]">lightbulb</span> Mẹo nhỏ</p>
+                <p class="text-[11px] leading-relaxed text-on-surface-variant">Dữ liệu đang được lưu ngay trên trình
+                    duyệt bằng Local Storage, phù hợp để thử nghiệm giao diện.</p>
+            </div>
+        </div>
+    </aside>
+    <!-- Main Content Area -->
+    <main class="ml-[280px] flex-1 flex flex-col min-h-screen">
+        <!-- Top App Bar -->
+        <header
+            class="flex justify-between items-center w-full px-8 py-6 max-w-max-content-width mx-auto bg-transparent top-0 z-10 sticky">
+            <div class="flex flex-col">
+                <h1 class="text-headline-xl font-headline-xl text-on-surface">Quản lý bài tập</h1>
+                <p class="text-body-md font-body-md text-on-surface-variant mt-1">Tạo, chỉnh sửa và theo dõi bài tập cho
+                    các lớp của bạn.</p>
+            </div>
+            <div class="flex items-center gap-6">
+                <!-- User Profile -->
+                <div
+                    class="flex items-center gap-3 bg-surface rounded-full py-1 pr-4 pl-1 shadow-sm border border-outline-variant/30">
+                    <div
+                        class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold">
+                        GV
+                    </div>
+                    <div class="flex flex-col"><span class="text-label-sm font-label-sm font-bold text-on-surface">Quản
+                            trị viên hệ thống</span><span class="text-[10px] text-on-surface-variant">Hệ thống quản
+                            lý</span></div>
+                </div>
+            </div>
+        </header>
+        <!-- Dashboard Content -->
+        <div class="p-8 max-w-max-content-width mx-auto w-full flex-1 flex flex-col gap-6">
+            <!-- Summary Cards Bento Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <!-- Total Card (Primary focus) -->
+                <div
+                    class="bg-primary-container/80 text-on-primary-container rounded-[24px] p-6 flex flex-col relative overflow-hidden shadow-soft transition-transform shadow-soft-hover">
+                    <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-primary/10 rounded-full blur-2xl"></div>
+                    <div class="w-10 h-10 rounded-xl bg-surface/50 flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined"
+                            style="font-variation-settings: 'FILL' 1;">assignment</span>
+                    </div>
+                    <h2 class="text-headline-xl font-headline-xl mb-1">3</h2>
+                    <p class="text-label-sm font-label-sm opacity-80">Tổng số bài tập toàn trường</p>
+                </div>
+                <!-- Pending Review Card -->
+                <div
+                    class="bg-surface rounded-[24px] p-6 flex flex-col border border-outline-variant/20 shadow-soft transition-transform shadow-soft-hover">
+                    <div
+                        class="w-10 h-10 rounded-xl bg-tertiary-container/30 text-tertiary flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined">person</span></div>
+                    <h2 class="text-headline-xl font-headline-xl mb-1 text-on-surface">42</h2>
+                    <p class="text-label-sm font-label-sm text-on-surface-variant">Giáo viên đang hoạt động</p>
+                </div>
+                <!-- Overdue Card -->
+                <div
+                    class="bg-surface rounded-[24px] p-6 flex flex-col border border-outline-variant/20 shadow-soft transition-transform shadow-soft-hover">
+                    <div
+                        class="w-10 h-10 rounded-xl bg-primary-container/30 text-primary flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined">meeting_room</span></div>
+                    <h2 class="text-headline-xl font-headline-xl mb-1 text-on-surface">15</h2>
+                    <p class="text-label-sm font-label-sm text-on-surface-variant">Lớp học đang mở</p>
+                </div>
+                <!-- Completed Card -->
+                <div
+                    class="bg-surface rounded-[24px] p-6 flex flex-col border border-outline-variant/20 shadow-soft transition-transform shadow-soft-hover">
+                    <div
+                        class="w-10 h-10 rounded-xl bg-secondary-container text-secondary flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined">trending_up</span></div>
+                    <h2 class="text-headline-xl font-headline-xl mb-1 text-on-surface">85%</h2>
+                    <p class="text-label-sm font-label-sm text-on-surface-variant">Tỷ lệ hoàn thành trung bình</p>
+                </div>
+            </div>
+            <!-- List Area (The "Sheet") -->
+            <div
+                class="bg-surface rounded-[24px] shadow-soft border border-outline-variant/30 flex-1 flex flex-col overflow-hidden">
+                <!-- Toolbar -->
+                <div class="p-6 border-b border-outline-variant/20 flex flex-wrap gap-4 items-center justify-between">
+                    <div class="flex-1 flex gap-4 min-w-[300px]">
+                        <!-- Search -->
+                        <div class="relative flex-1 max-w-md">
+                            <span
+                                class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/60">search</span>
+                            <input
+                                class="w-full pl-10 pr-4 py-2.5 bg-surface-container-low border border-outline-variant/30 rounded-xl text-body-md focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all placeholder:text-on-surface-variant/50"
+                                placeholder="Tìm theo tên bài tập, lớp hoặc mô tả..." type="text" />
+                        </div>
+                        <!-- Filters -->
+                        <select
+                            class="bg-surface-container-low border border-outline-variant/30 rounded-xl px-4 py-2.5 text-body-md text-on-surface focus:ring-2 focus:ring-primary/50 outline-none appearance-none pr-10 cursor-pointer"
+                            style="background-image: url('data:image/svg+xml;utf8,&lt;svg fill=%22none%22 stroke=%22currentColor%22 viewBox=%220 0 24 24%22 xmlns=%22http://www.w3.org/2000/svg%22&gt;&lt;path stroke-linecap=%22round%22 stroke-linejoin=%22round%22 stroke-width=%222%22 d=%22M19 9l-7 7-7-7%22&gt;&lt;/path&gt;&lt;/svg&gt;'); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px;">
+                            <option>Tất cả lớp</option>
+                            <option>10A1</option>
+                            <option>11A1</option>
+                            <option>10A2</option>
+                        </select>
+                        <select
+                            class="bg-surface-container-low border border-outline-variant/30 rounded-xl px-4 py-2.5 text-body-md text-on-surface focus:ring-2 focus:ring-primary/50 outline-none appearance-none pr-10 cursor-pointer"
+                            style="background-image: url('data:image/svg+xml;utf8,&lt;svg fill=%22none%22 stroke=%22currentColor%22 viewBox=%220 0 24 24%22 xmlns=%22http://www.w3.org/2000/svg%22&gt;&lt;path stroke-linecap=%22round%22 stroke-linejoin=%22round%22 stroke-width=%222%22 d=%22M19 9l-7 7-7-7%22&gt;&lt;/path&gt;&lt;/svg&gt;'); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px;">
+                            <option>Tất cả trạng thái</option>
+                            <option>Quá hạn</option>
+                            <option>Đã giao</option>
+                            <option>Bản nháp</option>
+                        </select>
+                    </div>
+                    <!-- CTA -->
+                    <button
+                        class="bg-primary hover:bg-on-primary-fixed-variant text-on-primary font-label-sm text-label-sm py-2.5 px-5 rounded-xl shadow-sm flex items-center gap-2 transition-all active:scale-95">
+                        <span class="material-symbols-outlined text-[20px]">add</span>
+                        Giao bài mới
+                    </button>
+                </div>
+                <!-- List Header -->
+                <div
+                    class="px-6 py-4 flex justify-between items-center bg-surface-container-low/50 border-b border-outline-variant/10">
+                    <span class="text-label-sm font-label-sm font-bold text-on-surface">Danh sách bài tập</span>
+                    <span class="text-label-sm font-label-sm text-on-surface-variant">3 bài tập</span>
+                </div>
+                <!-- List Items -->
+                <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
+                    <!-- Item 1: Overdue -->
+                    <div
+                        class="bg-surface border border-error/20 rounded-2xl p-4 flex gap-4 items-start relative group shadow-soft transition-all hover:border-error/40 shadow-soft-hover">
+                        <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-12 bg-error rounded-r-md"></div>
+                        <div
+                            class="w-12 h-12 rounded-xl bg-error-container/30 text-error flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined">assignment_late</span>
+                        </div>
+                        <div class="flex-1 flex flex-col">
+                            <div class="flex items-center gap-3 mb-1">
+                                <h3 class="text-body-lg font-headline-md font-bold text-on-surface">Ôn tập chương 1 -
+                                    Đại số</h3>
+                                <span
+                                    class="bg-error-container text-error text-[10px] font-bold px-2 py-0.5 rounded-full">Quá
+                                    hạn</span>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-4 text-label-sm text-on-surface-variant mb-2">
+                                <div class="flex items-center gap-1 font-bold text-primary"><span
+                                        class="material-symbols-outlined text-[16px]">person</span> GV. Nguyễn Văn A
+                                </div>
+                                <div class="flex items-center gap-1"><span
+                                        class="material-symbols-outlined text-[16px]">school</span> 10A1</div>
+                                <div class="flex items-center gap-1 text-error"><span
+                                        class="material-symbols-outlined text-[16px]">event</span> 21:00 CN, 09/08/2026
+                                </div>
+                                <div class="flex items-center gap-1"><span
+                                        class="material-symbols-outlined text-[16px]">star</span> 10 điểm</div>
+                            </div>
+                            <p class="text-body-md text-on-surface-variant opacity-80 line-clamp-1">Hoàn thành các câu 1
+                                đến 12 trong phiếu bài tập và trình bày rõ các bước giải.</p>
+                        </div>
+                        <!-- Actions -->
+                        <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                                class="w-8 h-8 rounded-lg bg-surface-container hover:bg-surface-container-highest text-on-surface-variant flex items-center justify-center transition-colors">
+                                <span class="material-symbols-outlined text-[18px]">content_copy</span>
+                            </button>
+                            <button
+                                class="w-8 h-8 rounded-lg bg-surface-container hover:bg-surface-container-highest text-on-surface-variant flex items-center justify-center transition-colors">
+                                <span class="material-symbols-outlined text-[18px]">edit</span>
+                            </button>
+                            <button
+                                class="w-8 h-8 rounded-lg bg-error-container/50 hover:bg-error-container text-error flex items-center justify-center transition-colors">
+                                <span class="material-symbols-outlined text-[18px]">delete</span>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Item 2: Active -->
+                    <div
+                        class="bg-surface border border-outline-variant/20 rounded-2xl p-4 flex gap-4 items-start group shadow-soft transition-all hover:border-primary/30 shadow-soft-hover">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-primary-container/20 text-primary flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined">assignment</span>
+                        </div>
+                        <div class="flex-1 flex flex-col">
+                            <div class="flex items-center gap-3 mb-1">
+                                <h3 class="text-body-lg font-headline-md font-bold text-on-surface">Thuyết trình: Bảo vệ
+                                    môi trường</h3>
+                                <span
+                                    class="bg-primary-container text-on-primary-container text-[10px] font-bold px-2 py-0.5 rounded-full">Đã
+                                    giao</span>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-4 text-label-sm text-on-surface-variant mb-2">
+                                <div class="flex items-center gap-1 font-bold text-primary"><span
+                                        class="material-symbols-outlined text-[16px]">person</span> GV. Trần Thị B</div>
+                                <div class="flex items-center gap-1"><span
+                                        class="material-symbols-outlined text-[16px]">school</span> 11A1</div>
+                                <div class="flex items-center gap-1"><span
+                                        class="material-symbols-outlined text-[16px]">event</span> 17:30 Thứ 5,
+                                    13/08/2026</div>
+                                <div class="flex items-center gap-1"><span
+                                        class="material-symbols-outlined text-[16px]">star</span> 20 điểm</div>
+                                <div class="flex items-center gap-1 text-primary"><span
+                                        class="material-symbols-outlined text-[16px]">attachment</span> Tài liệu</div>
+                            </div>
+                            <p class="text-body-md text-on-surface-variant opacity-80 line-clamp-1">Làm việc theo nhóm
+                                4-5 học sinh, chuẩn bị tối đa 10 slide và thuyết trình trong 7 phút.</p>
+                        </div>
+                        <!-- Actions -->
+                        <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                                class="w-8 h-8 rounded-lg bg-surface-container hover:bg-surface-container-highest text-on-surface-variant flex items-center justify-center transition-colors">
+                                <span class="material-symbols-outlined text-[18px]">content_copy</span>
+                            </button>
+                            <button
+                                class="w-8 h-8 rounded-lg bg-surface-container hover:bg-surface-container-highest text-on-surface-variant flex items-center justify-center transition-colors">
+                                <span class="material-symbols-outlined text-[18px]">edit</span>
+                            </button>
+                            <button
+                                class="w-8 h-8 rounded-lg bg-error-container/50 hover:bg-error-container text-error flex items-center justify-center transition-colors">
+                                <span class="material-symbols-outlined text-[18px]">delete</span>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Item 3: Draft -->
+                    <div
+                        class="bg-surface border border-outline-variant/20 rounded-2xl p-4 flex gap-4 items-start group shadow-soft transition-all hover:border-tertiary/30 shadow-soft-hover opacity-80">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-surface-container-highest text-on-surface-variant flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined">edit_document</span>
+                        </div>
+                        <div class="flex-1 flex flex-col">
+                            <div class="flex items-center gap-3 mb-1">
+                                <h3 class="text-body-lg font-headline-md font-bold text-on-surface">Phiếu luyện tập cuối
+                                    tuần</h3>
+                                <span
+                                    class="bg-surface-container-highest text-on-surface-variant text-[10px] font-bold px-2 py-0.5 rounded-full">Bản
+                                    nháp</span>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-4 text-label-sm text-on-surface-variant mb-2">
+                                <div class="flex items-center gap-1 font-bold text-primary"><span
+                                        class="material-symbols-outlined text-[16px]">person</span> GV. Lê Văn C</div>
+                                <div class="flex items-center gap-1"><span
+                                        class="material-symbols-outlined text-[16px]">school</span> 10A2</div>
+                                <div class="flex items-center gap-1"><span
+                                        class="material-symbols-outlined text-[16px]">event</span> 23:59 CN, 16/08/2026
+                                </div>
+                                <div class="flex items-center gap-1"><span
+                                        class="material-symbols-outlined text-[16px]">star</span> 10 điểm</div>
+                            </div>
+                            <p class="text-body-md text-on-surface-variant opacity-80 line-clamp-1">Bản nháp, chưa gửi
+                                tới học sinh.</p>
+                        </div>
+                        <!-- Actions -->
+                        <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                                class="w-8 h-8 rounded-lg bg-surface-container hover:bg-surface-container-highest text-on-surface-variant flex items-center justify-center transition-colors">
+                                <span class="material-symbols-outlined text-[18px]">content_copy</span>
+                            </button>
+                            <button
+                                class="w-8 h-8 rounded-lg bg-surface-container hover:bg-surface-container-highest text-on-surface-variant flex items-center justify-center transition-colors">
+                                <span class="material-symbols-outlined text-[18px]">edit</span>
+                            </button>
+                            <button
+                                class="w-8 h-8 rounded-lg bg-error-container/50 hover:bg-error-container text-error flex items-center justify-center transition-colors">
+                                <span class="material-symbols-outlined text-[18px]">delete</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>
