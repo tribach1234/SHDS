@@ -19,9 +19,14 @@ if (!USER_ID || !ROLE || isInvalidTeacher || isInvalidStudent || isInvalidAdmin)
 
 // 2. Server-side session verification
 async function verifySession() {
-  if (path.includes("login.html")) return;
+  if (path.includes("login.html") || path.includes("register.html")) return;
   try {
-    const res = await fetch("/api/me");
+    const res = await fetch("/api/me", {
+      headers: {
+        "x-user-id": USER_ID,
+        "x-user-role": ROLE
+      }
+    });
     if (!res.ok) throw new Error("Session expired");
   } catch (err) {
     handleLogout();

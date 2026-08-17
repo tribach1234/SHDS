@@ -8,7 +8,12 @@ let assignStudentName = '';
 
 function esc(s) {
   if (!s) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function escJs(s) {
+  if (!s) return '';
+  return String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;');
 }
 
 // ── Load students ─────────────────────────────────────────────
@@ -46,13 +51,13 @@ async function loadStudents(page = 1) {
           <td>${classes}</td>
           <td style="color:#999;font-size:12px">${date}</td>
           <td class="td-actions">
-            <button class="icon-btn" title="Phân lớp" onclick="openAssignModal('${esc(s.id)}','${esc(s.fullName).replace(/'/g,"\\'")}')">
+            <button class="icon-btn" title="Phân lớp" onclick="openAssignModal('${escJs(s.id)}','${escJs(s.fullName)}')">
               <svg><use href="#i-class"/></svg>
             </button>
-            <button class="icon-btn" title="Chỉnh sửa" onclick="openEditStudent('${esc(s.id)}')">
+            <button class="icon-btn" title="Chỉnh sửa" onclick="openEditStudent('${escJs(s.id)}')">
               <svg><use href="#i-edit"/></svg>
             </button>
-            <button class="icon-btn danger" title="Xóa" onclick="deleteStudent('${esc(s.id)}','${esc(s.fullName).replace(/'/g,"\\'")}')">
+            <button class="icon-btn danger" title="Xóa" onclick="deleteStudent('${escJs(s.id)}','${escJs(s.fullName)}')">
               <svg><use href="#i-trash"/></svg>
             </button>
           </td>

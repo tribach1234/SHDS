@@ -4,7 +4,12 @@ let editingTeacherId = null;
 
 function esc(s) {
   if (!s) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function escJs(s) {
+  if (!s) return '';
+  return String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;');
 }
 
 async function loadTeachers(page = 1) {
@@ -32,10 +37,10 @@ async function loadTeachers(page = 1) {
         <td>${esc(t.email)}</td>
         <td>${t.createdAt ? new Date(t.createdAt).toLocaleDateString('vi-VN') : 'N/A'}</td>
         <td class="td-actions">
-          <button class="icon-btn" title="Chỉnh sửa" onclick="openEditTeacher('${esc(t.id)}')">
+          <button class="icon-btn" title="Chỉnh sửa" onclick="openEditTeacher('${escJs(t.id)}')">
             <svg><use href="#i-edit"/></svg>
           </button>
-          <button class="icon-btn danger" title="Xóa" onclick="deleteTeacher('${esc(t.id)}','${esc(t.fullName).replace(/'/g, "\\'")}')">
+          <button class="icon-btn danger" title="Xóa" onclick="deleteTeacher('${escJs(t.id)}','${escJs(t.fullName)}')">
             <svg><use href="#i-trash"/></svg>
           </button>
         </td>
@@ -135,4 +140,12 @@ function deleteTeacher(id, name) {
 
 document.getElementById('createTeacherBtn').addEventListener('click', openCreateModal);
 document.getElementById('searchInput').addEventListener('input', () => loadTeachers(1));
+
+const teacherModal = document.getElementById('teacherModal');
+if (teacherModal) {
+  teacherModal.addEventListener('click', e => {
+    if (e.target === teacherModal) closeTeacherModal();
+  });
+}
+
 loadTeachers(1);

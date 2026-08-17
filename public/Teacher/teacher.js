@@ -69,22 +69,34 @@
     }
 
     // Populate Modal Dropdown with Authorized Classes Only
-    function populateClassDropdown() {
-      if (!elements.fields.className) return;
+        function populateClassDropdown() {
+          if (!elements.fields.className) return;
 
-      if (!authorizedClasses.length) {
-        elements.fields.className.innerHTML = `<option value="">Không có lớp phụ trách</option>`;
-        return;
-      }
+          if (!authorizedClasses.length) {
+            elements.fields.className.innerHTML =
+              `<option value="">Không có lớp phụ trách</option>`;
+            return;
+          }
 
-      elements.fields.className.innerHTML = `
-        <option value="">-- Chọn lớp học --</option>
-        ${authorizedClasses.map(cls => {
-          const classNameStr = typeof cls === 'string' ? cls : (cls.className || cls.name || cls.id);
-          return `<option value="${escapeHtml(classNameStr)}">${escapeHtml(classNameStr)}</option>`;
-        }).join("")}
-      `;
-    }
+          elements.fields.className.innerHTML = `
+            <option value="">-- Chọn lớp học --</option>
+            ${authorizedClasses.map(cls => {
+              const classId = typeof cls === "string"
+                ? cls
+                : (cls.classId || cls.id);
+
+              const className = typeof cls === "string"
+                ? cls
+                : (cls.className || cls.name || cls.id);
+
+              return `
+                <option value="${escapeHtml(classId)}">
+                  ${escapeHtml(className)}
+                </option>
+              `;
+            }).join("")}
+          `;
+        }
 
     // Fetch assignments from SQL database dynamically based on account ID
     async function loadAssignmentsFromDb() {

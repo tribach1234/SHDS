@@ -14,6 +14,17 @@ function esc(s) {
     .replace(/'/g, '&#39;');
 }
 
+function escJs(s) {
+  if (s === null || s === undefined) return '';
+  return String(s)
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/&/g, '&amp;');
+}
+
 // Lấy danh sách giáo viên để điền vào dropdown select
 async function loadTeachersOptions() {
   try {
@@ -63,7 +74,7 @@ async function loadClasses(page = 1) {
 tbody.innerHTML = classes.map(c => {
       // 1. Smart mapping for Class ID / Code
       // If c.id/c.code is missing, fall back to c.name which holds codes like 'DN-ART-ART1'
-      const rawId = c.id || c.class_id || c.code || '';
+      const rawId = c.classId || c.id || c.class_id || c.code || '';
       const classId = rawId || c.name || '';
 
       // 2. Smart mapping for Class Name
@@ -103,10 +114,10 @@ tbody.innerHTML = classes.map(c => {
           <td>${teacherHtml}</td>
           <td>${scheduleHtml}</td>
           <td class="td-actions">
-            <button class="icon-btn" title="Chỉnh sửa" onclick="openEditClass('${esc(classId)}')">
+            <button class="icon-btn" title="Chỉnh sửa" onclick="openEditClass('${escJs(classId)}')">
               <svg><use href="#i-edit"/></svg>
             </button>
-            <button class="icon-btn danger" title="Xóa" onclick="deleteClass('${esc(classId)}','${esc(className)}')">
+            <button class="icon-btn danger" title="Xóa" onclick="deleteClass('${escJs(classId)}','${escJs(className)}')">
               <svg><use href="#i-trash"/></svg>
             </button>
           </td>
@@ -157,11 +168,11 @@ async function openEditClass(id) {
     if (!data.success) throw new Error(data.message || 'Không tìm thấy thông tin lớp học');
 
     const cls = data.data;
-    editingClassId = cls.id || cls.class_id || id;
+    editingClassId = cls.classId || cls.id || cls.class_id || id;
 
     document.getElementById('classModalTitle').textContent = 'Chỉnh sửa lớp học';
-    document.getElementById('cId').value = cls.id || cls.class_id || '';
-    document.getElementById('cName').value = cls.name || cls.className || '';
+    document.getElementById('cId').value = cls.classId || cls.id || cls.class_id || '';
+    document.getElementById('cName').value = cls.className || cls.name || '';
     document.getElementById('cTeacher').value = cls.teacherId || cls.teacher_id || '';
     document.getElementById('cSchedule').value = cls.schedule || '';
     document.getElementById('cId').disabled = true;
@@ -182,7 +193,7 @@ async function saveClass() {
   const teacherId = document.getElementById('cTeacher').value;
   const schedule = document.getElementById('cSchedule').value.trim();
 
-  // Corrected validation checks
+  // Validation checks
   if (!editingClassId && !id) {
     return typeof showToast === 'function' ? showToast('Vui lòng nhập Mã lớp!', 'error') : alert('Vui lòng nhập Mã lớp!');
   }
@@ -190,14 +201,24 @@ async function saveClass() {
     return typeof showToast === 'function' ? showToast('Vui lòng nhập Tên lớp!', 'error') : alert('Vui lòng nhập Tên lớp!');
   }
 
+  const finalId = editingClassId || id;
+
   try {
     const url = editingClassId ? `/api/admin/classes/${encodeURIComponent(editingClassId)}` : '/api/admin/classes';
     const method = editingClassId ? 'PUT' : 'POST';
 
+    // Send both variants (id/classId and name/className) to match any backend requirement
     const res = await fetch(url, {
       method,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: editingClassId || id, name, teacherId, schedule })
+      body: JSON.stringify({ 
+        id: finalId, 
+        classId: finalId, 
+        name: name, 
+        className: name, 
+        teacherId, 
+        schedule 
+      })
     });
 
     const data = await res.json();
@@ -210,7 +231,6 @@ async function saveClass() {
     if (typeof showToast === 'function') showToast(err.message, 'error');
   }
 }
-
 function deleteClass(id, name) {
   if (typeof showConfirm === 'function') {
     showConfirm({
@@ -238,6 +258,13 @@ if (createBtn) createBtn.addEventListener('click', openCreateModal);
 
 const searchInput = document.getElementById('searchInput');
 if (searchInput) searchInput.addEventListener('input', () => loadClasses(1));
+
+const classModal = document.getElementById('classModal');
+if (classModal) {
+  classModal.addEventListener('click', e => {
+    if (e.target === classModal) closeClassModal();
+  });
+}
 
 // Initialize
 loadTeachersOptions();

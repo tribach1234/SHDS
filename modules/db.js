@@ -46,29 +46,23 @@ db.exec(`CREATE TABLE IF NOT EXISTS users.admins (
   fullName TEXT,
   email TEXT,
   pass TEXT,
-  activate TEXT DEFAULT 'false',
-  createdAt TEXT
+  activate TEXT DEFAULT 'false'
 )`);
 
-// Backfill createdAt for existing admins tables that lack it
-try { db.exec(`ALTER TABLE users.admins ADD COLUMN createdAt TEXT`); } catch (_) {}
-
-db.exec(`CREATE TABLE IF NOT EXISTS users.admin_activity (
+db.exec(`CREATE TABLE IF NOT EXISTS users.teachers (
   id TEXT PRIMARY KEY,
-  adminId TEXT,
-  adminName TEXT,
-  action TEXT,
-  targetType TEXT,
-  targetId TEXT,
-  targetName TEXT,
-  createdAt TEXT
+  fullName TEXT,
+  email TEXT,
+  pass TEXT,
+  adminId TEXT DEFAULT 'admin-001'
 )`);
 
 db.exec(`CREATE TABLE IF NOT EXISTS users.tas (
   id TEXT PRIMARY KEY,
   fullName TEXT,
   email TEXT,
-  pass TEXT
+  pass TEXT,
+  adminId TEXT DEFAULT 'admin-001'
 )`);
 
 db.exec(`CREATE TABLE IF NOT EXISTS users.students (
@@ -76,20 +70,8 @@ db.exec(`CREATE TABLE IF NOT EXISTS users.students (
   fullName TEXT,
   email TEXT,
   pass TEXT,
-  createdAt TEXT
+  adminId TEXT DEFAULT 'admin-001'
 )`);
-// Backfill createdAt for students
-try { db.exec(`ALTER TABLE users.students ADD COLUMN createdAt TEXT`); } catch (_) {}
-
-db.exec(`CREATE TABLE IF NOT EXISTS users.teachers (
-  id TEXT PRIMARY KEY,
-  fullName TEXT,
-  email TEXT,
-  pass TEXT,
-  createdAt TEXT
-)`);
-// Backfill createdAt for teachers (re-create covered by IF NOT EXISTS; alter for existing)
-try { db.exec(`ALTER TABLE users.teachers ADD COLUMN createdAt TEXT`); } catch (_) {}
 
 // ── Class tables (in main "classes.db" schema) ────────────────────
 db.exec(`CREATE TABLE IF NOT EXISTS classes (
@@ -97,7 +79,8 @@ db.exec(`CREATE TABLE IF NOT EXISTS classes (
   className TEXT,
   description TEXT,
   status TEXT,
-  note TEXT
+  note TEXT,
+  adminId TEXT DEFAULT 'admin-001'
 )`);
 
 db.exec(`CREATE TABLE IF NOT EXISTS class_members (
@@ -150,6 +133,19 @@ db.exec(`CREATE TABLE IF NOT EXISTS pk.requests (
   updatedAt TEXT
 )`);
 
+db.exec(`CREATE TABLE IF NOT EXISTS users.admin_activity (
+  id TEXT PRIMARY KEY,
+  adminId TEXT,
+  adminName TEXT,
+  action TEXT,
+  targetType TEXT,
+  targetId TEXT,
+  targetName TEXT,
+  createdAt TEXT
+)`);
+
+
+
 // The CREATE TABLE above only applies to brand-new databases — SQLite skips
 // it (IF NOT EXISTS) if hw.db already exists from before teacherId/points/
 // status existed. Backfill those columns for existing databases too.
@@ -172,6 +168,29 @@ for (const alterStmt of [
   }
 }
 
+// Backfill adminId on tables that existed before ownership scoping was added.
+// SQLite ADD COLUMN with a DEFAULT only fills *new* rows going forward for
+// some SQLite versions' behavior around defaults on ALTER, so we also run an
+// explicit UPDATE to make sure old rows aren't left with NULL.
+for (const alterStmt of [
+  `ALTER TABLE users.teachers ADD COLUMN adminId TEXT DEFAULT 'admin-001'`,
+  `ALTER TABLE users.tas ADD COLUMN adminId TEXT DEFAULT 'admin-001'`,
+  `ALTER TABLE users.students ADD COLUMN adminId TEXT DEFAULT 'admin-001'`,
+  `ALTER TABLE classes ADD COLUMN adminId TEXT DEFAULT 'admin-001'`,
+]) {
+  try {
+    db.exec(alterStmt);
+  } catch (err) {
+    // column already exists — ignore
+  }
+}
+
+// Make sure any rows that ended up NULL (e.g. inserted before this file
+// existed at all) are also owned by admin-001.
+db.exec(`UPDATE users.teachers SET adminId = 'admin-001' WHERE adminId IS NULL`);
+db.exec(`UPDATE users.tas SET adminId = 'admin-001' WHERE adminId IS NULL`);
+db.exec(`UPDATE users.students SET adminId = 'admin-001' WHERE adminId IS NULL`);
+db.exec(`UPDATE classes SET adminId = 'admin-001' WHERE adminId IS NULL`);
 // ⬇️ ADD THIS RIGHT BELOW THE FOR-LOOP ABOVE ⬇️
 try {
   db.exec(`
