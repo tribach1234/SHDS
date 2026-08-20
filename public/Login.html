@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login/Register</title>
+    <link rel="stylesheet" href="Login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.0/css/all.min.css">
+</head>
+
+<body>
+
+    <div class="container">
+        <!-- Login Form -->
+        <div class="form-box login">
+            <form action="">
+                <h1>Đăng nhập</h1>
+                <div class="input-box">
+                    <input type="text" placeholder="Tên đang nhập. email" required>
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <div class="input-box">
+                    <input type="password" placeholder="Mật khẩu" required>
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <div class="forgot-link">
+                    <a href="">Quên mật khẩu?</a>
+                </div>
+                <button type="submit" class="btn">Đăng nhập</button>
+                <p>Đăng nhập nhanh</p>
+                <div class="social-icons">
+                    <a href=""><i class="fa-brands fa-google"></i></a>
+                </div>
+            </form>
+        </div>
+        <!-- Register Form -->
+        <div class="form-box register">
+            <form action="">
+                <h1>Đăng ký</h1>
+                <div class="input-box">
+                    <input type="text" placeholder="Tên đăng nhâp" required>
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <div class="input-box">
+                    <input type="email" placeholder="Email" required>
+                    <i class="fa-solid fa-envelope"></i>
+                </div>
+                <div class="input-box">
+                    <input type="password" placeholder="Mật khẩu" required>
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <button type="submit" class="btn">Đăng ký</button>
+                <p>Đăng ký nhanh</p>
+                <div class="social-icons">
+                    <a href=""><i class="fa-brands fa-google"></i></a>
+                </div>
+            </form>
+        </div>
+        <!-- Toggle Box -->
+        <div class="toggle-box">
+            <!-- Toggle Box Left -->
+            <div class="toggle-panel toggle-left">
+                <h1>Đăng nhập tại đây</h1>
+                <p>Bạn chưa có tài khoản ?</p>
+                <button class="btn register-btn">Đăng ký</button>
+            </div>
+            <!-- Toggle Box Right -->
+            <div class="toggle-panel toggle-right">
+                <h1>Đăng ký tại đây</h1>
+                <p>Bạn đã có tài khoản?</p>
+                <button class="btn login-btn">Đăng nhập</button>
+            </div>
+        </div>
+    </div>
+    <script src="Login.js"></script>
+</body>
+</html>

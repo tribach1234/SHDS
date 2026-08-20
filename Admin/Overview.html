@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduAdmin - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link rel="stylesheet" href="Overview.css">
+</head>
+
+<body class="font-body-md text-body-md antialiased min-h-screen flex">
+    <!-- SideNavBar -->
+    <aside
+        class="hidden md:flex fixed left-0 top-0 h-full w-[240px] flex-col py-8 bg-[#C1ECD4] border-r border-[#A8E7C5] rounded-r-[32px]">
+        <div class="flex items-center gap-2 mb-8 px-8">
+            <span class="text-primary font-bold text-xl hover:scale-105 transition-transform duration-300">eco</span>
+            <span
+                class="text-on-surface font-semibold text-xl hover:scale-105 transition-transform duration-300">EduAdmin</span>
+        </div>
+        <div class="px-8 mb-4">
+            <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-xs">Quản trị hệ
+                thống</p>
+        </div>
+        <nav class="flex-1 flex flex-col gap-2 px-4">
+            <a class="bg-surface-container-lowest text-on-surface -ml-4 pl-8 py-3 font-semibold shadow-sm flex items-center gap-3 relative rounded-r-[32px] transition-all duration-300 hover:bg-white/50 hover:pl-10"
+                href="#">
+                <div class="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r"></div>
+                <span class="material-symbols-outlined text-outline" data-icon="dashboard">dashboard</span>
+                Tổng quan
+            </a>
+            <a class="text-on-surface-variant px-4 py-3 flex items-center gap-3 hover:bg-white/50 hover:text-primary transition-all rounded-full duration-300 hover:pl-5"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="group">group</span>
+                Quản lý giáo viên
+            </a>
+            <a class="text-on-surface-variant px-4 py-3 flex items-center gap-3 hover:bg-white/50 hover:text-primary transition-all rounded-full duration-300 hover:pl-5"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+                Quản lý bài tập
+            </a>
+            <a class="text-on-surface-variant px-4 py-3 flex items-center gap-3 hover:bg-white/50 hover:text-primary transition-all rounded-full duration-300 hover:pl-5"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="school">school</span>
+                Lớp học
+            </a>
+            <a class="text-on-surface-variant px-4 py-3 flex items-center gap-3 hover:bg-white/50 hover:text-primary transition-all rounded-full duration-300 hover:pl-5"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="settings">settings</span>
+                Cài đặt
+            </a>
+        </nav>
+        <div class="mt-auto px-4 pb-4">
+            <nav class="flex flex-col gap-2">
+                <a class="text-on-surface-variant px-4 py-3 flex items-center gap-3 hover:bg-white/50 hover:text-primary transition-all rounded-full duration-300 hover:pl-5"
+                    href="#">
+                    <span class="material-symbols-outlined" data-icon="help">help</span>
+                    Trợ giúp
+                </a>
+                <a class="text-on-surface-variant px-4 py-3 flex items-center gap-3 hover:bg-white/50 hover:text-primary transition-all rounded-full duration-300 hover:pl-5"
+                    href="#">
+                    <span class="material-symbols-outlined" data-icon="logout">logout</span>
+                    Đăng xuất
+                </a>
+            </nav>
+        </div>
+    </aside>
+    <!-- Main Content Area -->
+    <main class="flex-1 md:ml-[240px] min-h-screen flex flex-col bg-[#ffffff]">
+        <!-- TopNavBar -->
+        <header class="hidden md:flex items-center justify-end px-8 py-8 w-full">
+            <div
+                class="flex items-center gap-3 bg-surface-container-lowest rounded-full p-2 pr-5 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 cursor-pointer">
+                <div
+                    class="w-10 h-10 rounded-full bg-[#89F7A1] flex items-center justify-center text-on-surface font-semibold text-sm hover:scale-105 transition-transform duration-300">
+                    GV
+                </div>
+                <div>
+                    <p class="font-semibold text-sm text-on-surface">Quản trị viên hệ thống</p>
+                    <p class="text-xs text-on-surface-variant">Hệ thống quản lý</p>
+                </div>
+            </div>
+        </header>
+        <!-- Dashboard Content -->
+        <div class="px-8 pb-8 flex-1 w-full max-w-7xl mx-auto flex flex-col gap-8">
+            <div class="">
+                <h2 class="font-headline-xl text-headline-xl text-on-surface mb-2">Tổng quan hệ thống</h2>
+                <p class="font-body-lg text-body-lg text-on-surface-variant">Chào buổi sáng, xem lại các hoạt động hôm
+                    nay.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Stats Cards -->
+                <div
+                    class="bg-[#ffffff] p-8 flex flex-col justify-between h-[180px] relative overflow-hidden rounded-[32px] ambient-shadow card-border hover:-translate-y-1 hover:shadow-xl transition-all duration-300 cursor-pointer">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-[#E8FFF0] flex items-center justify-center text-primary mb-4 relative z-10 hover:scale-105 hover:brightness-110 active:scale-95 transition-all duration-300">
+                        <span class="material-symbols-outlined" data-icon="groups"
+                            style='font-variation-settings: "FILL" 1;'>groups</span>
+                    </div>
+                    <div class="relative z-10 mt-auto">
+                        <h3 class="font-headline-xl text-headline-xl text-on-surface leading-none mb-2">1,245</h3>
+                        <p class="font-body-sm text-body-sm text-on-surface-variant font-medium">Tổng học sinh toàn
+                            trường</p>
+                    </div>
+                </div>
+                <div
+                    class="bg-[#ffffff] p-8 flex flex-col justify-between h-[180px] rounded-[32px] ambient-shadow card-border hover:-translate-y-1 hover:shadow-xl transition-all duration-300 cursor-pointer">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-[#E8FFF0] flex items-center justify-center text-primary mb-4 hover:scale-105 hover:brightness-110 active:scale-95 transition-all duration-300">
+                        <span class="material-symbols-outlined" data-icon="school"
+                            style='font-variation-settings: "FILL" 1;'>school</span>
+                    </div>
+                    <div class="mt-auto">
+                        <h3 class="font-headline-xl text-headline-xl text-on-surface leading-none mb-2">84</h3>
+                        <p class="font-body-sm text-body-sm text-on-surface-variant">Giáo viên đang hoạt động</p>
+                    </div>
+                </div>
+                <div
+                    class="bg-[#ffffff] p-8 flex flex-col justify-between h-[180px] rounded-[32px] ambient-shadow card-border hover:-translate-y-1 hover:shadow-xl transition-all duration-300 cursor-pointer">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-[#E8FFF0] flex items-center justify-center text-primary mb-4 hover:scale-105 hover:brightness-110 active:scale-95 transition-all duration-300">
+                        <span class="material-symbols-outlined" data-icon="meeting_room"
+                            style='font-variation-settings: "FILL" 1;'>meeting_room</span>
+                    </div>
+                    <div class="mt-auto">
+                        <h3 class="font-headline-xl text-headline-xl text-on-surface leading-none mb-2">42</h3>
+                        <p class="font-body-sm text-body-sm text-on-surface-variant">Lớp học đang mở</p>
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-12 gap-8">
+                <!-- Main Chart Area -->
+                <div
+                    class="col-span-12 md:col-span-8 bg-[#ffffff] card-border ambient-shadow min-h-[360px] flex flex-col rounded-[32px] p-8 hover:-translate-y-1 hover:shadow-xl transition-all duration-300">
+                    <div class="flex justify-between items-center mb-8">
+                        <h3 class="font-headline-md text-headline-md text-on-surface">Tiến độ học tập hàng tuần</h3>
+                        <button
+                            class="text-primary hover:bg-surface-container-low px-4 py-2 transition-all font-label-md text-label-md rounded-xl hover:scale-105 hover:brightness-110 active:scale-95 duration-300">Chi
+                            tiết</button>
+                    </div>
+                    <!-- Placeholder for Chart -->
+                    <div
+                        class="flex-1 bg-surface-bright rounded-2xl border border-outline-variant/30 flex items-end justify-between p-6 gap-4">
+                        <!-- Simulated bar chart -->
+                        <div
+                            class="w-full bg-primary/20 rounded-t-md h-[40%] relative group cursor-pointer hover:bg-primary/40 transition-colors">
+                            <div
+                                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-on-surface text-surface text-xs px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                                T2</div>
+                        </div>
+                        <div
+                            class="w-full bg-primary/60 rounded-t-md h-[60%] relative group cursor-pointer hover:bg-primary/80 transition-colors">
+                            <div
+                                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-on-surface text-surface text-xs px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                                T3</div>
+                        </div>
+                        <div
+                            class="w-full bg-primary rounded-t-md h-[85%] relative group cursor-pointer hover:bg-primary-container transition-colors">
+                            <div
+                                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-on-surface text-surface text-xs px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                                T4</div>
+                        </div>
+                        <div
+                            class="w-full bg-primary/40 rounded-t-md h-[50%] relative group cursor-pointer hover:bg-primary/60 transition-colors">
+                            <div
+                                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-on-surface text-surface text-xs px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                                T5</div>
+                        </div>
+                        <div
+                            class="w-full bg-primary/70 rounded-t-md h-[75%] relative group cursor-pointer hover:bg-primary/90 transition-colors">
+                            <div
+                                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-on-surface text-surface text-xs px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                                T6</div>
+                        </div>
+                        <div
+                            class="w-full bg-primary/30 rounded-t-md h-[30%] relative group cursor-pointer hover:bg-primary/50 transition-colors">
+                            <div
+                                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-on-surface text-surface text-xs px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                                T7</div>
+                        </div>
+                        <div
+                            class="w-full bg-primary/10 rounded-t-md h-[15%] relative group cursor-pointer hover:bg-primary/30 transition-colors">
+                            <div
+                                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-on-surface text-surface text-xs px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                                CN</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Recent Activities -->
+                <div
+                    class="col-span-12 md:col-span-4 bg-[#ffffff] card-border ambient-shadow flex flex-col rounded-[32px] p-8 hover:-translate-y-1 hover:shadow-xl transition-all duration-300">
+                    <h3 class="font-headline-md text-headline-md text-on-surface mb-6">Hoạt động gần đây</h3>
+                    <div class="flex-1 overflow-y-auto pr-2">
+                        <ul class="flex flex-col gap-6">
+                            <li
+                                class="flex gap-4 items-start hover:bg-surface-container-low p-2 -m-2 rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-md cursor-pointer">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary flex-shrink-0 hover:scale-105 hover:brightness-110 active:scale-95 transition-all duration-300">
+                                    <span class="material-symbols-outlined text-base"
+                                        data-icon="assignment">assignment</span>
+                                </div>
+                                <div>
+                                    <p class="font-body-md text-body-md font-semibold text-on-surface">Bài tập mới: Toán
+                                        Cao Cấp</p>
+                                    <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Lớp 12A1 • Thầy
+                                        Nguyễn Văn A</p>
+                                    <span class="font-body-sm text-body-sm text-outline text-xs mt-1 block">10 phút
+                                        trước</span>
+                                </div>
+                            </li>
+                            <li
+                                class="flex gap-4 items-start hover:bg-surface-container-low p-2 -m-2 rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-md cursor-pointer">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-error-container flex items-center justify-center text-on-error-container flex-shrink-0 hover:scale-105 hover:brightness-110 active:scale-95 transition-all duration-300">
+                                    <span class="material-symbols-outlined text-base"
+                                        data-icon="campaign">campaign</span>
+                                </div>
+                                <div>
+                                    <p class="font-body-md text-body-md font-semibold text-on-surface">Thông báo: Họp
+                                        phụ huynh</p>
+                                    <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Toàn trường • Ban
+                                        Giám Hiệu</p>
+                                    <span class="font-body-sm text-body-sm text-outline text-xs mt-1 block">1 giờ
+                                        trước</span>
+                                </div>
+                            </li>
+                            <li
+                                class="flex gap-4 items-start hover:bg-surface-container-low p-2 -m-2 rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-md cursor-pointer">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary flex-shrink-0 hover:scale-105 hover:brightness-110 active:scale-95 transition-all duration-300">
+                                    <span class="material-symbols-outlined text-base"
+                                        data-icon="event_available">event_available</span>
+                                </div>
+                                <div>
+                                    <p class="font-body-md text-body-md font-semibold text-on-surface">Cập nhật sĩ số
+                                    </p>
+                                    <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Khối 10 &amp; 11
+                                    </p>
+                                    <span class="font-body-sm text-body-sm text-outline text-xs mt-1 block">3 giờ
+                                        trước</span>
+                                </div>
+                            </li>
+                            <li
+                                class="flex gap-4 items-start hover:bg-surface-container-low p-2 -m-2 rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-md cursor-pointer">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary flex-shrink-0 hover:scale-105 hover:brightness-110 active:scale-95 transition-all duration-300">
+                                    <span class="material-symbols-outlined text-base"
+                                        data-icon="person_add">person_add</span>
+                                </div>
+                                <div>
+                                    <p class="font-body-md text-body-md font-semibold text-on-surface">Học sinh mới nhập
+                                        học</p>
+                                    <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Lớp 10B2 • Trần
+                                        Thị B</p>
+                                    <span class="font-body-sm text-body-sm text-outline text-xs mt-1 block">Hôm
+                                        qua</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="Overview.js"></script>
+</body>
+
+</html>

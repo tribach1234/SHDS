@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+
+<html lang="vi" style="">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduAdmin - Quản lý lớp học</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link rel="stylesheet" href="StudentAdmin.css">
+</head>
+
+<body class="bg-[#e8fff0] text-on-background font-body-md text-body-md min-h-screen flex antialiased">
+    <!-- SideNavBar -->
+    <nav class="fixed left-0 top-0 h-full w-[280px] flex flex-col bg-[#c1ecd4] hidden md:flex z-20 rounded-[32px] m-4 shadow-sm"
+        style="height: calc(100% - 32px);">
+        <div class="flex items-center gap-3 p-6 mb-4">
+            <h1 class="font-headline-md text-headline-md font-bold text-primary flex items-center gap-2">
+                <span class="text-secondary text-2xl font-black">eco</span>
+                <span class="text-on-surface">EduAdmin</span>
+            </h1>
+        </div>
+        <div class="px-6 mb-4">
+            <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-xs">Quản trị hệ
+                thống</p>
+        </div>
+        <div class="flex-1 flex flex-col mt-2">
+            <!-- Inactive -->
+            <a class="flex items-center gap-4 text-on-surface px-6 py-3 transition-all duration-300 hover:pl-8 hover:bg-white/50"
+                href="#">
+                <span class="material-symbols-outlined text-outline" data-icon="dashboard">dashboard</span>
+                <span class="font-body-md text-body-md">Tổng quan</span>
+            </a>
+            <!-- Inactive -->
+            <a class="flex items-center gap-4 text-on-surface px-6 py-3 transition-all duration-300 hover:pl-8 hover:bg-white/50"
+                href="#">
+                <span class="material-symbols-outlined text-outline" data-icon="group">group</span>
+                <span class="font-body-md text-body-md">Quản lý giáo viên</span>
+            </a>
+            <!-- Inactive -->
+            <a class="flex items-center gap-4 text-on-surface px-6 py-3 transition-all duration-300 hover:pl-8 hover:bg-white/50"
+                href="#">
+                <span class="material-symbols-outlined text-outline" data-icon="book">book</span>
+                <span class="font-body-md text-body-md">Quản lý bài tập</span>
+            </a>
+            <!-- Active -->
+            <a class="flex items-center gap-4 bg-white text-primary px-6 py-3 rounded-r-full mr-4 shadow-sm transition-all duration-300 hover:pl-8 hover:bg-white/80"
+                href="#">
+                <span class="material-symbols-outlined text-primary" data-icon="school">school</span>
+                <span class="font-body-md text-body-md font-bold">Lớp học</span>
+            </a>
+            <!-- Inactive -->
+            <!-- Inactive -->
+            <a class="flex items-center gap-4 text-on-surface px-6 py-3 transition-all duration-300 hover:pl-8 hover:bg-white/50"
+                href="#">
+                <span class="material-symbols-outlined text-outline" data-icon="settings">settings</span>
+                <span class="font-body-md text-body-md">Cài đặt</span>
+            </a>
+        </div>
+        <div class="mt-auto mb-4">
+            <div class="flex flex-col gap-1"><a
+                    class="flex items-center gap-4 text-on-surface px-6 py-3 transition-all duration-300 hover:pl-8 hover:bg-white/50"
+                    href="#"><span class="material-symbols-outlined text-outline">help</span><span
+                        class="font-body-md text-body-md">Trợ giúp</span></a><a
+                    class="flex items-center gap-4 text-error px-6 py-3 transition-all duration-300 hover:pl-8 hover:bg-error/10 hover:bg-white/50"
+                    href="#"><span class="material-symbols-outlined text-error">logout</span><span
+                        class="font-body-md text-body-md">Đăng xuất</span></a></div>
+        </div>
+    </nav>
+    <!-- Main Wrapper -->
+    <div class="flex-1 flex flex-col min-w-0 md:ml-[280px]">
+        <!-- Main Content -->
+        <main class="flex-1 p-8 flex flex-col max-w-7xl mx-auto w-full">
+            <!-- Page Header -->
+            <header class="flex items-start justify-between mb-8 w-full">
+                <div>
+                    <h2 class="font-headline-xl text-[32px] leading-tight font-bold text-on-surface tracking-tight">Quản
+                        lý lớp học</h2>
+                    <p class="font-body-lg text-body-lg text-on-surface-variant mt-2">Tổng quan và quản lý thông tin các
+                        lớp học trong toàn trường.</p>
+                </div>
+                <div
+                    class="flex items-center gap-3 bg-white rounded-full p-2 pr-4 shadow-sm border border-outline-variant/30">
+                    <div
+                        class="w-10 h-10 rounded-full bg-[#8cf9a4] flex items-center justify-center text-[#005224] font-bold text-sm">
+                        GV
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-label-md text-sm text-on-surface font-bold leading-tight">Quản trị viên hệ
+                            thống</span>
+                        <span class="font-body-sm text-xs text-on-surface-variant leading-tight">Hệ thống quản lý</span>
+                    </div>
+                </div>
+            </header>
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 w-full">
+                <div
+                    class="bg-[#8cf9a4] rounded-[32px] p-6 flex flex-col justify-between h-[140px] shadow-sm border border-outline-variant/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                    <div class="w-10 h-10 rounded-xl bg-white/40 flex items-center justify-center text-[#005224]">
+                        <span class="material-symbols-outlined">class</span>
+                    </div>
+                    <div>
+                        <h3 class="font-headline-xl text-[36px] font-bold text-[#00210b] leading-none mb-1">36</h3>
+                        <p class="font-body-sm text-sm text-[#005224]">Tổng số lớp toàn trường</p>
+                    </div>
+                </div>
+                <div
+                    class="bg-white rounded-[32px] p-6 border border-outline-variant/20 flex flex-col justify-between h-[140px] shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                    <div
+                        class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-on-surface">
+                        <span class="material-symbols-outlined">group</span>
+                    </div>
+                    <div>
+                        <h3 class="font-headline-xl text-[36px] font-bold text-on-surface leading-none mb-1">1,452</h3>
+                        <p class="font-body-sm text-sm text-on-surface-variant">Tổng số học sinh</p>
+                    </div>
+                </div>
+                <div
+                    class="bg-white rounded-[32px] p-6 border border-outline-variant/20 flex flex-col justify-between h-[140px] shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                    <div
+                        class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-on-surface">
+                        <span class="material-symbols-outlined">analytics</span>
+                    </div>
+                    <div>
+                        <h3 class="font-headline-xl text-[36px] font-bold text-on-surface leading-none mb-1">40.3</h3>
+                        <p class="font-body-sm text-sm text-on-surface-variant">Sĩ số trung bình</p>
+                    </div>
+                </div>
+                <div
+                    class="bg-white rounded-[32px] p-6 border border-outline-variant/20 flex flex-col justify-between h-[140px] shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                    <div
+                        class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-on-surface">
+                        <span class="material-symbols-outlined">school</span>
+                    </div>
+                    <div>
+                        <h3 class="font-headline-xl text-[36px] font-bold text-on-surface leading-none mb-1">42</h3>
+                        <p class="font-body-sm text-sm text-on-surface-variant">Giáo viên đang hoạt động</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Main Content Area -->
+            <div
+                class="bg-white rounded-[32px] p-6 border border-outline-variant/20 w-full flex-1 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                <!-- Toolbar -->
+                <div class="flex flex-col md:flex-row gap-6 items-center justify-between mb-6">
+                    <div class="flex gap-6 items-center flex-1 w-full">
+                        <div
+                            class="relative w-full max-w-md shadow-sm transition-all duration-300 hover:scale-105 active:scale-95">
+                            <span
+                                class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+                            <input
+                                class="w-full bg-[#f0f4f8] border-none rounded-2xl pl-12 pr-4 py-3 text-body-md focus:ring-2 focus:ring-primary/50 text-on-surface placeholder-on-surface-variant/70 outline-none"
+                                placeholder="Tìm kiếm tên lớp, giáo viên hoặc mô tả..." type="text" />
+                        </div>
+                        <div
+                            class="relative min-w-[140px] shadow-sm transition-all duration-300 hover:scale-105 active:scale-95">
+                            <select
+                                class="w-full bg-[#f0f4f8] border-none rounded-2xl py-3 px-4 pr-10 text-body-md focus:ring-2 focus:ring-primary/50 text-on-surface appearance-none cursor-pointer outline-none">
+                                <option value="all">Tất cả khối</option>
+                            </select>
+                            <span
+                                class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+                        </div>
+                        <div
+                            class="relative min-w-[160px] shadow-sm transition-all duration-300 hover:scale-105 active:scale-95">
+                            <select
+                                class="w-full bg-[#f0f4f8] border-none rounded-2xl py-3 px-4 pr-10 text-body-md focus:ring-2 focus:ring-primary/50 text-on-surface appearance-none cursor-pointer outline-none">
+                                <option value="all">Tất cả trạng thái</option>
+                            </select>
+                            <span
+                                class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+                        </div>
+                    </div>
+                    <button
+                        class="bg-primary text-on-primary px-5 py-3 rounded-2xl font-label-md text-sm font-bold flex items-center gap-2 shadow-sm whitespace-nowrap transition-all duration-300 hover:scale-105 active:scale-95 hover:brightness-110">
+                        <span class="material-symbols-outlined text-[20px]">add</span>
+                        Thêm lớp mới
+                    </button>
+                </div>
+                <div class="flex justify-between items-center mb-4 px-2">
+                    <h3 class="font-label-md text-sm font-bold text-on-surface">Danh sách lớp học</h3>
+                    <span class="font-body-sm text-sm text-on-surface-variant">36 lớp</span>
+                </div>
+                <!-- Class List -->
+                <div class="flex flex-col gap-6">
+                    <!-- Item 1 -->
+                    <div
+                        class="border border-error/30 rounded-[32px] p-5 flex items-start gap-4 relative overflow-hidden bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:bg-surface-container-low hover:shadow-xl">
+                        <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-error"></div>
+                        <div
+                            class="w-12 h-12 rounded-xl bg-error/10 flex items-center justify-center text-error shrink-0">
+                            <span class="material-symbols-outlined">warning</span>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-2">
+                                <h4 class="font-headline-md text-lg font-bold text-on-surface">10A1</h4>
+                                <span
+                                    class="bg-error/10 text-error px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wide">Cần
+                                    chú ý</span>
+                            </div>
+                            <div
+                                class="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-on-surface-variant mb-2">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-[18px]">person</span>
+                                    <span class="font-bold text-on-surface">GV. Nguyễn Văn A</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-[18px]">meeting_room</span>
+                                    <span class="">Phòng 101</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-[18px]">group</span>
+                                    <span class="">Khối 10</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-[18px]">analytics</span>
+                                    <span class="">Sĩ số: 42/45</span>
+                                </div>
+                            </div>
+                            <p class="text-sm text-on-surface-variant">Lớp đang có thay đổi giáo viên chủ nhiệm, cần cập
+                                nhật thông tin.</p>
+                        </div>
+                    </div>
+                    <!-- Item 2 -->
+                    <div
+                        class="border border-outline-variant/30 rounded-[32px] p-5 flex items-start gap-4 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:bg-surface-container-low hover:shadow-xl">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-[#c1ecd4] flex items-center justify-center text-primary shrink-0">
+                            <span class="material-symbols-outlined">class</span>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-2">
+                                <h4 class="font-headline-md text-lg font-bold text-on-surface">11B2</h4>
+                                <span
+                                    class="bg-[#8cf9a4]/40 text-[#005224] px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wide">Đang
+                                    hoạt động</span>
+                            </div>
+                            <div
+                                class="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-on-surface-variant mb-2">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-[18px]">person</span>
+                                    <span class="font-bold text-on-surface">GV. Trần Thị Bích</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-[18px]">meeting_room</span>
+                                    <span class="">Phòng 204</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-[18px]">group</span>
+                                    <span class="">Khối 11</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 text-primary">
+                                    <span class="material-symbols-outlined text-[18px]">analytics</span>
+                                    <span class="">Sĩ số: 38/40</span>
+                                </div>
+                            </div>
+                            <p class="text-sm text-on-surface-variant">Lớp học tiêu chuẩn, hoạt động bình thường.</p>
+                        </div>
+                    </div>
+                    <!-- Item 3 -->
+                    <div
+                        class="border border-outline-variant/30 rounded-[32px] p-5 flex items-start gap-4 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:bg-surface-container-low hover:shadow-xl">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-[#f0f4f8] flex items-center justify-center text-on-surface-variant shrink-0">
+                            <span class="material-symbols-outlined">class</span>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-2">
+                                <h4 class="font-headline-md text-lg font-bold text-on-surface">12C1</h4>
+                                <span
+                                    class="bg-[#f0f4f8] text-on-surface-variant px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wide">Tạm
+                                    ngưng</span>
+                            </div>
+                            <div
+                                class="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-on-surface-variant mb-2">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-[18px]">person</span>
+                                    <span class="font-bold text-on-surface">GV. Lê Văn Cường</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-[18px]">meeting_room</span>
+                                    <span class="">Phòng 302</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-[18px]">group</span>
+                                    <span class="">Khối 12</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-[18px]">analytics</span>
+                                    <span class="">Sĩ số: 45/45</span>
+                                </div>
+                            </div>
+                            <p class="text-sm text-on-surface-variant">Lớp học tạm ngưng hoạt động do lịch thi.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <script src="StudentAdmin.js"></script>
+    </div>
+</body>
+
+</html>

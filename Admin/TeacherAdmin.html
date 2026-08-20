@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi" style="">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduAdmin - Quản lý giáo viên</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link rel="stylesheet" href="TeacherAdmin.css">
+</head>
+
+<body
+    class="bg-surface-container-lowest text-on-background font-body-md h-screen w-screen flex overflow-hidden p-6 gap-6">
+    <!-- Sidebar from IMAGE_18 -->
+    <aside
+        class="w-[280px] h-full bg-surface-container-low flex flex-col border border-outline-variant/30 flex-shrink-0 z-20 rounded-3xl">
+        <div class="p-8 flex items-center gap-2">
+            <span class="text-primary font-bold text-2xl tracking-tight">eco</span>
+            <span class="text-on-surface font-semibold text-xl">EduAdmin</span>
+        </div>
+        <div class="px-8 pb-4">
+            <p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">QUẢN TRỊ HỆ THỐNG</p>
+        </div>
+        <nav class="flex-1 px-4 space-y-2">
+            <a class="flex items-center gap-3 px-4 py-3 rounded-2xl text-on-surface-variant transition-all duration-300 hover:bg-white/50 hover:pl-5"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                <span class="font-medium text-sm">Tổng quan</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-surface-container-lowest text-on-surface font-medium text-sm shadow-sm transition-all duration-300 hover:bg-white/50 hover:pl-5"
+                href="#">
+                <span class="material-symbols-outlined text-primary" data-icon="group">group</span>
+                <span class="">Quản lý giáo viên</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-2xl text-on-surface-variant transition-all duration-300 hover:bg-white/50 hover:pl-5"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="school">school</span>
+                <span class="font-medium text-sm">Lớp học</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-2xl text-on-surface-variant transition-all duration-300 hover:bg-white/50 hover:pl-5"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="settings">settings</span>
+                <span class="font-medium text-sm">Cài đặt</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-2xl text-on-surface-variant transition-all duration-300 hover:bg-white/50 hover:pl-5"
+                href="#"><span class="material-symbols-outlined" data-icon="help">help</span><span
+                    class="font-medium text-sm">Trợ giúp</span></a><a
+                class="flex items-center gap-3 px-4 py-3 rounded-2xl text-error transition-all duration-300 hover:bg-white/50 hover:pl-5"
+                href="#"><span class="material-symbols-outlined" data-icon="logout">logout</span><span
+                    class="font-medium text-sm">Đăng xuất</span></a>
+        </nav>
+    </aside>
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-surface-container-lowest rounded-3xl">
+        <!-- Top Header -->
+        <header class="h-24 flex items-center justify-end flex-shrink-0">
+            <div
+                class="flex items-center gap-3 bg-surface-container-lowest pl-3 pr-4 py-2 rounded-full shadow-md border border-outline-variant/30">
+                <div
+                    class="w-8 h-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-sm">
+                    GV
+                </div>
+                <div>
+                    <p class="text-sm font-bold text-on-surface leading-tight">Quản trị viên hệ thống</p>
+                    <p class="text-[11px] text-on-surface-variant">Hệ thống quản lý</p>
+                </div>
+            </div>
+        </header>
+        <!-- Main Scrollable Area -->
+        <main class="flex-1 overflow-y-auto pb-10">
+            <!-- Page Title & Description -->
+            <div class="mb-8">
+                <h1 class="text-4xl font-bold text-on-surface tracking-tight mb-2">Quản lý giáo viên</h1>
+                <p class="text-base text-on-surface-variant">Quản lý danh sách, chuyên môn và trạng thái công tác của
+                    giáo viên toàn trường.</p>
+            </div>
+            <!-- Stats Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <!-- Card 1 (Active style) -->
+                <div
+                    class="bg-primary rounded-[32px] p-6 relative overflow-hidden text-on-primary shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                    <div
+                        class="w-10 h-10 bg-surface-container-lowest/20 rounded-2xl flex items-center justify-center mb-6">
+                        <span class="material-symbols-outlined text-on-primary" data-icon="group">group</span>
+                    </div>
+                    <h3 class="text-4xl font-bold mb-1">45</h3>
+                    <p class="text-sm opacity-90">Tổng số giáo viên toàn trường</p>
+                </div>
+                <!-- Card 2 -->
+                <div
+                    class="bg-surface-container-lowest rounded-[32px] p-6 shadow-md border border-outline-variant/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                    <div class="w-10 h-10 bg-surface-container-low rounded-2xl flex items-center justify-center mb-6">
+                        <span class="material-symbols-outlined text-primary"
+                            data-icon="person_check">person_check</span>
+                    </div>
+                    <h3 class="text-4xl font-bold text-on-surface mb-1">42</h3>
+                    <p class="text-sm text-on-surface-variant">Giáo viên đang công tác</p>
+                </div>
+                <!-- Card 3 -->
+                <div
+                    class="bg-surface-container-lowest rounded-[32px] p-6 shadow-md border border-outline-variant/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                    <div class="w-10 h-10 bg-surface-container-low rounded-2xl flex items-center justify-center mb-6">
+                        <span class="material-symbols-outlined text-primary" data-icon="school">school</span>
+                    </div>
+                    <h3 class="text-4xl font-bold text-on-surface mb-1">15</h3>
+                    <p class="text-sm text-on-surface-variant">Tổ bộ môn</p>
+                </div>
+                <!-- Card 4 -->
+                <div
+                    class="bg-surface-container-lowest rounded-[32px] p-6 shadow-md border border-outline-variant/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                    <div class="w-10 h-10 bg-surface-container-low rounded-2xl flex items-center justify-center mb-6">
+                        <span class="material-symbols-outlined text-primary" data-icon="trending_up">trending_up</span>
+                    </div>
+                    <h3 class="text-4xl font-bold text-on-surface mb-1">98%</h3>
+                    <p class="text-sm text-on-surface-variant">Tỷ lệ hoàn thành nhiệm vụ</p>
+                </div>
+            </div>
+            <!-- Filter Bar -->
+            <div
+                class="bg-surface-container-lowest rounded-[32px] p-6 shadow-md border border-outline-variant/20 flex flex-wrap items-center gap-6 mb-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                <div class="flex-1 relative min-w-[200px]">
+                    <span
+                        class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant"
+                        data-icon="search">search</span>
+                    <input
+                        class="w-full pl-12 pr-4 py-3 bg-surface-container-low rounded-2xl border-none text-sm text-on-surface placeholder:text-on-surface-variant/70 focus:ring-2 focus:ring-primary transition-all duration-300 hover:scale-105 active:scale-95"
+                        placeholder="Tìm theo tên giáo viên, tổ bộ môn..." type="text" />
+                </div>
+                <div class="relative">
+                    <select
+                        class="appearance-none pl-4 pr-10 py-3 bg-surface-container-low rounded-2xl border-none text-sm text-on-surface focus:ring-2 focus:ring-primary cursor-pointer hover:scale-105 active:scale-95 transition-all duration-300">
+                        <option>Tất cả tổ bộ môn</option>
+                        <option>Toán - Tin</option>
+                        <option>Ngữ văn</option>
+                    </select>
+                    <span
+                        class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none"
+                        data-icon="expand_more">expand_more</span>
+                </div>
+                <div class="relative">
+                    <select
+                        class="appearance-none pl-4 pr-10 py-3 bg-surface-container-low rounded-2xl border-none text-sm text-on-surface focus:ring-2 focus:ring-primary cursor-pointer hover:scale-105 active:scale-95 transition-all duration-300">
+                        <option>Tất cả trạng thái</option>
+                        <option>Đang dạy</option>
+                        <option>Nghỉ phép</option>
+                    </select>
+                    <span
+                        class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none"
+                        data-icon="expand_more">expand_more</span>
+                </div>
+                <button
+                    class="flex items-center gap-2 bg-primary text-on-primary px-6 py-3 rounded-2xl font-medium text-sm hover:bg-primary/90 transition-colors shadow-sm hover:scale-105 active:scale-95 transition-all duration-300 hover:brightness-110">
+                    <span class="material-symbols-outlined text-lg" data-icon="add">add</span>
+                    Thêm mới
+                </button>
+            </div>
+            <!-- List Container -->
+            <div
+                class="bg-surface-container-lowest rounded-[32px] p-8 shadow-md border border-outline-variant/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                <div class="flex items-center justify-between mb-6 px-2">
+                    <h3 class="text-base font-bold text-on-surface">Danh sách giáo viên</h3>
+                    <span class="text-sm text-on-surface-variant">45 giáo viên</span>
+                </div>
+                <!-- List Items -->
+                <div class="space-y-6">
+                    <!-- Item 1 -->
+                    <div
+                        class="border border-outline-variant/30 rounded-3xl p-6 flex flex-col sm:flex-row sm:items-center gap-6 transition-colors shadow-md bg-surface-container-lowest transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:bg-surface-container-low">
+                        <div class="w-14 h-14 rounded-2xl bg-surface-container overflow-hidden flex-shrink-0">
+                            <img alt="Avatar" class="w-full h-full object-cover"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdAAMcIpN4VpusC9ny9GMWnK4C6K953M2FnzG2vJYlxW90yoGeCcRJdnZ4MPHXMqtNcpjR1I4l3CtzexGO3dWquzQ4qfdCApwwbjwf60Rqfp5MecOzgUK5GrZKZqXGpTPJUEfMlwLTQQ391aRF4I4HoH33_GP54f4mD_Zu5vq2ZyLFlvgf2zOBq-mnP-J6t9rMQHDh6j9IugrsL3A70ReBt6cKQs-CLUYHb34ltrTGGxOOXTABJbA" />
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-2">
+                                <h4 class="font-bold text-on-surface text-lg">Nguyễn Thị Lan Anh</h4>
+                                <span
+                                    class="px-3 py-1 rounded-lg text-[11px] font-bold bg-primary/10 text-primary uppercase tracking-wide">Đang
+                                    dạy</span>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-6 text-sm text-on-surface-variant">
+                                <span class="flex items-center gap-1.5"><span
+                                        class="material-symbols-outlined text-[18px]" data-icon="badge">badge</span>
+                                    GV001</span>
+                                <span class="flex items-center gap-1.5"><span
+                                        class="material-symbols-outlined text-[18px]" data-icon="book">book</span> Toán
+                                    học</span>
+                                <span class="flex items-center gap-1.5"><span
+                                        class="material-symbols-outlined text-[18px]"
+                                        data-icon="account_balance">account_balance</span> Tổ Toán - Tin</span>
+                                <span class="flex items-center gap-1.5"><span
+                                        class="material-symbols-outlined text-[18px]" data-icon="class">class</span>
+                                    10A1, 11A2</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button
+                                class="p-3 text-on-surface-variant hover:text-primary rounded-xl hover:bg-surface-container-highest transition-colors hover:scale-110 active:scale-90 transition-transform">
+                                <span class="material-symbols-outlined text-xl" data-icon="edit">edit</span>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Item 2 -->
+                    <div
+                        class="border border-error/30 rounded-3xl p-6 flex flex-col sm:flex-row sm:items-center gap-6 transition-colors bg-surface-container-lowest relative overflow-hidden shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:bg-surface-container-low hover:border-error/50">
+                        <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-error"></div>
+                        <div class="w-14 h-14 rounded-2xl bg-surface-container overflow-hidden flex-shrink-0">
+                            <img alt="Avatar" class="w-full h-full object-cover"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCeGBiNMduEQiYcuwo1B4rAY5TfZQPhIRwxMPc252Kl-ShXhZneyL8URgiXeR26Emx4srZFQNQsjjUyNMkxTAfu7Nu7A-b2cei3ybtKg7CFvG2wqUszEl6fNu0WjicP6CwInC9dYW8cFnngAcgEyMRlnJo6QVTczFQyt5GXCRc-Ov_qv5mYhROMcMRmA41lycNlpeBUgQs2pYFXbYLmbjauCuLbj6ecB2KPOCIXcPbl0qH4JwKLJzk" />
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-2">
+                                <h4 class="font-bold text-on-surface text-lg">Trần Văn Hùng</h4>
+                                <span
+                                    class="px-3 py-1 rounded-lg text-[11px] font-bold bg-error/10 text-error uppercase tracking-wide">Nghỉ
+                                    phép</span>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-6 text-sm text-on-surface-variant">
+                                <span class="flex items-center gap-1.5"><span
+                                        class="material-symbols-outlined text-[18px]" data-icon="badge">badge</span>
+                                    GV002</span>
+                                <span class="flex items-center gap-1.5"><span
+                                        class="material-symbols-outlined text-[18px]" data-icon="book">book</span> Vật
+                                    lý</span>
+                                <span class="flex items-center gap-1.5"><span
+                                        class="material-symbols-outlined text-[18px]"
+                                        data-icon="account_balance">account_balance</span> Tổ KHTN</span>
+                                <span class="flex items-center gap-1.5"><span
+                                        class="material-symbols-outlined text-[18px]" data-icon="class">class</span>
+                                    12A1 (CN)</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button
+                                class="p-3 text-on-surface-variant hover:text-primary rounded-xl hover:bg-surface-container-highest transition-colors hover:scale-110 active:scale-90 transition-transform">
+                                <span class="material-symbols-outlined text-xl" data-icon="edit">edit</span>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Item 3 -->
+                    <div
+                        class="border border-outline-variant/30 rounded-3xl p-6 flex flex-col sm:flex-row sm:items-center gap-6 transition-colors shadow-md bg-surface-container-lowest transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:bg-surface-container-low hover:border-primary/30">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-surface-container-highest text-primary flex items-center justify-center font-bold flex-shrink-0 text-lg">
+                            LP
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-2">
+                                <h4 class="font-bold text-on-surface text-lg">Lê Phương Phương</h4>
+                                <span
+                                    class="px-3 py-1 rounded-lg text-[11px] font-bold bg-primary/10 text-primary uppercase tracking-wide">Đang
+                                    dạy</span>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-6 text-sm text-on-surface-variant">
+                                <span class="flex items-center gap-1.5"><span
+                                        class="material-symbols-outlined text-[18px]" data-icon="badge">badge</span>
+                                    GV005</span>
+                                <span class="flex items-center gap-1.5"><span
+                                        class="material-symbols-outlined text-[18px]" data-icon="book">book</span> Tiếng
+                                    Anh</span>
+                                <span class="flex items-center gap-1.5"><span
+                                        class="material-symbols-outlined text-[18px]"
+                                        data-icon="account_balance">account_balance</span> Tổ Ngoại Ngữ</span>
+                                <span class="flex items-center gap-1.5"><span
+                                        class="material-symbols-outlined text-[18px]" data-icon="class">class</span>
+                                    10A2, 10A3, 11A4</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button
+                                class="p-3 text-on-surface-variant hover:text-primary rounded-xl hover:bg-surface-container-highest transition-colors hover:scale-110 active:scale-90 transition-transform">
+                                <span class="material-symbols-outlined text-xl" data-icon="edit">edit</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <script src="TeacherAdmin.js"></script>
+    </div>
+</body>
+
+</html>

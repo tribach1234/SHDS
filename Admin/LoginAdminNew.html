@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduAdmin - Đăng nhập</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#535f70",
+                        "inverse-primary": "#a8c7fa",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary": "#6b5778",
+                        "surface-dim": "#d7dae0",
+                        "on-primary-fixed-variant": "#004a77",
+                        "inverse-surface": "#2e3135",
+                        "secondary-container": "#d7e3f8",
+                        "on-secondary-container": "#101c2b",
+                        "on-background": "#191c20",
+                        "error-container": "#f9dedc",
+                        "outline": "#74777f",
+                        "on-primary-container": "#041e49",
+                        "inverse-on-surface": "#f0f0f4",
+                        "surface-container": "#eceef4",
+                        "error": "#b3261e",
+                        "primary-fixed-dim": "#a8c7fa",
+                        "on-error-container": "#410e0b",
+                        "primary": "#1a73e8",
+                        "on-tertiary-fixed-variant": "#523f5f",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed": "#001d35",
+                        "primary-fixed": "#d3e3fd",
+                        "on-surface-variant": "#44474f",
+                        "on-tertiary-fixed": "#251431",
+                        "tertiary-fixed-dim": "#d6bbee",
+                        "on-tertiary-container": "#251431",
+                        "on-primary": "#ffffff",
+                        "on-surface": "#191c20",
+                        "surface-container-highest": "#e1e2e8",
+                        "on-secondary-fixed": "#0f1c2b",
+                        "secondary-fixed": "#d7e3f8",
+                        "on-tertiary": "#ffffff",
+                        "surface-bright": "#f7f9ff",
+                        "surface-tint": "#1a73e8",
+                        "background": "#f7f9ff",
+                        "on-secondary": "#ffffff",
+                        "surface-variant": "#e0e2ec",
+                        "tertiary-container": "#f2daff",
+                        "on-secondary-fixed-variant": "#3b4758",
+                        "surface": "#f7f9ff",
+                        "primary-container": "#d3e3fd",
+                        "tertiary-fixed": "#f2daff",
+                        "secondary-fixed-dim": "#bbc7db",
+                        "outline-variant": "#c4c6d0",
+                        "surface-container-high": "#e6e8ee",
+                        "surface-container-low": "#f1f4fa"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "8px",
+                        "sidebar-width": "280px",
+                        "max-content-width": "1440px",
+                        "container-padding": "24px",
+                        "gutter": "20px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Plus Jakarta Sans"],
+                        "label-caps": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "headline-xl": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"],
+                        "headline-xl-mobile": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "800" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-xl": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-xl-mobile": ["26px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--ink);
+  font-family: Inter, sans-serif;
+
+   background:
+    radial-gradient(
+      circle at 8% 18%,
+      rgba(37, 99, 235, 0.25),
+      transparent 20rem
+    ),
+    radial-gradient(
+      circle at 96% 12%,
+      rgba(59, 130, 246, 0.30),
+      transparent 22rem
+    ),
+    linear-gradient(
+      135deg,
+      #eff6ff 0%,
+      #dbeafe 50%,
+      #bfdbfe 100%
+    );
+
+  overflow-x: hidden;
+}
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  width: 320px;
+  height: 520px;
+  opacity: 0.18;
+  filter: blur(1px);
+  pointer-events: none;
+
+  background:
+    radial-gradient(ellipse at 50% 10%, #2563eb 0 14%, transparent 15%),
+    radial-gradient(ellipse at 35% 27%, #3b82f6  0 12%, transparent 13%),
+    radial-gradient(ellipse at 63% 42%, #1d4ed8  0 13%, transparent 14%),
+    radial-gradient(ellipse at 38% 60%, #60a5fa  0 12%, transparent 13%),
+    radial-gradient(ellipse at 64% 78%, #1e40af  0 13%, transparent 14%),
+    linear-gradient(
+      90deg,
+      transparent 48%,
+      #3b82f6  49% 51%,
+      transparent 52%
+    );
+
+  transform: rotate(-17deg);
+}
+
+body::before {
+  left: -90px;
+  top: -30px;
+}
+
+body::after {
+  right: -110px;
+  bottom: -110px;
+  transform: rotate(166deg);
+}
+    </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center font-body-md text-on-surface antialiased p-4 sm:p-8">
+    <main class="w-full max-w-md">
+        <div
+            class="bg-surface-container-lowest rounded-[24px] p-[24px] sm:p-10 organic-shadow border border-surface-variant/50 relative overflow-hidden">
+            <div
+                class="absolute -top-12 -right-12 w-32 h-32 bg-secondary-container rounded-full mix-blend-multiply filter blur-xl opacity-50 pointer-events-none">
+            </div>
+            <div
+                class="absolute -bottom-8 -left-8 w-24 h-24 bg-primary-container rounded-full mix-blend-multiply filter blur-lg opacity-30 pointer-events-none">
+            </div>
+            <div class="relative z-10 flex flex-col items-center mb-8">
+                <div
+                    class="w-16 h-16 bg-primary-container rounded-[16px] flex items-center justify-center text-primary mb-4 shadow-sm">
+                    <span class="material-symbols-outlined text-4xl" data-weight="fill"
+                        style="font-variation-settings: 'FILL' 1;">eco</span>
+                </div>
+                <h1 class="font-headline-xl text-headline-xl text-on-surface mb-2 tracking-tight">EduAdmin</h1>
+                <p class="font-body-md text-body-md text-on-surface-variant text-center">Hệ thống quản lý học tập thân
+                    thiện &amp; hiệu quả.</p>
+            </div>
+            <form action="#" class="space-y-6 relative z-10" method="POST">
+                <div class="space-y-2">
+                    <label class="block font-label-sm text-label-sm text-on-surface-variant" for="email">Email hoặc Tên
+                        đăng nhập</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-outline">
+                            <span class="material-symbols-outlined text-lg">mail</span>
+                        </div>
+                        <input
+                            class="block w-full pl-10 pr-3 py-3 bg-surface-container-low border border-transparent rounded-[12px] text-on-surface font-body-md text-body-md focus:ring-1 focus:ring-primary focus:border-primary transition-colors placeholder-outline/50"
+                            id="email" name="email" placeholder="admin@edugreen.edu.vn" required="" type="email" />
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <label class="block font-label-sm text-label-sm text-on-surface-variant" for="password">Mật
+                            khẩu</label>
+                        <a class="font-label-sm text-label-sm text-primary hover:text-on-primary-container transition-colors"
+                            href="#">Quên mật khẩu?</a>
+                    </div>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-outline">
+                            <span class="material-symbols-outlined text-lg">lock</span>
+                        </div>
+                        <input
+                            class="block w-full pl-10 pr-10 py-3 bg-surface-container-low border border-transparent rounded-[12px] text-on-surface font-body-md text-body-md focus:ring-1 focus:ring-primary focus:border-primary transition-colors placeholder-outline/50"
+                            id="password" name="password" placeholder="••••••••" required="" type="password" />
+                        <button aria-label="Hiện mật khẩu"
+                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-outline hover:text-on-surface transition-colors"
+                            type="button">
+                            <span class="material-symbols-outlined text-lg">visibility</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <input
+                        class="h-4 w-4 text-primary focus:ring-primary border-outline-variant rounded-[4px] cursor-pointer"
+                        id="remember-me" name="remember-me" type="checkbox" />
+                    <label class="ml-2 block font-body-md text-body-md text-on-surface-variant cursor-pointer"
+                        for="remember-me">
+                        Ghi nhớ đăng nhập
+                    </label>
+                </div>
+                <button
+                    class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-[12px] shadow-sm text-on-primary bg-primary hover:bg-on-primary-container focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary font-label-sm text-label-sm transition-all duration-200 transform hover:scale-[1.01]"
+                    type="submit">
+                    <span class="material-symbols-outlined mr-2 text-sm"
+                        style="font-variation-settings: 'FILL' 1;">login</span>
+                    Đăng nhập
+                </button>
+            </form>
+            <div class="mt-8 text-center relative z-10">
+                <p class="font-label-sm text-label-sm text-outline">© 2026 EduGreen.Nội dung trên hệ thống được bảo vệ bởi bản quyền.</p>
+            </div>
+        </div>
+        <div class="mt-8 text-center">
+            <span
+                class="inline-flex items-center px-3 py-1 rounded-full bg-secondary-container/50 text-on-secondary-container font-label-caps text-label-caps backdrop-blur-sm" style="background-color: #ADC6FF;">
+                <span class="w-2 h-2 rounded-full bg-primary mr-2 animate-pulse"></span>
+                Hệ thống hoạt động bình thường
+            </span>
+        </div>
+    </main>
+</body>
+
+</html>
