@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: shds-backend
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    disk:
+      name: data-dir
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: DATA_DIR
+        value: /var/data
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: FRONTEND_URL
+        value: "https://your-frontend-app.vercel.app" # Change to your Vercel URL

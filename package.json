@@ -1,5 +1,41 @@
 {
+<<<<<<< HEAD
   "dependencies": {
     "dotenv": "^17.4.2"
   }
+=======
+  "name": "project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.local.js",
+    "local": "node server.local.js",
+    "seed": "node Seedteststudent.js",
+    "check": "node Checkdata.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^13.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "nodemailer": "^9.0.4",
+    "nodemon": "^3.1.14"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tribach1234/SHDS.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tribach1234/SHDS/issues"
+  },
+  "homepage": "https://github.com/tribach1234/SHDS#readme"
+>>>>>>> c04470f834667901cd494acf30176ef2b5d3d9a7
 }

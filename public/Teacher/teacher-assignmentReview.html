@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#b9dda0" />
+  <title>EduGreen - Xem bài nộp</title>
+  <link rel="stylesheet" href="teacher.css" />
+  <style>
+    /* Bổ sung CSS Modal Chấm bài & Mô phỏng */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .modal-content {
+      background: #fff;
+      padding: 24px;
+      border-radius: 16px;
+      width: 95%;
+      max-width: 1200px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+    .split-layout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      margin-top: 16px;
+    }
+    .split-left { flex: 0 0 360px; max-width: 100%; }
+    .split-right { flex: 1 1 600px; border-left: 1px solid #e2e8f0; padding-left: 24px; min-height: 400px; }
+    @media (max-width: 900px) {
+      .split-left { flex: 1 1 100%; }
+      .split-right { border-left: none; padding-left: 0; border-top: 1px solid #e2e8f0; padding-top: 20px; }
+    }
+  </style>
+</head>
+
+<body>
+  <svg aria-hidden="true" width="0" height="0" style="position:absolute">
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.8A2.8 2.8 0 0 0 4 20.8V5.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" /><path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20v3H6.5A2.5 2.5 0 0 1 4 18.5M8 7h8M8 11h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V10Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" /></symbol>
+    <symbol id="i-task" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.8" /><path d="m8 9 1.5 1.5L12 8M14 9h3M8 15h9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="1.8" /><path d="M3.5 20a5.5 5.5 0 0 1 11 0M16 5.3a3 3 0 0 1 0 5.4M16.5 14.7A5.5 5.5 0 0 1 20.5 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2" /><path d="m20 20-4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8" /><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2.7 20h18.6L12 3Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" /><path d="M12 9v5M12 17.3v.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" /></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.2 1.2M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.2-1.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </svg>
+
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Điều hướng chính">
+      <div class="brand">
+        <div class="brand-mark"><svg><use href="#i-book"></use></svg></div>
+        <span>EduGreen</span>
+      </div>
+
+      <div class="nav-label">Không gian giáo viên</div>
+      <nav class="nav">
+        <a class="nav-item" href="teacher-overview.html">
+          <svg><use href="#i-home"></use></svg>
+          <span>Tổng quan</span>
+        </a>
+        <a class="nav-item active" href="teacher-assignmentManage.html" aria-current="page">
+          <svg><use href="#i-task"></use></svg>
+          <span>Quản lý bài tập</span>
+        </a>
+        <a class="nav-item" href="teacher-phuckhao.html">
+          <svg><use href="#i-alert"></use></svg>
+          <span>Phúc khảo</span>
+        </a>
+        <a class="nav-item" href="#" onclick="comingSoon('Lớp học'); return false;">
+          <svg><use href="#i-users"></use></svg>
+          <span>Lớp học</span>
+        </a>
+        <a class="nav-item" href="#" onclick="comingSoon('Kết quả học tập'); return false;">
+          <svg><use href="#i-chart"></use></svg>
+          <span>Kết quả học tập</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-spacer"></div>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="heading-group">
+          <button class="mobile-menu" id="mobileMenuBtn" aria-label="Mở menu">
+            <svg><use href="#i-search"></use></svg>
+          </button>
+          <div class="page-heading">
+            <h1>Kiểm tra bài nộp</h1>
+            <p>Xem và chấm bài cho bài tập đã chọn.</p>
+          </div>
+        </div>
+
+        <div class="teacher-chip" aria-label="Tài khoản giáo viên">
+          <div class="avatar">GV</div>
+          <div class="teacher-text">
+            <strong>Giáo viên</strong>
+            <span>Teacher Workspace</span>
+          </div>
+          <button type="button" onclick="handleLogout()" style="margin-left:12px;background:transparent;border:1px solid #ccc;padding:4px 8px;border-radius:6px;cursor:pointer;font-size:12px;">Đăng xuất</button>
+        </div>
+      </header>
+
+      <section class="workspace">
+        <div class="list-header" style="margin-bottom:22px;">
+          <div>
+            <h2 id="assignmentTitle">Đang tải bài tập...</h2>
+            <p id="assignmentMeta" style="margin:6px 0 0 0;color:#55606c;font-size:14px;">Vui lòng đợi trong giây lát.</p>
+          </div>
+          <button class="btn btn-primary" id="refreshBtn" type="button">Làm mới</button>
+        </div>
+
+        <div class="assignment-detail-card" id="assignmentDetailCard" style="padding:20px;background:#fff;border:1px solid #e5e7eb;border-radius:18px;box-shadow:0 10px 24px rgba(16,24,40,0.06);margin-bottom:24px;">
+          <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;">
+            <div><strong>Lớp học:</strong> <span id="detailClass">—</span></div>
+            <div><strong>Điểm tối đa:</strong> <span id="detailPoints">—</span></div>
+            <div><strong>Hạn nộp:</strong> <span id="detailDeadline">—</span></div>
+            <div><strong>Trạng thái:</strong> <span id="detailStatus">—</span></div>
+          </div>
+          <p id="detailDescription" style="margin-top:16px;color:#334155;"></p>
+        </div>
+
+        <div class="list-header">
+          <h2>Danh sách bài nộp</h2>
+          <span class="result-count" id="submissionCount">0 nộp</span>
+        </div>
+
+        <div id="submissionList">
+          <p style="padding:16px;color:#888">Đang tải danh sách nộp bài...</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="../shared_auth.js"></script>
+  <script src="teacher-assignmentReview.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,153 @@
+/* teacher-grading.css — extends teacher.css for the grading page only */
+
+.assignment-card.graded {
+  border-left: 4px solid var(--success);
+}
+
+.assignment-card.pending {
+  border-left: 4px solid var(--warning);
+}
+
+.grading-modal {
+  width: min(920px, 100%);
+}
+
+.grading-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+}
+
+.submission-info {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 20px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #f7f8f7;
+}
+
+.info-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.info-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-soft);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.info-label svg {
+  width: 14px;
+  height: 14px;
+}
+
+.info-value {
+  font-size: 13px;
+  font-weight: 650;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.info-value a {
+  color: var(--green-700);
+  font-weight: 700;
+}
+
+.grading-form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 17px;
+}
+
+.grading-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.simulation-section {
+  border-top: 1px dashed var(--line);
+  padding-top: 16px;
+}
+
+.simulation-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.simulation-header h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.simulation-hint {
+  color: var(--ink-soft);
+  font-size: 11px;
+}
+
+.simulation-preview {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 14px;
+  background: #fbfbfa;
+  min-height: 80px;
+}
+
+.preview-label {
+  margin-bottom: 10px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--green-700);
+}
+
+.preview-empty,
+.preview-note {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.preview-note {
+  margin-top: 10px;
+}
+
+.preview-note a {
+  color: var(--green-700);
+  font-weight: 700;
+}
+
+.preview-frame {
+  width: 100%;
+  height: 402px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+}
+
+@media (max-width: 640px) {
+  .submission-info,
+  .grading-form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .preview-frame {
+    height: 320px;
+  }
+}

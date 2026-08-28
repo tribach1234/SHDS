@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#b9dda0" />
+  <title>EduGreen - Lớp học</title>
+  <link rel="stylesheet" href="teacher.css" />
+  <link rel="stylesheet" href="teacher-classroom.css" />
+</head>
+
+<body>
+  <svg aria-hidden="true" width="0" height="0" style="position:absolute">
+    <symbol id="i-book" viewBox="0 0 24 24">
+      <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.8A2.8 2.8 0 0 0 4 20.8V5.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+      <path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20v3H6.5A2.5 2.5 0 0 1 4 18.5M8 7h8M8 11h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+    </symbol>
+    <symbol id="i-home" viewBox="0 0 24 24">
+      <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V10Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+    </symbol>
+    <symbol id="i-task" viewBox="0 0 24 24">
+      <rect x="4" y="3" width="16" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.8" />
+      <path d="m8 9 1.5 1.5L12 8M14 9h3M8 15h9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+    </symbol>
+    <symbol id="i-users" viewBox="0 0 24 24">
+      <circle cx="9" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="1.8" />
+      <path d="M3.5 20a5.5 5.5 0 0 1 11 0M16 5.3a3 3 0 0 1 0 5.4M16.5 14.7A5.5 5.5 0 0 1 20.5 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+    </symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24">
+      <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+    </symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8" />
+      <path d="M19.4 15a1.8 1.8 0 0 0 .36 2l.06.06-2.12 2.12-.06-.06a1.8 1.8 0 0 0-2-.36 1.8 1.8 0 0 0-1.1 1.65V20.5h-3v-.09A1.8 1.8 0 0 0 10.4 18.8a1.8 1.8 0 0 0-2 .36l-.06.06-2.12-2.12.06-.06a1.8 1.8 0 0 0 .36-2A1.8 1.8 0 0 0 5 13.9H4.9v-3H5A1.8 1.8 0 0 0 6.6 9.8a1.8 1.8 0 0 0-.36-2l-.06-.06 2.12-2.12.06.06a1.8 1.8 0 0 0 2 .36A1.8 1.8 0 0 0 11.5 4.4V4.3h3v.1a1.8 1.8 0 0 0 1.1 1.64 1.8 1.8 0 0 0 2-.36l.06-.06 2.12 2.12-.06.06a1.8 1.8 0 0 0-.36 2A1.8 1.8 0 0 0 21 10.9h.1v3H21a1.8 1.8 0 0 0-1.6 1.1Z" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linejoin="round" />
+    </symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24">
+      <path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+    </symbol>
+    <symbol id="i-check" viewBox="0 0 24 24">
+      <path d="m5 12 4 4L19 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+    </symbol>
+    <symbol id="i-close" viewBox="0 0 24 24">
+      <path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+    </symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24">
+      <path d="M12 3 2.7 20h18.6L12 3Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+      <path d="M12 9v5M12 17.3v.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+    </symbol>
+    <symbol id="i-back" viewBox="0 0 24 24">
+      <path d="M19 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+    </symbol>
+  </svg>
+
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Điều hướng chính">
+      <div class="brand">
+        <div class="brand-mark"><svg><use href="#i-book"></use></svg></div>
+        <span>EduGreen</span>
+      </div>
+
+      <div class="nav-label">Không gian giáo viên</div>
+      <nav class="nav">
+        <a class="nav-item " href="teacher-overview.html" aria-current="page">
+          <svg><use href="#i-home"></use></svg>
+          <span>Tổng quan</span>
+        </a>
+        <a class="nav-item" href="teacher-assignmentManage.html">
+          <svg><use href="#i-task"></use></svg>
+          <span>Quản lý bài tập</span>
+        </a>
+        <a class="nav-item " href="teacher-phuckhao.html">
+          <svg><use href="#i-alert"></use></svg>
+          <span>Phúc khảo</span>
+        </a>
+        <a class="nav-item active" href="teacher-classroom.html">
+          <svg><use href="#i-users"></use></svg>
+          <span>Lớp học</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-spacer"></div>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="heading-group">
+          <button class="mobile-menu" id="mobileMenuBtn" aria-label="Mở menu">
+            <svg><use href="#i-menu"></use></svg>
+          </button>
+          <div class="page-heading">
+            <h1>Lớp học</h1>
+            <p>Xem sĩ số, điểm danh theo buổi học, và hồ sơ học sinh trong các lớp bạn đang dạy.</p>
+          </div>
+        </div>
+
+        <div class="teacher-chip" aria-label="Tài khoản giáo viên">
+          <div class="avatar">GV</div>
+          <div class="teacher-text">
+            <strong>Giáo viên</strong>
+            <span>Teacher Workspace</span>
+          </div>
+          <button type="button" onclick="handleLogout()" style="margin-left: 12px; background: transparent; border: 1px solid #ccc; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 12px;">
+            Đăng xuất
+          </button>
+        </div>
+      </header>
+
+      <!-- ===== VIEW 1: Danh sách lớp ===== -->
+      <section class="workspace" id="classListView">
+        <div class="list-header">
+          <h2>Các lớp bạn đang dạy</h2>
+          <span class="result-count" id="classCount">0 lớp</span>
+        </div>
+        <div class="class-grid" id="classGrid">
+          <p style="padding:16px;color:#888">Đang tải dữ liệu...</p>
+        </div>
+      </section>
+
+      <!-- ===== VIEW 2: Sĩ số + điểm danh của 1 lớp ===== -->
+      <section class="workspace" id="rosterView" style="display:none">
+        <div class="roster-toolbar">
+          <button class="btn btn-secondary" id="backToClassesBtn" type="button">
+            <svg><use href="#i-back"></use></svg>
+            <span>Quay lại</span>
+          </button>
+          <h2 id="rosterClassName" style="margin:0;flex:1">Lớp</h2>
+          <select class="control" id="sessionSelect" aria-label="Chọn buổi học"></select>
+          <button class="btn btn-primary" id="saveAttendanceBtn" type="button">
+            <svg><use href="#i-check"></use></svg>
+            <span>Lưu điểm danh</span>
+          </button>
+        </div>
+
+        <div class="roster-stats" id="rosterStats"></div>
+
+        <div class="list-header">
+          <h2>Danh sách học sinh</h2>
+          <span class="result-count" id="rosterCount">0 học sinh</span>
+        </div>
+
+        <div id="rosterList" class="roster-list"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ===== Modal: Hồ sơ học sinh ===== -->
+  <div class="modal-backdrop" id="profileModal" role="dialog" aria-modal="true">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-title-icon" id="profileAvatar">HS</div>
+          <div>
+            <h2 id="profileName">Học sinh</h2>
+            <p id="profileEmail">—</p>
+          </div>
+        </div>
+        <button class="close-btn" type="button" id="closeProfileBtn" aria-label="Đóng">
+          <svg><use href="#i-close"></use></svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="profile-stats" id="profileStats"></div>
+
+        <div class="list-header" style="padding-left:0;padding-right:0">
+          <h2>Bài tập / buổi học gần đây</h2>
+          <label class="hw-limit-label">
+            Hiển thị
+            <select class="control" id="hwLimitSelect">
+              <option value="5">5 bài</option>
+              <option value="10">10 bài</option>
+              <option value="20">20 bài</option>
+              <option value="200">Tất cả</option>
+            </select>
+          </label>
+        </div>
+
+        <div id="profileHomeworkList" class="assignment-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="../shared_auth.js"></script>
+  <script src="teacher-classroom.js"></script>
+</body>
+
+</html>
