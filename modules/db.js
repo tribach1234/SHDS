@@ -4,7 +4,11 @@ const path = require('path');
 const Database = require('better-sqlite3');
 
 const fs = require('fs');
-const dataDir = path.join(__dirname, '..', 'data');
+const dataDir = process.env.DATA_DIR || path.join(__dirname, '..', 'data');
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+}
+
 const classesDbPath = path.join(dataDir, 'classes.db');
 const phucKhaoDbPath = path.join(dataDir, 'phuckhao.db');
 const usersDbPath = path.join(dataDir, 'users.db');
